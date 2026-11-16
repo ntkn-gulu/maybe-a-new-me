@@ -60,6 +60,7 @@ const VI = {
     sfx_sparkle: 'Lấp lánh',
     sfx_whoosh: 'Vút',
     sfx_chime: 'Chuông',
+    haptic_test: 'Rung',
 
     // Flame tiers (index matches FLAME_TIERS in core)
     tier_0_name: 'Tinh Hỏa',
@@ -135,6 +136,7 @@ const EN: Record<StringKey, string> = {
     sfx_sparkle: 'Sparkle',
     sfx_whoosh: 'Whoosh',
     sfx_chime: 'Chime',
+    haptic_test: 'Haptic',
 
     tier_0_name: 'Spark',
     tier_0_words: 'A tiny spark.\nEnough to begin.',

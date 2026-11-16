@@ -137,6 +137,20 @@
     color: var(--color-ink);
 }
 
+/* Card content sits above the light-sweep layer (::after, z-index 1) */
+.gem,
+.card_label,
+.card_example
+{
+    position: relative;
+    z-index: 2;
+}
+
+.card_rate
+{
+    z-index: 2;
+}
+
 /* Four-point star that twinkles (shape via clip-path) */
 .sparkle
 {
@@ -258,7 +272,7 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(110deg, transparent 30%, rgba(255, 210, 80, 0.45) 47%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 210, 80, 0.45) 53%, transparent 70%);
+    background: linear-gradient(110deg, transparent 32%, rgba(255, 200, 60, 0.28) 46%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 200, 60, 0.28) 54%, transparent 68%);
     background-size: 250% 100%;
     animation: shine 2.2s ease-in-out infinite;
     pointer-events: none;
@@ -285,7 +299,7 @@
 /* Gold text with a moving highlight */
 .legendary .card_label
 {
-    background: linear-gradient(90deg, #d98a00 0%, #ffb400 30%, #fff3c4 50%, #ffb400 70%, #d98a00 100%);
+    background: linear-gradient(90deg, #b86200 0%, #e09000 30%, #ffc94d 50%, #e09000 70%, #b86200 100%);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;

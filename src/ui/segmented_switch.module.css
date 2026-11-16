@@ -1,18 +1,24 @@
+/* Sunken track. Shadows are even on all sides (no darker top edge, no solid
+   drop below the thumb), so the thumb reads as vertically centered. */
 .track
 {
     display: inline-flex;
     flex-shrink: 0;
-    padding: 4px;
+    gap: 2px;
+    padding: 3px;
     border-radius: var(--radius-pill);
     background: var(--color-bg-deep);
-    box-shadow: inset 0 0 0 1.5px rgba(60, 45, 25, 0.08), inset 0 2px 3px rgba(60, 45, 25, 0.18);
+    box-shadow: inset 0 0 0 1.5px rgba(60, 45, 25, 0.1), inset 0 0 6px rgba(60, 45, 25, 0.12);
 }
 
 .option
 {
     position: relative;
-    min-width: 50px;
-    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    height: 28px;
     padding: 0 12px;
     border: none;
     border-radius: var(--radius-pill);
@@ -32,7 +38,7 @@
     inset: 0;
     border-radius: var(--radius-pill);
     background: var(--btn-ink-face);
-    box-shadow: 0 2px 0 var(--btn-ink-side), 0 3px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 .label
@@ -41,5 +47,11 @@
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 700;
+    line-height: 1;
+    /* Trim the font's built-in space above caps / below the baseline, so the
+       capital letters themselves are centered (Safari 18.2+, Chrome 133+) */
+    text-box: trim-both cap alphabetic;
     letter-spacing: 0.1em;
+    /* Letter-spacing adds space after the last letter too; pull it back so text is truly centered */
+    margin-right: -0.1em;
 }

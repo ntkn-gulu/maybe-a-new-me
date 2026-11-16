@@ -114,6 +114,10 @@ export function SettingsScreen()
                         {t(sound.label_key)}
                     </TactileButton>
                 ))}
+                {/* Every tactile button already buzzes on click; this one only buzzes */}
+                <TactileButton size="sm" variant="ink">
+                    {t('haptic_test')}
+                </TactileButton>
             </div>
 
             <p className={`mono_label ${styles.footer}`}>Maybe A New Me · v{APP_VERSION}</p>

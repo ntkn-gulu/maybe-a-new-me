@@ -1,47 +1,54 @@
 // Experimental haptics for iPhone without a native app.
-// iOS 18+ Safari gives a light haptic tick when an <input type="checkbox" switch>
-// is toggled. Clicking a hidden label for such a switch during a user tap
-// triggers that tick. Android/desktop simply ignore it.
+// iOS 18+ Safari plays a light system haptic when an
+// <input type="checkbox" switch> is toggled. Clicking a throwaway label
+// that wraps such a switch triggers it (same trick as the ios-haptics library).
+//
+// IMPORTANT: browsers only allow this inside a real user activation.
+// On touch screens that means a `click` / `pointerup` / `touchend` handler,
+// NOT `pointerdown` (pointerdown only counts for mouse). Call triggerHaptic()
+// from onClick.
 
-let hidden_label: HTMLLabelElement | null = null;
 let is_enabled = true;
 
-function getHiddenLabel(): HTMLLabelElement
-{
-    if (!hidden_label)
-    {
-        const input = document.createElement('input');
-        input.type = 'checkbox';
-        input.setAttribute('switch', '');
-        input.id = 'haptic-switch';
-
-        hidden_label = document.createElement('label');
-        hidden_label.htmlFor = input.id;
-        hidden_label.setAttribute('aria-hidden', 'true');
-        hidden_label.style.cssText = 'position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;';
-        hidden_label.appendChild(input);
-        document.body.appendChild(hidden_label);
-    }
-    return hidden_label;
-}
+const ANDROID_VIBRATE_MS = 10;
 
 export function setHapticEnabled(enabled: boolean): void
 {
     is_enabled = enabled;
 }
 
-// Must be called inside a user gesture handler (pointer/click), or iOS ignores it.
 export function triggerHaptic(): void
 {
     if (!is_enabled)
     {
         return;
     }
-    // navigator.vibrate works on Android; iOS does not have it
-    if ('vibrate' in navigator)
+
+    // Android (and some desktops) support the standard Vibration API
+    if (typeof navigator.vibrate === 'function')
     {
-        navigator.vibrate(8);
+        navigator.vibrate(ANDROID_VIBRATE_MS);
         return;
     }
-    getHiddenLabel().click();
+
+    try
+    {
+        const label = document.createElement('label');
+        label.setAttribute('aria-hidden', 'true');
+        label.style.display = 'none';
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.setAttribute('switch', '');
+        label.appendChild(input);
+
+        // A fresh element each time: iOS only ticks when the switch state changes
+        document.head.appendChild(label);
+        label.click();
+        document.head.removeChild(label);
+    }
+    catch
+    {
+        // Haptics are a nice-to-have; never break a tap because of them
+    }
 }

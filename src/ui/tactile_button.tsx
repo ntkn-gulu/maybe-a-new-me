@@ -54,7 +54,14 @@ export function TactileButton(props: TactileButtonProps)
         }
         setIsPressed(true);
         playSfx('press');
+    }
+
+    // Haptic fires on click: iOS only allows it inside a real user activation,
+    // and on touch screens pointerdown does not count as one.
+    function handleClick(): void
+    {
         triggerHaptic();
+        props.onClick?.();
     }
 
     function handlePointerUp(): void
@@ -88,7 +95,7 @@ export function TactileButton(props: TactileButtonProps)
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            onClick={props.onClick}
+            onClick={handleClick}
         >
             <span className={styles.base} style={{ top: depth }} />
             <motion.span

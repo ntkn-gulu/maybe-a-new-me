@@ -13,8 +13,8 @@ export default defineConfig(({ command }) => ({
         VitePWA({
             registerType: 'autoUpdate',
             // Precache fonts too, so the app looks right offline
-            workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2}'] },
-            includeAssets: ['icons/icon.svg'],
+            workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
+            includeAssets: ['icons/icon.svg', 'icons/apple-touch-icon.png'],
             manifest: {
                 name: 'Maybe A New Me',
                 short_name: 'New Me',
@@ -27,6 +27,8 @@ export default defineConfig(({ command }) => ({
                 theme_color: APP_BACKGROUND,
                 background_color: APP_BACKGROUND,
                 icons: [
+                    { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+                    { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
                     { src: 'icons/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
                 ],
             },
