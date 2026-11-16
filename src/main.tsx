@@ -6,10 +6,8 @@ import './stores/settings_store';
 
 // Fonts are bundled (not loaded from Google) so the PWA works offline.
 // Each file includes the Vietnamese subset.
-import '@fontsource/anton/400.css';
-import '@fontsource/be-vietnam-pro/500.css';
-import '@fontsource/be-vietnam-pro/700.css';
-import '@fontsource/be-vietnam-pro/800.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/700.css';
 import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import './styles/global.css';

@@ -54,8 +54,8 @@
     --shadow-contact: 0 3px 0 rgba(60, 45, 25, 0.08);
 
     /* Type */
-    --font-display: "Anton", "Be Vietnam Pro", Impact, sans-serif;
-    --font-ui: "Be Vietnam Pro", -apple-system, system-ui, "Segoe UI", sans-serif;
+    --font-display: "Space Grotesk", -apple-system, system-ui, "Segoe UI", sans-serif;
+    --font-ui: "Space Grotesk", -apple-system, system-ui, "Segoe UI", sans-serif;
     --font-mono: "Space Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
     /* Layout */

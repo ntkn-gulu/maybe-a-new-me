@@ -1,0 +1,45 @@
+.track
+{
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-deep);
+    box-shadow: inset 0 0 0 1.5px rgba(60, 45, 25, 0.08), inset 0 2px 3px rgba(60, 45, 25, 0.18);
+}
+
+.option
+{
+    position: relative;
+    min-width: 50px;
+    height: 32px;
+    padding: 0 12px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+}
+
+.active
+{
+    color: #ffffff;
+}
+
+.thumb
+{
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-pill);
+    background: var(--btn-ink-face);
+    box-shadow: 0 2px 0 var(--btn-ink-side), 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.label
+{
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}

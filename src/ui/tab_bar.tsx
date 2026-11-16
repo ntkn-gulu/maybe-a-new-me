@@ -4,6 +4,8 @@ import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { ChestIcon, FlameIcon, GearIcon, TimerIcon } from './icons';
 import { SPRING_PRESS, SPRING_SLIDE } from './motion_presets';
+import { useT } from '../i18n/use_t';
+import type { StringKey } from '../i18n/strings';
 import styles from './tab_bar.module.css';
 
 export type TabId = 'streak' | 'focus' | 'rewards' | 'settings';
@@ -11,15 +13,15 @@ export type TabId = 'streak' | 'focus' | 'rewards' | 'settings';
 interface TabDefinition
 {
     id: TabId;
-    label: string;
+    label_key: StringKey;
     icon: ReactNode;
 }
 
 export const TABS: TabDefinition[] = [
-    { id: 'streak', label: 'Hành trình', icon: <FlameIcon /> },
-    { id: 'focus', label: 'Tập trung', icon: <TimerIcon /> },
-    { id: 'rewards', label: 'Rương', icon: <ChestIcon /> },
-    { id: 'settings', label: 'Cài đặt', icon: <GearIcon /> },
+    { id: 'streak', label_key: 'tab_journey', icon: <FlameIcon /> },
+    { id: 'focus', label_key: 'tab_focus', icon: <TimerIcon /> },
+    { id: 'rewards', label_key: 'tab_rewards', icon: <ChestIcon /> },
+    { id: 'settings', label_key: 'tab_settings', icon: <GearIcon /> },
 ];
 
 interface TabBarProps
@@ -30,6 +32,8 @@ interface TabBarProps
 
 export function TabBar(props: TabBarProps)
 {
+    const t = useT();
+
     function selectTab(tab: TabId): void
     {
         if (tab === props.active_tab)
@@ -61,7 +65,7 @@ export function TabBar(props: TabBarProps)
                             <motion.span layoutId="tab-pill" className={styles.pill} transition={SPRING_SLIDE} />
                         )}
                         <span className={styles.icon}>{tab.icon}</span>
-                        <span className={styles.label}>{tab.label}</span>
+                        <span className={styles.label}>{t(tab.label_key)}</span>
                     </motion.button>
                 );
             })}

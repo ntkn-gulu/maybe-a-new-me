@@ -5,6 +5,8 @@ import { Ribbon } from '../../ui/ribbon';
 import { TypewriterText } from '../../ui/typewriter_text';
 import { FLAME_TIERS, getTierProgress } from '../../core/flame_tiers';
 import { playSfx } from '../../sound/sfx_engine';
+import { useT } from '../../i18n/use_t';
+import { tierNameKey, tierWordsKey } from '../../i18n/strings';
 import { LowPolyFlame } from './low_poly_flame';
 import { TierStrip } from './tier_strip';
 import styles from './streak_screen.module.css';
@@ -18,6 +20,7 @@ const LAST_TIER_INDEX = FLAME_TIERS.length - 1;
 
 export function StreakScreen()
 {
+    const t = useT();
     const progress = getTierProgress(DEMO_STREAK_DAYS);
     const [selected_index, setSelectedIndex] = useState(progress.current.index);
 
@@ -35,28 +38,30 @@ export function StreakScreen()
         setSelectedIndex(tier_index);
     }
 
-    let ribbon_text = `${DEMO_STREAK_DAYS} ngày liên tiếp`;
+    const selected_name = t(tierNameKey(selected_index));
+
+    let ribbon_text = t('journey_streak', { n: DEMO_STREAK_DAYS });
     if (is_locked)
     {
-        ribbon_text = `Mở khóa ở ${selected_tier.min_days} ngày`;
+        ribbon_text = t('journey_unlock_at', { n: selected_tier.min_days });
     }
     else if (!is_current)
     {
-        ribbon_text = 'Đã đi qua';
+        ribbon_text = t('journey_passed');
     }
 
     return (
-        <Screen kicker={`Hành trình · Cấp ${selected_index} / ${LAST_TIER_INDEX}`} align="center">
+        <Screen kicker={t('journey_kicker', { level: selected_index, max: LAST_TIER_INDEX })} align="center">
             <AnimatePresence mode="wait" initial={false}>
                 <motion.h1
-                    key={selected_tier.name}
+                    key={selected_name}
                     className={styles.tier_name}
                     initial={{ y: 16, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -16, opacity: 0 }}
                     transition={{ duration: 0.18 }}
                 >
-                    {selected_tier.name}
+                    {selected_name}
                 </motion.h1>
             </AnimatePresence>
 
@@ -71,7 +76,7 @@ export function StreakScreen()
             </div>
 
             <div className={styles.words}>
-                <TypewriterText text={selected_tier.words} start_delay_ms={350} />
+                <TypewriterText text={t(tierWordsKey(selected_index))} start_delay_ms={350} />
             </div>
 
             {is_current && progress.next && (
@@ -89,7 +94,7 @@ export function StreakScreen()
                             transition={{ type: 'spring', stiffness: 120, damping: 20, delay: 0.4 }}
                         />
                     </div>
-                    <span className="mono_label">Tới {progress.next.name}</span>
+                    <span className="mono_label">{t('journey_next', { name: t(tierNameKey(progress.next.index)) })}</span>
                 </div>
             )}
 

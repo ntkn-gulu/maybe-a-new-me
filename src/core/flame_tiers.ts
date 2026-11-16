@@ -1,24 +1,23 @@
 // Flame tiers: the streak journey. Pure data + lookups, no UI code here.
-// To add a tier, append an entry with a higher min_days.
+// Display names and words live in i18n (tier_<index>_name / tier_<index>_words).
+// To add a tier, append an entry with a higher min_days and add its strings.
 
 export interface FlameTier
 {
     index: number;
     min_days: number;   // streak length that unlocks this tier
-    name: string;       // shown in the display font, uppercase
-    words: string;      // short words of support, typed out on the journey screen
 }
 
 export const FLAME_TIERS: readonly FlameTier[] = [
-    { index: 0, min_days: 0, name: 'Tinh Hỏa', words: 'Một đốm lửa nhỏ.\nĐủ để bắt đầu.' },
-    { index: 1, min_days: 3, name: 'Xích Hỏa', words: 'Ba ngày liền.\nLửa đã bén củi.' },
-    { index: 2, min_days: 7, name: 'Kim Hỏa', words: 'Trọn một tuần.\nTia lửa bắt đầu bắn ra.' },
-    { index: 3, min_days: 14, name: 'Lam Hỏa', words: 'Hai tuần.\nLửa nóng tới mức đổi màu.' },
-    { index: 4, min_days: 30, name: 'Tử Hỏa', words: 'Một tháng.\nThói quen đang thành con người bạn.' },
-    { index: 5, min_days: 60, name: 'Huyễn Hỏa', words: 'Hai tháng.\nAi đi ngang cũng thấy bạn sáng.' },
-    { index: 6, min_days: 100, name: 'Bạch Hỏa', words: 'Một trăm ngày.\nChẳng còn gì dập được nữa.' },
-    { index: 7, min_days: 180, name: 'Thất Sắc Hỏa', words: 'Nửa năm.\nMỗi ngày một màu, vẫn là bạn.' },
-    { index: 8, min_days: 365, name: 'Thiên Hà Hỏa', words: 'Một năm.\nCả dải ngân hà cháy trong tay bạn.' },
+    { index: 0, min_days: 0 },
+    { index: 1, min_days: 3 },
+    { index: 2, min_days: 7 },
+    { index: 3, min_days: 14 },
+    { index: 4, min_days: 30 },
+    { index: 5, min_days: 60 },
+    { index: 6, min_days: 100 },
+    { index: 7, min_days: 180 },
+    { index: 8, min_days: 365 },
 ];
 
 export function getTierForStreak(streak_days: number): FlameTier

@@ -74,6 +74,7 @@
     background: var(--tile-face);
     box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
     overflow: hidden;
+    isolation: isolate;
 }
 
 .common
@@ -96,30 +97,6 @@
     --rarity: var(--rarity-legendary);
 }
 
-/* Moving shine across the legendary card */
-.legendary::after
-{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(110deg, transparent 30%, rgba(255, 200, 60, 0.35) 50%, transparent 70%);
-    background-size: 250% 100%;
-    animation: shine 2.6s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes shine
-{
-    from
-    {
-        background-position: 120% 0;
-    }
-    to
-    {
-        background-position: -120% 0;
-    }
-}
-
 /* Faceted gem: a rotated square with a lit half */
 .gem
 {
@@ -135,8 +112,10 @@
 .card_label
 {
     font-family: var(--font-display);
-    font-size: 22px;
-    line-height: 1.1;
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
     color: var(--rarity);
 }
@@ -156,4 +135,172 @@
     font-size: 12px;
     font-weight: 700;
     color: var(--color-ink);
+}
+
+/* Four-point star that twinkles (shape via clip-path) */
+.sparkle
+{
+    position: absolute;
+    z-index: 2;
+    clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+    background: var(--rarity);
+    opacity: 0;
+    animation: twinkle 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes twinkle
+{
+    0%, 100%
+    {
+        opacity: 0;
+        transform: scale(0.2) rotate(0deg);
+    }
+    50%
+    {
+        opacity: 1;
+        transform: scale(1) rotate(90deg);
+    }
+}
+
+/* Light sweep across a card (epic + legendary) */
+@keyframes shine
+{
+    from
+    {
+        background-position: 130% 0;
+    }
+    to
+    {
+        background-position: -130% 0;
+    }
+}
+
+@keyframes gem_pulse
+{
+    0%, 100%
+    {
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18), 0 0 0 0 var(--gem-glow);
+    }
+    50%
+    {
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18), 0 0 14px 4px var(--gem-glow);
+    }
+}
+
+/* ---------- Epic: purple shimmer + pulsing gem ---------- */
+.epic
+{
+    --gem-glow: rgba(154, 91, 255, 0.55);
+    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px rgba(154, 91, 255, 0.35);
+}
+
+.epic::after
+{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(110deg, transparent 35%, rgba(154, 91, 255, 0.22) 50%, transparent 65%);
+    background-size: 250% 100%;
+    animation: shine 3.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.epic .gem
+{
+    animation: gem_pulse 2.4s ease-in-out infinite;
+}
+
+/* ---------- Legendary: rotating gold border, glow, sparkles, shiny text ---------- */
+@property --border-angle
+{
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
+.legendary
+{
+    --gem-glow: rgba(255, 180, 0, 0.7);
+    border: 2.5px solid transparent;
+    background:
+        linear-gradient(var(--tile-face), var(--tile-face)) padding-box,
+        conic-gradient(from var(--border-angle), #ffb400, #ff5a1f, #ff4d6d, #ffde61, #fff3c4, #ffb400) border-box;
+    animation:
+        border_spin 3s linear infinite,
+        legend_glow 2.4s ease-in-out infinite;
+}
+
+@keyframes border_spin
+{
+    to
+    {
+        --border-angle: 360deg;
+    }
+}
+
+@keyframes legend_glow
+{
+    0%, 100%
+    {
+        box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), 0 0 0 0 rgba(255, 180, 0, 0);
+    }
+    50%
+    {
+        box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), 0 0 26px 2px rgba(255, 180, 0, 0.45);
+    }
+}
+
+.legendary::after
+{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 210, 80, 0.45) 47%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 210, 80, 0.45) 53%, transparent 70%);
+    background-size: 250% 100%;
+    animation: shine 2.2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.legendary .gem
+{
+    background: conic-gradient(from 0deg, #fff3c4, #ffb400, #ff5a1f, #ffb400, #fff3c4);
+    animation: gem_pulse 1.6s ease-in-out infinite, gem_spin 4s linear infinite;
+}
+
+@keyframes gem_spin
+{
+    from
+    {
+        transform: rotate(45deg);
+    }
+    to
+    {
+        transform: rotate(405deg);
+    }
+}
+
+/* Gold text with a moving highlight */
+.legendary .card_label
+{
+    background: linear-gradient(90deg, #d98a00 0%, #ffb400 30%, #fff3c4 50%, #ffb400 70%, #d98a00 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: text_shine 2.2s linear infinite;
+}
+
+@keyframes text_shine
+{
+    from
+    {
+        background-position: 200% 0;
+    }
+    to
+    {
+        background-position: 0% 0;
+    }
 }

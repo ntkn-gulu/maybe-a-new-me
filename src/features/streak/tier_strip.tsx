@@ -2,6 +2,8 @@ import { motion } from 'motion/react';
 import { FLAME_TIERS } from '../../core/flame_tiers';
 import { FLAME_PALETTES } from './flame_palettes';
 import { SPRING_PRESS, SPRING_SLIDE } from '../../ui/motion_presets';
+import { useT } from '../../i18n/use_t';
+import { tierNameKey } from '../../i18n/strings';
 import styles from './tier_strip.module.css';
 
 // Row of all tiers as small flame badges. Reached tiers are colored,
@@ -19,6 +21,8 @@ interface TierStripProps
 
 export function TierStrip(props: TierStripProps)
 {
+    const t = useT();
+
     return (
         <div className={styles.strip}>
             {FLAME_TIERS.map((tier) =>
@@ -34,7 +38,7 @@ export function TierStrip(props: TierStripProps)
                         whileTap={{ scale: 0.8 }}
                         transition={SPRING_PRESS}
                         onClick={() => props.onSelect(tier.index)}
-                        aria-label={`${tier.name}, ${tier.min_days} ngày`}
+                        aria-label={t('journey_tier_label', { name: t(tierNameKey(tier.index)), n: tier.min_days })}
                     >
                         <svg viewBox="0 0 200 260" className={styles.icon}>
                             <polygon

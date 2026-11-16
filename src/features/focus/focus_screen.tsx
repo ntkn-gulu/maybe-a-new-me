@@ -4,6 +4,7 @@ import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { playSfx } from '../../sound/sfx_engine';
 import { SPRING_POP } from '../../ui/motion_presets';
+import { useT } from '../../i18n/use_t';
 import styles from './focus_screen.module.css';
 
 // Focus tab. A chunky kitchen-timer dial: the colored wedge shows how long
@@ -24,21 +25,38 @@ const RATCHET_INTERVAL_MS = 45;
 // Spring that turns the dial like a real knob (slight overshoot)
 const DIAL_SPRING = { stiffness: 140, damping: 14 };
 
+// Wedge geometry in the disc's own SVG space (viewBox 0 0 100 100).
+// The radius is larger than the disc so the arc edge is hidden by the
+// disc's round clip: no thin anti-aliased rim can show.
+const WEDGE_CENTER = 50;
+const WEDGE_RADIUS = 60;
+const MAX_WEDGE_DEGREES = 359.9;       // a full 360 arc would collapse to nothing
+
 function formatMinutes(minutes: number): string
 {
     return `${String(minutes).padStart(2, '0')}:00`;
 }
 
+// SVG pie slice from 12 o'clock, clockwise, to `degrees`
+function wedgePath(degrees: number): string
+{
+    const clamped = Math.min(Math.max(degrees, 0), MAX_WEDGE_DEGREES);
+    const radians = (clamped * Math.PI) / 180;
+    const end_x = WEDGE_CENTER + WEDGE_RADIUS * Math.sin(radians);
+    const end_y = WEDGE_CENTER - WEDGE_RADIUS * Math.cos(radians);
+    const large_arc = clamped > 180 ? 1 : 0;
+    return `M ${WEDGE_CENTER} ${WEDGE_CENTER} L ${WEDGE_CENTER} ${WEDGE_CENTER - WEDGE_RADIUS} `
+        + `A ${WEDGE_RADIUS} ${WEDGE_RADIUS} 0 ${large_arc} 1 ${end_x} ${end_y} Z`;
+}
+
 export function FocusScreen()
 {
+    const t = useT();
     const [focus_length, setFocusLength] = useState<FocusLength>(25);
     const [is_preview_note_visible, setIsPreviewNoteVisible] = useState(false);
 
     const sweep_degrees = useSpring(focus_length * DEGREES_PER_MINUTE, DIAL_SPRING);
-    const wedge_background = useTransform(
-        sweep_degrees,
-        (degrees) => `conic-gradient(var(--wedge-color) 0deg ${degrees}deg, transparent ${degrees}deg)`,
-    );
+    const wedge_d = useTransform(sweep_degrees, wedgePath);
 
     useEffect(() =>
     {
@@ -66,7 +84,7 @@ export function FocusScreen()
     }
 
     return (
-        <Screen kicker={`Phiên ${DEMO_DONE_TODAY + 1} / ${DEMO_DAILY_GOAL} hôm nay`} title="Tập trung">
+        <Screen kicker={t('focus_kicker', { n: DEMO_DONE_TODAY + 1, goal: DEMO_DAILY_GOAL })} title={t('focus_title')}>
             <div className={styles.dial}>
                 <div className={styles.dial_ring}>
                     {Array.from({ length: TICK_COUNT }, (_, index) => (
@@ -78,7 +96,13 @@ export function FocusScreen()
                     ))}
                 </div>
                 <div className={styles.dial_disc}>
-                    <motion.div className={styles.wedge} style={{ background: wedge_background }} />
+                    <svg className={styles.wedge} viewBox="0 0 100 100" aria-hidden="true">
+                        <motion.path d={wedge_d} className={styles.wedge_path} />
+                    </svg>
+                </div>
+                {/* Needle layer sits outside the clipped disc. Its drop shadow is on this
+                    non-rotating wrapper, so the light direction stays fixed while it turns. */}
+                <div className={styles.needle_layer}>
                     <motion.div className={styles.needle} style={{ rotate: sweep_degrees }}>
                         <span className={styles.needle_bar} />
                     </motion.div>
@@ -101,7 +125,7 @@ export function FocusScreen()
                 </AnimatePresence>
             </div>
 
-            <div className={styles.pips} aria-label={`${DEMO_DONE_TODAY} trên ${DEMO_DAILY_GOAL} pomodoro hôm nay`}>
+            <div className={styles.pips} aria-label={t('focus_pips_label', { done: DEMO_DONE_TODAY, goal: DEMO_DAILY_GOAL })}>
                 {Array.from({ length: DEMO_DAILY_GOAL }, (_, index) => (
                     <span key={index} className={index < DEMO_DONE_TODAY ? `${styles.pip} ${styles.pip_done}` : styles.pip} />
                 ))}
@@ -115,14 +139,14 @@ export function FocusScreen()
                         is_selected={length === focus_length}
                         onClick={() => chooseLength(length)}
                     >
-                        {length} phút
+                        {t('focus_minutes', { n: length })}
                     </TactileButton>
                 ))}
             </div>
 
             <div className={styles.start_area}>
                 <TactileButton variant="accent" size="lg" is_full_width onClick={handleStart}>
-                    Bắt đầu
+                    {t('focus_start')}
                 </TactileButton>
                 <AnimatePresence>
                     {is_preview_note_visible && (
@@ -132,7 +156,7 @@ export function FocusScreen()
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                         >
-                            Đồng hồ thật + chế độ strict có ở GĐ2
+                            {t('focus_preview_note')}
                         </motion.p>
                     )}
                 </AnimatePresence>

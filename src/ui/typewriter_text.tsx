@@ -60,7 +60,8 @@ export function TypewriterText(props: TypewriterTextProps)
             <span className={styles.ghost} aria-hidden="true">{props.text}</span>
             <span className={styles.typed} aria-hidden="true">
                 {props.text.slice(0, visible_count)}
-                <span className={is_done ? `${styles.caret} ${styles.blink}` : styles.caret} />
+                {/* Caret only while typing; it disappears once the line is complete */}
+                {!is_done && <span className={styles.caret} />}
             </span>
         </p>
     );
