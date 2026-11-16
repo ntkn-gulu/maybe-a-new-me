@@ -1,0 +1,120 @@
+.button
+{
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.button:focus-visible .face
+{
+    outline: 2px solid var(--color-accent-bright);
+    outline-offset: 3px;
+}
+
+/* The "side" of the button, visible below the face */
+.base
+{
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-drop);
+}
+
+/* The top surface that moves */
+.face
+{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    box-shadow: var(--shadow-inner-top);
+}
+
+/* Variants */
+.neutral .base
+{
+    background: var(--btn-neutral-side);
+}
+
+.neutral .face
+{
+    background: linear-gradient(180deg, var(--btn-neutral-face-top), var(--btn-neutral-face));
+    color: var(--color-text);
+}
+
+.accent .base
+{
+    background: var(--color-accent-side);
+    box-shadow: var(--shadow-drop), 0 6px 28px var(--color-accent-glow);
+}
+
+.accent .face
+{
+    background: linear-gradient(180deg, var(--color-accent-bright), var(--color-accent));
+    color: #1a0d03;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* Latched (selected) neutral button: darker face, glowing accent label */
+.neutral.selected .face
+{
+    background: linear-gradient(180deg, var(--btn-neutral-face), #202026);
+    color: var(--color-accent-bright);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45), 0 0 18px var(--color-accent-glow);
+}
+
+/* Sizes */
+.sm .face
+{
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+}
+
+.sm .base
+{
+    border-radius: var(--radius-sm);
+}
+
+.md .face
+{
+    min-height: 50px;
+    padding: 0 20px;
+    font-size: 16px;
+}
+
+.lg .face
+{
+    min-height: 64px;
+    padding: 0 28px;
+    font-size: 20px;
+    border-radius: var(--radius-lg);
+}
+
+.lg .base
+{
+    border-radius: var(--radius-lg);
+}
+
+.full_width
+{
+    display: block;
+    width: 100%;
+}
+
+.disabled
+{
+    opacity: 0.4;
+    cursor: not-allowed;
+}

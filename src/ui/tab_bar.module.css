@@ -1,0 +1,63 @@
+.bar
+{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    /* On wide screens keep the tabs in a phone-width column, centered */
+    padding: 8px max(12px, calc((100vw - 560px) / 2)) calc(8px + var(--safe-bottom));
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0), var(--color-bg) 28%);
+}
+
+.tab
+{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 58px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-text-faint);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.active
+{
+    color: var(--color-accent);
+}
+
+.pill
+{
+    position: absolute;
+    inset: 2px 6px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    box-shadow: var(--shadow-inner-top), 0 0 22px var(--color-accent-glow);
+}
+
+.icon,
+.label
+{
+    position: relative;   /* sit above the pill */
+}
+
+.icon
+{
+    display: flex;
+}
+
+.label
+{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}

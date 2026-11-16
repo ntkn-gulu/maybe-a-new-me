@@ -1,0 +1,103 @@
+import { useState, type ReactNode } from 'react';
+import { motion } from 'motion/react';
+import { playSfx } from '../sound/sfx_engine';
+import { triggerHaptic } from '../sound/haptic_hack';
+import { SPRING_PRESS } from './motion_presets';
+import styles from './tactile_button.module.css';
+
+// A physical-feeling 3D button: the face sinks into its base on press,
+// springs back on release, with a sound + haptic at both moments.
+
+export type TactileVariant = 'accent' | 'neutral';
+export type TactileSize = 'sm' | 'md' | 'lg';
+
+interface TactileButtonProps
+{
+    children: ReactNode;
+    onClick?: () => void;
+    variant?: TactileVariant;
+    size?: TactileSize;
+    is_selected?: boolean;       // stays pressed-in, used for segmented choices
+    is_disabled?: boolean;
+    is_full_width?: boolean;
+    aria_label?: string;
+}
+
+// Thickness of the button "side" in pixels, per size
+const DEPTH_BY_SIZE: Record<TactileSize, number> = { sm: 4, md: 6, lg: 8 };
+
+// How far a selected (latched) button stays sunk, as a share of depth
+const SELECTED_SINK_RATIO = 0.6;
+
+export function TactileButton(props: TactileButtonProps)
+{
+    const variant = props.variant ?? 'neutral';
+    const size = props.size ?? 'md';
+    const depth = DEPTH_BY_SIZE[size];
+    const [is_pressed, setIsPressed] = useState(false);
+
+    let sink = 0;
+    if (is_pressed)
+    {
+        sink = depth;
+    }
+    else if (props.is_selected)
+    {
+        sink = depth * SELECTED_SINK_RATIO;
+    }
+
+    function handlePointerDown(): void
+    {
+        if (props.is_disabled)
+        {
+            return;
+        }
+        setIsPressed(true);
+        playSfx('press');
+        triggerHaptic();
+    }
+
+    function handlePointerUp(): void
+    {
+        if (!is_pressed)
+        {
+            return;
+        }
+        setIsPressed(false);
+        playSfx('release');
+    }
+
+    const class_names = [
+        styles.button,
+        styles[variant],
+        styles[size],
+        props.is_full_width ? styles.full_width : '',
+        props.is_selected ? styles.selected : '',
+        props.is_disabled ? styles.disabled : '',
+    ].join(' ');
+
+    return (
+        <button
+            type="button"
+            className={class_names}
+            style={{ paddingBottom: depth }}
+            disabled={props.is_disabled}
+            aria-label={props.aria_label}
+            aria-pressed={props.is_selected}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onClick={props.onClick}
+        >
+            <span className={styles.base} style={{ top: depth }} />
+            <motion.span
+                className={styles.face}
+                animate={{ y: sink }}
+                transition={SPRING_PRESS}
+            >
+                {props.children}
+            </motion.span>
+        </button>
+    );
+}

@@ -1,0 +1,49 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after
+{
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root
+{
+    margin: 0;
+    height: 100%;
+}
+
+body
+{
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;     /* no rubber-band bounce: feels like a native app */
+    touch-action: manipulation;    /* removes the double-tap zoom delay */
+}
+
+button
+{
+    font: inherit;
+    color: inherit;
+}
+
+input[type="range"]
+{
+    accent-color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+    *
+    {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
