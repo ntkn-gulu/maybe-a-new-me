@@ -3,6 +3,8 @@ import { FLAME_TIERS } from '../../core/flame_tiers';
 import { FLAME_PALETTES } from './flame_palettes';
 import { SPRING_PRESS, SPRING_SLIDE } from '../../ui/motion_presets';
 import { useT } from '../../i18n/use_t';
+import { getPressableProps } from '../../ui/pressable';
+import { HapticOverlay } from '../../ui/haptic_overlay';
 import { tierNameKey } from '../../i18n/strings';
 import styles from './tier_strip.module.css';
 
@@ -31,13 +33,12 @@ export function TierStrip(props: TierStripProps)
                 const is_selected = tier.index === props.selected_index;
                 const palette = FLAME_PALETTES[tier.index];
                 return (
-                    <motion.button
+                    <motion.div
                         key={tier.index}
-                        type="button"
+                        {...getPressableProps(() => props.onSelect(tier.index))}
                         className={styles.badge}
                         whileTap={{ scale: 0.8 }}
                         transition={SPRING_PRESS}
-                        onClick={() => props.onSelect(tier.index)}
                         aria-label={t('journey_tier_label', { name: t(tierNameKey(tier.index)), n: tier.min_days })}
                     >
                         <svg viewBox="0 0 200 260" className={styles.icon}>
@@ -53,7 +54,8 @@ export function TierStrip(props: TierStripProps)
                         {is_selected && (
                             <motion.span layoutId="tier-marker" className={styles.marker} transition={SPRING_SLIDE} />
                         )}
-                    </motion.button>
+                        <HapticOverlay />
+                    </motion.div>
                 );
             })}
         </div>

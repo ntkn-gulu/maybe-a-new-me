@@ -1,14 +1,17 @@
 import { motion } from 'motion/react';
 import { TactileButton } from '../../ui/tactile_button';
+import { TypewriterText } from '../../ui/typewriter_text';
 import { useT } from '../../i18n/use_t';
 import type { StringKey } from '../../i18n/strings';
 import type { BreakReason } from '../../core/session_rules';
 import { detectDevice } from '../../stores/clock';
 import { useFocusStore } from '../../stores/focus_store';
 import { useSettingsStore } from '../../stores/settings_store';
+import { ShatteredDial } from './shattered_dial';
 import styles from './focus_session.module.css';
 
-// A broken session: the dial cracks and shakes, the reason is shown plainly.
+// A broken session: the dial shatters, the reason sits on a card,
+// and a calm line says it's fine to go again.
 
 const REASON_KEYS: Record<BreakReason, StringKey> = {
     left_app: 'broken_left_app',
@@ -16,6 +19,14 @@ const REASON_KEYS: Record<BreakReason, StringKey> = {
     missed_check: 'broken_missed_check',
     clock_jump: 'broken_clock_jump',
     gave_up: 'broken_gave_up',
+};
+
+const REASON_ICONS: Record<BreakReason, string> = {
+    left_app: '🚪',
+    away_too_long: '⏳',
+    missed_check: '😴',
+    clock_jump: '🕰️',
+    gave_up: '🏳️',
 };
 
 interface SessionBrokenProps
@@ -36,26 +47,27 @@ export function SessionBroken(props: SessionBrokenProps)
     }
 
     return (
-        <motion.div className={styles.paper} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <motion.svg
-                className={styles.cracked_dial}
-                viewBox="0 0 120 120"
-                aria-hidden="true"
-                initial={{ rotate: 0 }}
-                animate={{ rotate: [0, -6, 5, -3, 2, 0], x: [0, -6, 5, -3, 0] }}
-                transition={{ duration: 0.5 }}
-            >
-                <circle cx="60" cy="64" r="50" fill="#d9cfbf" />
-                <circle cx="60" cy="58" r="50" fill="var(--tile-face)" />
-                <circle cx="60" cy="58" r="36" fill="var(--color-pink)" />
-                <polyline points="60,8 54,30 66,44 52,62 63,78 56,108" fill="none" stroke="var(--color-ink)" strokeWidth="3" strokeLinejoin="round" />
-                <polyline points="66,44 86,50 98,40" fill="none" stroke="var(--color-ink)" strokeWidth="2.5" strokeLinejoin="round" />
-                <polyline points="52,62 34,66 22,80" fill="none" stroke="var(--color-ink)" strokeWidth="2.5" strokeLinejoin="round" />
-            </motion.svg>
-
+        <div className={styles.paper}>
             <span className="mono_label">{t('broken_kicker')}</span>
             <h2 className={styles.paper_title}>{t('broken_title')}</h2>
-            {props.reason && <p className={styles.broken_reason}>{t(REASON_KEYS[props.reason])}</p>}
+
+            <ShatteredDial />
+
+            {props.reason && (
+                <motion.div
+                    className={styles.reason_card}
+                    initial={{ y: 16, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ y: { type: 'spring', stiffness: 260, damping: 20, delay: 0.6 }, opacity: { duration: 0.2, delay: 0.6 } }}
+                >
+                    <span className={styles.reason_icon} aria-hidden="true">{REASON_ICONS[props.reason]}</span>
+                    <span className={styles.reason_text}>{t(REASON_KEYS[props.reason])}</span>
+                </motion.div>
+            )}
+
+            <div className={styles.broken_words}>
+                <TypewriterText text={t('broken_encourage')} start_delay_ms={900} />
+            </div>
 
             <div className={styles.paper_actions}>
                 <TactileButton variant="accent" size="lg" is_full_width onClick={retry}>
@@ -65,6 +77,6 @@ export function SessionBroken(props: SessionBrokenProps)
                     {t('broken_back')}
                 </TactileButton>
             </div>
-        </motion.div>
+        </div>
     );
 }

@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useSpring, useTransform } from 'motion/react';
 import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { playSfx } from '../../sound/sfx_engine';
-import { SPRING_POP } from '../../ui/motion_presets';
+import { OPACITY_FADE, SPRING_POP } from '../../ui/motion_presets';
 import { useT } from '../../i18n/use_t';
 import { useFocusStore, DEV_TIME_SCALE } from '../../stores/focus_store';
 import { useTodayProgress } from '../../stores/progress_store';
@@ -148,7 +148,9 @@ export function FocusScreen()
                         initial={{ y: 30, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -30, opacity: 0 }}
-                        transition={SPRING_POP}
+                        // Spring only for movement: a springy opacity overshoots past 0
+                        // and briefly brings the old number back as a ghost
+                        transition={{ y: SPRING_POP, opacity: OPACITY_FADE }}
                     >
                         {formatMinutes(focus_length)}
                     </motion.span>

@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { HoldButton } from '../../ui/hold_button';
+import { isAudioStale, playSfx, unlockAudio } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
 import { getMaxAwayMs, getOpenPresenceCheck, getRemainingSeconds, PRESENCE_CHECKS_PER_25_MIN, type FocusGuardState } from '../../core/session_rules';
 import { getSessionNow, useFocusStore } from '../../stores/focus_store';
@@ -34,9 +35,31 @@ export function SessionRunning(props: SessionRunningProps)
     const open_check = getOpenPresenceCheck(props.session, now);
     const away_left_seconds = (getMaxAwayMs(props.session.planned_minutes, props.session.limit_scale) - props.session.total_away_ms) / 1000 / props.session.limit_scale;
     const checks_count = (props.session.planned_minutes / 25) * PRESENCE_CHECKS_PER_25_MIN.desktop;
+    // Re-read every tick: after returning from the background, sound needs one tap
+    const is_sound_stale = isAudioStale();
+
+    // Any tap on the running screen rebuilds the audio (must happen inside a tap on iOS)
+    function handleTap(): void
+    {
+        if (isAudioStale())
+        {
+            unlockAudio();
+            playSfx('tick');
+        }
+    }
 
     return (
-        <div className={styles.running}>
+        <div className={styles.running} onClick={handleTap}>
+            {is_sound_stale && (
+                <motion.div
+                    className={styles.sound_banner}
+                    initial={{ y: -12, opacity: 0 }}
+                    animate={{ y: 0, opacity: [0.6, 1, 0.6] }}
+                    transition={{ y: { duration: 0.2 }, opacity: { duration: 1.6, repeat: Infinity } }}
+                >
+                    🔈 {t('focus_tap_for_sound')}
+                </motion.div>
+            )}
             <div className={styles.running_top}>
                 <span className={styles.running_label}>{t('focus_running_label', { n: props.session.planned_minutes })}</span>
                 {clock.time_scale > 1 && <span className={styles.dev_chip}>{t('focus_dev_chip', { n: clock.time_scale })}</span>}

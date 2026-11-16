@@ -8,6 +8,8 @@ import { triggerHaptic } from '../../sound/haptic_hack';
 import { useT } from '../../i18n/use_t';
 import type { StringKey } from '../../i18n/strings';
 import { ChestArt } from './chest_art';
+import { getPressableProps } from '../../ui/pressable';
+import { HapticOverlay } from '../../ui/haptic_overlay';
 import styles from './chest_screen.module.css';
 
 // Rewards tab. Phase 0: the chest (tap it: it rattles but stays locked)
@@ -68,18 +70,18 @@ export function ChestScreen()
         <Screen kicker={t('rewards_kicker')} title={t('rewards_title')}>
             <div className={styles.hero}>
                 <div className={styles.glow} />
-                <motion.button
-                    type="button"
+                <motion.div
+                    {...getPressableProps(rattleChest)}
                     className={styles.chest_button}
                     animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                    onClick={rattleChest}
                     aria-label={t('rewards_chest_label')}
                 >
                     <motion.div animate={chest_controls}>
                         <ChestArt size={210} />
                     </motion.div>
-                </motion.button>
+                    <HapticOverlay />
+                </motion.div>
                 <div className={styles.shadow} />
             </div>
 

@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { SPRING_SLIDE } from './motion_presets';
+import { getPressableProps } from './pressable';
+import { HapticOverlay } from './haptic_overlay';
 import styles from './segmented_switch.module.css';
 
 // A sunken track with 2+ labeled options and a raised thumb that slides
@@ -44,19 +46,18 @@ export function SegmentedSwitch<Value extends string>(props: SegmentedSwitchProp
             {
                 const is_active = option.value === props.value;
                 return (
-                    <button
+                    <div
                         key={option.value}
-                        type="button"
-                        role="radio"
+                        {...getPressableProps(() => choose(option.value), false, 'radio')}
                         aria-checked={is_active}
                         className={is_active ? `${styles.option} ${styles.active}` : styles.option}
-                        onClick={() => choose(option.value)}
                     >
                         {is_active && (
                             <motion.span layoutId={thumb_id} className={styles.thumb} transition={SPRING_SLIDE} />
                         )}
                         <span className={styles.label}>{option.label}</span>
-                    </button>
+                        <HapticOverlay />
+                    </div>
                 );
             })}
         </div>

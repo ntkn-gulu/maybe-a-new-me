@@ -4,6 +4,8 @@ import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { ChestIcon, FlameIcon, GearIcon, TimerIcon } from './icons';
 import { SPRING_PRESS, SPRING_SLIDE } from './motion_presets';
+import { getPressableProps } from './pressable';
+import { HapticOverlay } from './haptic_overlay';
 import { useT } from '../i18n/use_t';
 import type { StringKey } from '../i18n/strings';
 import styles from './tab_bar.module.css';
@@ -51,13 +53,12 @@ export function TabBar(props: TabBarProps)
             {
                 const is_active = tab.id === props.active_tab;
                 return (
-                    <motion.button
+                    <motion.div
                         key={tab.id}
-                        type="button"
+                        {...getPressableProps(() => selectTab(tab.id))}
                         className={is_active ? `${styles.tab} ${styles.active}` : styles.tab}
                         whileTap={{ scale: 0.86 }}
                         transition={SPRING_PRESS}
-                        onClick={() => selectTab(tab.id)}
                         aria-current={is_active ? 'page' : undefined}
                     >
                         {is_active && (
@@ -66,7 +67,8 @@ export function TabBar(props: TabBarProps)
                         )}
                         <span className={styles.icon}>{tab.icon}</span>
                         <span className={styles.label}>{t(tab.label_key)}</span>
-                    </motion.button>
+                        <HapticOverlay />
+                    </motion.div>
                 );
             })}
         </nav>

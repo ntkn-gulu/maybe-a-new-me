@@ -93,12 +93,24 @@ function tryResume(context: AudioContext): void
             needs_rebuild = true;
         }
     }, RESUME_TIMEOUT_MS);
+    // Note: a successful resume does NOT clear needs_rebuild, because iOS can
+    // report "running" while silent. Only a rebuild inside a tap clears it.
+}
+
+// True while handling a real tap/click. A brand-new context only starts
+// "running" on iOS when it is created inside one. Browsers without the
+// UserActivation API are assumed to be in a gesture (sounds come from taps).
+function isInUserGesture(): boolean
+{
+    const user_activation = (navigator as Navigator & { userActivation?: { isActive: boolean } }).userActivation;
+    return user_activation ? user_activation.isActive : true;
 }
 
 // iOS keeps audio locked until a user gesture: call this from a tap.
 export function unlockAudio(): void
 {
-    if (needs_rebuild || audio_context?.state === 'closed')
+    const wants_rebuild = needs_rebuild || audio_context?.state === 'closed';
+    if (wants_rebuild && isInUserGesture())
     {
         rebuildContext();
     }
@@ -109,12 +121,21 @@ export function unlockAudio(): void
     }
 }
 
-// Coming back to the app (after a screenshot, app switch, lock screen...)
-// often leaves the context suspended/interrupted: wake it up right away.
+// True when sound may be silent until the next tap (after the app was in the background)
+export function isAudioStale(): boolean
+{
+    return needs_rebuild;
+}
+
+// Known iOS bug: after the app goes to the background and comes back, the
+// context can report "running" yet play nothing. So every return from the
+// background marks it stale; the next tap builds a fresh one. Meanwhile we
+// still try a resume in case the old context is fine.
 document.addEventListener('visibilitychange', () =>
 {
-    if (document.visibilityState === 'visible' && audio_context && audio_context.state !== 'running')
+    if (document.visibilityState === 'visible' && audio_context)
     {
+        needs_rebuild = true;
         tryResume(audio_context);
     }
 });

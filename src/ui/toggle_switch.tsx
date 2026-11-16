@@ -2,6 +2,8 @@ import { motion } from 'motion/react';
 import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { SPRING_PRESS } from './motion_presets';
+import { getPressableProps } from './pressable';
+import { HapticOverlay } from './haptic_overlay';
 import styles from './toggle_switch.module.css';
 
 // Chunky on/off switch with a springy knob and a "tick" sound.
@@ -26,19 +28,18 @@ export function ToggleSwitch(props: ToggleSwitchProps)
     }
 
     return (
-        <button
-            type="button"
-            role="switch"
+        <div
+            {...getPressableProps(flip, false, 'switch')}
             aria-checked={props.is_on}
             aria-label={props.aria_label}
             className={props.is_on ? `${styles.track} ${styles.on}` : styles.track}
-            onClick={flip}
         >
             <motion.span
                 className={styles.knob}
                 animate={{ x: props.is_on ? KNOB_TRAVEL : 0 }}
                 transition={SPRING_PRESS}
             />
-        </button>
+            <HapticOverlay />
+        </div>
     );
 }

@@ -37,6 +37,12 @@ button
     color: inherit;
 }
 
+/* Div-based tap targets: no focus ring on touch/click, keep it for keyboard */
+[tabindex]:focus:not(:focus-visible)
+{
+    outline: none;
+}
+
 input[type="range"]
 {
     accent-color: var(--color-ink);

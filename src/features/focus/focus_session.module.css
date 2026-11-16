@@ -29,6 +29,22 @@
     color: rgba(255, 255, 255, 0.82);
 }
 
+/* Pill at the top asking for one tap so sound works again after a trip out of the app */
+.sound_banner
+{
+    align-self: center;
+    margin-bottom: 14px;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.1);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+}
+
 .running_top
 {
     display: flex;
@@ -200,7 +216,7 @@
     width: 100%;
     max-width: var(--content-max);
     margin: 0 auto;
-    padding: calc(48px + var(--safe-top)) var(--gutter) calc(24px + var(--safe-bottom));
+    padding: calc(32px + var(--safe-top)) var(--gutter) calc(24px + var(--safe-bottom));
     text-align: center;
 }
 
@@ -299,15 +315,42 @@
     width: 100%;
 }
 
-.cracked_dial
+/* Reason for the break, on an extruded card */
+.reason_card
 {
-    width: 150px;
-    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+    text-align: left;
 }
 
-.broken_reason
+.reason_icon
 {
-    margin: 0;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--color-bg-deep);
+    font-size: 22px;
+}
+
+.reason_text
+{
     font-size: 16px;
-    color: var(--color-ink-soft);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.broken_words
+{
+    width: 100%;
+    margin-top: 20px;
 }

@@ -1,12 +1,6 @@
-// Experimental haptics for iPhone without a native app.
-// iOS 18+ Safari plays a light system haptic when an
-// <input type="checkbox" switch> is toggled. Clicking a throwaway label
-// that wraps such a switch triggers it (same trick as the ios-haptics library).
-//
-// IMPORTANT: browsers only allow this inside a real user activation.
-// On touch screens that means a `click` / `pointerup` / `touchend` handler,
-// NOT `pointerdown` (pointerdown only counts for mouse). Call triggerHaptic()
-// from onClick.
+// Haptics from code. Only the standard Vibration API (Android) works here:
+// iOS ignores programmatic switch clicks, so iPhone haptics come from
+// HapticOverlay (src/ui/haptic_overlay.tsx), a real switch under the finger.
 
 let is_enabled = true;
 
@@ -17,39 +11,11 @@ export function setHapticEnabled(enabled: boolean): void
     is_enabled = enabled;
 }
 
+// Call from a click handler (browsers only allow vibration after a user tap)
 export function triggerHaptic(): void
 {
-    if (!is_enabled)
-    {
-        return;
-    }
-
-    // Android (and some desktops) support the standard Vibration API
-    if (typeof navigator.vibrate === 'function')
+    if (is_enabled && typeof navigator.vibrate === 'function')
     {
         navigator.vibrate(ANDROID_VIBRATE_MS);
-        return;
-    }
-
-    try
-    {
-        const label = document.createElement('label');
-        label.setAttribute('aria-hidden', 'true');
-        // Rendered but invisible: newer iOS may skip the haptic for display:none elements
-        label.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;';
-
-        const input = document.createElement('input');
-        input.type = 'checkbox';
-        input.setAttribute('switch', '');
-        label.appendChild(input);
-
-        // A fresh element each time: iOS only ticks when the switch state changes
-        document.body.appendChild(label);
-        label.click();
-        document.body.removeChild(label);
-    }
-    catch
-    {
-        // Haptics are a nice-to-have; never break a tap because of them
     }
 }

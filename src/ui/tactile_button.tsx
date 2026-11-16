@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { SPRING_PRESS } from './motion_presets';
+import { getPressableProps } from './pressable';
+import { HapticOverlay } from './haptic_overlay';
 import styles from './tactile_button.module.css';
 
 // A physical-feeling 3D button: the face sinks into its base on press,
@@ -56,8 +58,8 @@ export function TactileButton(props: TactileButtonProps)
         playSfx('press');
     }
 
-    // Haptic fires on click: iOS only allows it inside a real user activation,
-    // and on touch screens pointerdown does not count as one.
+    // iPhone haptics come from the HapticOverlay under the finger;
+    // triggerHaptic covers Android (vibration needs a click, not pointerdown).
     function handleClick(): void
     {
         triggerHaptic();
@@ -84,18 +86,16 @@ export function TactileButton(props: TactileButtonProps)
     ].join(' ');
 
     return (
-        <button
-            type="button"
+        <div
+            {...getPressableProps(handleClick, props.is_disabled)}
             className={class_names}
             style={{ paddingBottom: depth }}
-            disabled={props.is_disabled}
             aria-label={props.aria_label}
             aria-pressed={props.is_selected}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            onClick={handleClick}
         >
             <span className={styles.base} style={{ top: depth }} />
             <motion.span
@@ -105,6 +105,7 @@ export function TactileButton(props: TactileButtonProps)
             >
                 {props.children}
             </motion.span>
-        </button>
+            <HapticOverlay is_disabled={props.is_disabled} />
+        </div>
     );
 }

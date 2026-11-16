@@ -8,7 +8,8 @@ A bilingual (Vietnamese / English) PWA with a tactile "warm paper + extruded obj
 - **Focus** runs real strict-mode sessions: countdown on a black screen, wake lock, leave-the-app limits (phone), random "Still there?" checks with an escalating chime, a required note, and saved history.
 - **Journey** shows the real streak (from session history) with a low-poly flame for all 9 tiers; tiers can be previewed.
 - **Chests** shows the chest and rarity teasers; chest earning/opening is not wired to the UI yet.
-- **Settings**: daily goal (applies tomorrow), language, sound, haptics (with diagnostics), sound test.
+- **Settings**: daily goal (applies tomorrow), language, sound, haptics, sound test.
+- Every tap target is a `div` with button semantics (`getPressableProps`) holding a `HapticOverlay`, so iPhones buzz on tap.
 - `src/core/` holds all game rules as pure, tested TypeScript.
 - Hidden dev mode (tap the Focus kicker 5 times): sessions run 25x faster; time limits stay in real seconds.
 
@@ -66,23 +67,24 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 ### Design system (`src/ui/`)
 | File | Role |
 |---|---|
-| `motion_presets.ts` | Shared springs: `SPRING_PRESS`, `SPRING_SLIDE`, `SPRING_POP` |
-| `tactile_button.tsx` | Extruded button: face sinks into its side band on press (spring), `press`/`release` sounds on pointer down/up, haptic on click. Variants `accent`/`neutral`/`ink`, sizes `sm`/`md`/`lg` (`lg` is uppercase display text), latched `is_selected` (ink face), `is_disabled` |
-| `toggle_switch.tsx` | On/off switch: absolutely positioned knob (only `x` animates, stays vertically centered), even inset ring on the track, `toggle` sound + haptic |
-| `segmented_switch.tsx` | Generic `SegmentedSwitch<Value>`: sunken track, labeled options, raised ink thumb that slides (`useId` layoutId per instance); even shadows and cap-height-trimmed labels (`text-box`) for optical centering; used for VI / EN |
-| `tab_bar.tsx` | Floating extruded dock; `TabId` = streak (Journey), focus, rewards, settings with translated labels; ink pill slides between tabs (`layoutId`) |
+| `motion_presets.ts` | Shared springs: `SPRING_PRESS`, `SPRING_SLIDE`, `SPRING_POP` (position/scale only: it overshoots) and `OPACITY_FADE` (tween to pair with springs so opacity never bounces back) |
+| `pressable.ts` | `getPressableProps(onActivate, is_disabled, role)`: role, tabIndex, `aria-disabled`, click and Enter/Space handling for div-based tap targets |
+| `tactile_button.tsx` | Extruded button (`div` + `getPressableProps` + `HapticOverlay`): face sinks into its side band on press (spring), `press`/`release` sounds on pointer down/up, Android vibration on click. Variants `accent`/`neutral`/`ink`, sizes `sm`/`md`/`lg` (`lg` is uppercase display text), latched `is_selected` (ink face), `is_disabled` |
+| `toggle_switch.tsx` | On/off switch (`div` role switch + `HapticOverlay`): absolutely positioned knob (only `x` animates, stays vertically centered), even inset ring on the track, `toggle` sound + haptic |
+| `segmented_switch.tsx` | Generic `SegmentedSwitch<Value>`: sunken track, labeled options (`div` role radio + `HapticOverlay`), raised ink thumb that slides (`useId` layoutId per instance); even shadows and cap-height-trimmed labels (`text-box`) for optical centering; used for VI / EN |
+| `tab_bar.tsx` | Floating extruded dock (div tabs + `HapticOverlay`); `TabId` = streak (Journey), focus, rewards, settings with translated labels; ink pill slides between tabs (`layoutId`) |
 | `screen.tsx` | Page frame: safe-area padding, optional mono `kicker` (with optional `onKickerTap`) + display `title`, left or center aligned |
 | `ribbon.tsx` | Banner with folded notched tails; colors `blue`/`ink`/`flame`; pops in |
 | `typewriter_text.tsx` | Types text character by character with soft `tick` sounds; each new character fades in from a warm accent glow to ink (no caret); reserves final size so layout does not jump; restarts when `text` changes |
-| `hold_button.tsx` | Press-and-hold to confirm (default 2 s): a fill grows while held, letting go cancels. Used for "give up" |
-| `haptic_overlay.tsx` | Nearly invisible real `<input type="checkbox" switch>` stretched over a tap area, so the finger itself toggles a switch (newer iOS only buzzes for real taps). Currently used on the Settings test pad; parent must be `position: relative` and not a `<button>` |
+| `hold_button.tsx` | Press-and-hold to confirm (default 2 s): a fill grows while held, letting go cancels. Used for "give up"; a real `<button>` (no haptic overlay: a hold is not a tap) |
+| `haptic_overlay.tsx` | Nearly invisible real `<input type="checkbox" switch>` stretched over a tap area, so the finger itself toggles a switch and iOS buzzes (newer iOS ignores programmatic clicks). Renders nothing when haptics are off or the target is disabled. Parent must be `position: relative` and not a `<button>` |
 | `icons.tsx` | Inline SVG icons (flame, timer, chest, gear) using `currentColor` |
 
 ### Sound (`src/sound/`)
 | File | Role |
 |---|---|
-| `sfx_engine.ts` | Web Audio synthesizer. `playSfx(name, loudness_scale = 1)` for `press`, `release`, `tab`, `toggle`, `chime`, `tick`, `whoosh`, `sparkle`, `crack`; `loudness_scale` > 1 for escalating alarms. Context lifecycle: `unlockAudio()` resumes any non-running state (incl. iOS `interrupted`), re-resumes on `visibilitychange`, rebuilds a fresh context on the next tap if a resume fails or times out (400 ms). Sets `navigator.audioSession.type = 'playback'` so sounds play with the silent switch on |
-| `haptic_hack.ts` | `triggerHaptic()`: `navigator.vibrate` on Android; on iOS appends an invisible label wrapping `<input switch>` to `<body>`, clicks it, removes it. Called from click handlers. Known not to buzz on newer iOS (programmatic clicks); see `haptic_overlay.tsx` |
+| `sfx_engine.ts` | Web Audio synthesizer. `playSfx(name, loudness_scale = 1)` for `press`, `release`, `tab`, `toggle`, `chime`, `tick`, `whoosh`, `sparkle`, `crack`; `loudness_scale` > 1 for escalating alarms. Context lifecycle: every return from the background marks the context stale (iOS can report "running" yet stay silent) and tries a resume; `unlockAudio()` rebuilds a fresh context only inside a real user gesture (`navigator.userActivation.isActive`), otherwise just resumes; a failed/timed-out resume (400 ms) also marks it stale. `isAudioStale()` tells the UI a tap is needed. Sets `navigator.audioSession.type = 'playback'` so sounds play with the silent switch on |
+| `haptic_hack.ts` | `triggerHaptic()`: Vibration API only (Android), called from click handlers. iPhone haptics come from `HapticOverlay` |
 
 ### Stores (`src/stores/`)
 | File | Role |
@@ -99,19 +101,20 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 | `streak/low_poly_flame.tsx` | SVG flame (size prop or `--flame-size` CSS variable; journey uses `min(230px, 25dvh)`): 20 shell + 5 core facets with 4-shade lighting; facets fly in and assemble on mount / tier change; sway; floating shards; glow + ground shadow; `rainbow` and `galaxy` effects |
 | `streak/flame_palettes.ts` | `FLAME_PALETTES[tier_index]`: facet shades, core colors, glow, shard colors, effect |
 | `streak/tier_strip.tsx` | Extruded strip of 9 mini flame badges (colored when reached, outlined when locked) with a sliding marker; tap to preview |
-| `focus/focus_screen.tsx` | Idle Focus tab: kitchen-timer dial (size capped at `30dvh`; SVG pie-slice wedge; needle in an unclipped layer with a fixed shadow; ratchet ticks on change), mono time, today's pips from `useTodayProgress()`, 25/50 selector (persisted), start button (starts a session; shows a DEV badge in dev mode). Kicker shows "session n / goal" or "goal done"; 5 taps on it toggle dev mode with a toast |
+| `focus/focus_screen.tsx` | Idle Focus tab (time digits swap with spring movement + `OPACITY_FADE`): kitchen-timer dial (size capped at `30dvh`; SVG pie-slice wedge; needle in an unclipped layer with a fixed shadow; ratchet ticks on change), mono time, today's pips from `useTodayProgress()`, 25/50 selector (persisted), start button (starts a session; shows a DEV badge in dev mode). Kicker shows "session n / goal" or "goal done"; 5 taps on it toggle dev mode with a toast |
 | `focus/focus_session_layer.tsx` | Fixed full-screen layer while a session exists; runs `useFocusGuard` and `useWakeLock`; picks the view by status; plays the time-up chime (3 rings), crack + haptic on break, sparkle on completion |
-| `focus/session_running.tsx` | Black running view: label (+ DEV chip), thin progress ring, big countdown, time-away budget (phone) or desktop check count, leave hint, hold-to-give-up; shows `PresenceCheck` when a check is open |
+| `focus/session_running.tsx` | Black running view: "tap to turn sound back on" pill while `isAudioStale()` (any tap on the view rebuilds audio), label (+ DEV chip), thin progress ring, big countdown, time-away budget (phone) or desktop check count, leave hint, hold-to-give-up; shows `PresenceCheck` when a check is open |
 | `focus/presence_check.tsx` | "Still there?" over a solid accent screen with a pulsing flash, countdown in real seconds, big answer button; chime rings every 8 s, louder each time (0.6 → 2.2) |
 | `focus/session_note.tsx` | "What did you do?" textarea (17 px so iOS doesn't zoom), live min-length hint, save button disabled until valid |
 | `focus/session_done.tsx` | Celebration: today's pips with the new one popping in, "flame kept today" ribbon when the goal is met, typewriter line (goal met / sessions left), continue |
-| `focus/session_broken.tsx` | Cracked, shaking dial, reason per `BreakReason`, retry (starts a new session) / back |
+| `focus/session_broken.tsx` | `ShatteredDial`, reason card with an icon per `BreakReason`, typewriter encouragement, retry (starts a new session) / back |
+| `focus/shattered_dial.tsx` | The Focus dial breaking: pink disc split into 7 thick shards along bent cracks from an off-center origin (shared edges, so it starts whole), shards burst out and drop with springs, the needle snaps and falls (an invisible hub-centered circle makes it rotate around the hub), debris triangles fly and fade; the cream ring stays intact |
 | `focus/use_focus_guard.ts` | While running: 1 s tick interval, `visibilitychange` → hidden/visible, `pagehide` → hidden |
 | `focus/use_wake_lock.ts` | Screen wake lock while active; re-requested whenever the page becomes visible; fails silently |
 | `focus/format_time.ts` | `formatClock(seconds)` → `mm:ss` (rounded up) |
 | `rewards/chest_screen.tsx` | 2.5D chest that floats and rattles when tapped (typewriter line changes after 3 taps), chest count ribbon, rarity teaser cards with drop rates. Epic: purple sweep, pulsing gem, sparkles. Legendary: rotating conic gold border (`@property --border-angle`), pulsing glow, gold sweep, spinning gem, gold gradient text, more sparkles |
 | `rewards/chest_art.tsx` | Flat-shaded SVG chest (front, side, lid, bands, lock) |
-| `settings/settings_screen.tsx` | Goal group (− / + stepper editing tomorrow's goal, caption shows today vs tomorrow when pending), General (VI / EN), Sound & haptics (sound, volume, haptic toggle, native iOS switch diagnostic, overlay-method haptic test pad), sound test buttons + haptic-only button, version |
+| `settings/settings_screen.tsx` | Goal group (− / + stepper editing tomorrow's goal, caption shows today vs tomorrow when pending), General (VI / EN), Sound & haptics (sound, volume, haptic toggle), sound test buttons + haptic-only button, version |
 
 Each `.tsx` with styles has a sibling `<name>.module.css` (CSS Modules); the focus session views share `focus/focus_session.module.css`.
 
@@ -141,6 +144,8 @@ Each core test file also pins the numbers agreed in the plan, so an accidental e
 - Variables `snake_case`, functions `camelCase`, components/types/enums `PascalCase`, constants `UPPER_SNAKE_CASE`.
 - Files `snake_case`, including React component files (`tab_bar.tsx` exports `TabBar`). CSS Module class names are `snake_case`.
 - Component props use `snake_case` fields (`is_selected`, `aria_label`); callback props are `camelCase` (`onChange`).
+- Tap targets: `div` + `getPressableProps` + `<HapticOverlay />`, never `<button>` (except `HoldButton`).
+- Never animate opacity with a bouncy spring (it overshoots and brings ghosts back); pair springs with `OPACITY_FADE`.
 - Zustand: select single values (or functions) per hook call; never return a new object from a selector (Zustand 5 would re-render forever).
 - Allman braces; English code comments with aligned trailing `//` comments.
 - All visible text comes from `src/i18n/strings.ts` via `useT()` (both `vi` and `en`); "VI"/"EN" labels and the "Tiếng Việt · English" caption are the only literals. Display and mono text is uppercased with CSS (`text-transform`), not in the source strings.
