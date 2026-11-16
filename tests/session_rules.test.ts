@@ -216,6 +216,22 @@ describe('cheating the clock', () =>
     });
 });
 
+describe('dev mode limit scale', () =>
+{
+    it('stretches the answer window and away limits by the scale', () =>
+    {
+        const scale = 25;
+        const state = startSession(T0, 25, 'phone', createSeededRandom(1), scale);
+        const due = state.presence_checks[0].due_at_second;
+        // 2x the normal window is still fine when limits are scaled 25x
+        expect(tickSession(state, T0 + (due + 2 * PRESENCE_RESPONSE_SECONDS) * SECOND).status).toBe('running');
+
+        let away = onAppHidden(state, T0 + MINUTE);
+        away = onAppVisible(away, T0 + MINUTE + 5 * MINUTE);   // 5 min < 60 s x 25
+        expect(away.status).toBe('running');
+    });
+});
+
 describe('giving up', () =>
 {
     it('marks the session broken', () =>

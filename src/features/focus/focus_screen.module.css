@@ -182,3 +182,16 @@
     text-transform: uppercase;
     color: var(--color-ink-soft);
 }
+
+/* Small "DEV x25" tag inside the start button when dev mode is on */
+.dev_badge
+{
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--color-yellow);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-shadow: none;
+}

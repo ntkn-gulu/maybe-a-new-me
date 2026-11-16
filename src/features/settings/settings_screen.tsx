@@ -3,7 +3,10 @@ import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { ToggleSwitch } from '../../ui/toggle_switch';
 import { SegmentedSwitch, type SegmentOption } from '../../ui/segmented_switch';
+import { HapticOverlay } from '../../ui/haptic_overlay';
 import { useSettingsStore } from '../../stores/settings_store';
+import { MAX_DAILY_GOAL, MIN_DAILY_GOAL, useGoalSetting, useProgressStore } from '../../stores/progress_store';
+import { getTodayKey } from '../../stores/clock';
 import { playSfx, type SfxName } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
 import type { Language, StringKey } from '../../i18n/strings';
@@ -63,9 +66,34 @@ export function SettingsScreen()
     const setSoundEnabled = useSettingsStore((state) => state.setSoundEnabled);
     const setSfxVolume = useSettingsStore((state) => state.setSfxVolume);
     const setHapticEnabled = useSettingsStore((state) => state.setHapticEnabled);
+    const goal = useGoalSetting();
+    const setDailyGoal = useProgressStore((state) => state.setDailyGoal);
+
+    // Edits the value for tomorrow (today's goal can never be lowered)
+    function changeGoal(step: number): void
+    {
+        setDailyGoal(goal.tomorrow_goal + step, getTodayKey());
+    }
 
     return (
         <Screen kicker={t('settings_kicker')} title={t('settings_title')}>
+            <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_goal')}</h2>
+            <div className={styles.group}>
+                <SettingRow
+                    label={t('settings_goal')}
+                    caption={goal.tomorrow_goal !== goal.today_goal
+                        ? t('settings_goal_pending', { today: goal.today_goal, tomorrow: goal.tomorrow_goal })
+                        : t('settings_goal_caption')}
+                    control={
+                        <div className={styles.stepper}>
+                            <TactileButton size="sm" is_disabled={goal.tomorrow_goal <= MIN_DAILY_GOAL} onClick={() => changeGoal(-1)} aria_label="-1">−</TactileButton>
+                            <span className={styles.stepper_value}>{goal.tomorrow_goal}</span>
+                            <TactileButton size="sm" is_disabled={goal.tomorrow_goal >= MAX_DAILY_GOAL} onClick={() => changeGoal(1)} aria_label="+1">+</TactileButton>
+                        </div>
+                    }
+                />
+            </div>
+
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_general')}</h2>
             <div className={styles.group}>
                 <SettingRow
@@ -116,6 +144,17 @@ export function SettingsScreen()
                         // Diagnostic: the browser's own switch. If flipping this one by hand does
                         // not buzz, iOS gives no web haptics on this device and our trick can't either.
                         <input type="checkbox" {...NATIVE_SWITCH_ATTRIBUTE} className={styles.native_switch} aria-label={t('settings_native_switch')} />
+                    }
+                />
+                <SettingRow
+                    label={t('settings_haptic_pad')}
+                    caption={t('settings_haptic_pad_caption')}
+                    control={
+                        // Test pad for the overlay method: the finger lands on an invisible real switch
+                        <div className={styles.haptic_pad} onClick={() => playSfx('tick')}>
+                            <span aria-hidden="true">👆</span>
+                            <HapticOverlay />
+                        </div>
                     }
                 />
             </div>

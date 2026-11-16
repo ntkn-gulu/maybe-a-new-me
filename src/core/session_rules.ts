@@ -45,6 +45,9 @@ export interface FocusGuardState
     presence_checks: PresenceCheck[];
     last_seen_at: number;       // latest time seen, to detect clock changes
     note: string;
+    // Multiplies every time limit (answer window, time away). 1 normally; the
+    // dev-mode speed factor, so limits still feel like real seconds while testing.
+    limit_scale: number;
 }
 
 // Random check times: within each 25-minute block, `checks_per_block`
@@ -70,7 +73,7 @@ export function planPresenceChecks(planned_minutes: FocusLength, device: Device,
     return due_seconds;
 }
 
-export function startSession(now: number, planned_minutes: FocusLength, device: Device, random: RandomFn): FocusGuardState
+export function startSession(now: number, planned_minutes: FocusLength, device: Device, random: RandomFn, limit_scale = 1): FocusGuardState
 {
     return {
         started_at: now,
@@ -83,6 +86,7 @@ export function startSession(now: number, planned_minutes: FocusLength, device: 
         presence_checks: planPresenceChecks(planned_minutes, device, random).map((due_at_second) => ({ due_at_second, answered: false })),
         last_seen_at: now,
         note: '',
+        limit_scale,
     };
 }
 
@@ -101,9 +105,15 @@ export function getRemainingSeconds(state: FocusGuardState, now: number): number
     return Math.max(0, state.planned_minutes * 60 - getElapsedSeconds(state, now));
 }
 
-export function getMaxAwayMs(planned_minutes: FocusLength): number
+export function getMaxAwayMs(planned_minutes: FocusLength, limit_scale = 1): number
 {
-    return (planned_minutes / 25) * MAX_AWAY_SECONDS_PER_25_MIN * MS_PER_SECOND;
+    return (planned_minutes / 25) * MAX_AWAY_SECONDS_PER_25_MIN * MS_PER_SECOND * limit_scale;
+}
+
+// Seconds allowed to answer a check, in session time
+export function getResponseSeconds(state: FocusGuardState): number
+{
+    return PRESENCE_RESPONSE_SECONDS * state.limit_scale;
 }
 
 // The check currently waiting for an answer, if any
@@ -131,7 +141,7 @@ export function tickSession(state: FocusGuardState, now: number): FocusGuardStat
     }
 
     const elapsed = getElapsedSeconds(state, now);
-    const missed = state.presence_checks.some((check) => !check.answered && elapsed >= check.due_at_second + PRESENCE_RESPONSE_SECONDS);
+    const missed = state.presence_checks.some((check) => !check.answered && elapsed >= check.due_at_second + getResponseSeconds(state));
     if (missed)
     {
         return breakSession(state, 'missed_check', now);
@@ -170,11 +180,11 @@ export function onAppVisible(state: FocusGuardState, now: number): FocusGuardSta
 
     const away_ms = now - state.away_since;
     const total_away_ms = state.total_away_ms + away_ms;
-    if (away_ms > LEAVE_GRACE_SECONDS * MS_PER_SECOND)
+    if (away_ms > LEAVE_GRACE_SECONDS * MS_PER_SECOND * state.limit_scale)
     {
         return breakSession({ ...state, total_away_ms }, 'left_app', now);
     }
-    if (total_away_ms > getMaxAwayMs(state.planned_minutes))
+    if (total_away_ms > getMaxAwayMs(state.planned_minutes, state.limit_scale))
     {
         return breakSession({ ...state, total_away_ms }, 'away_too_long', now);
     }

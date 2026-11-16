@@ -5,6 +5,7 @@ import { Ribbon } from '../../ui/ribbon';
 import { TypewriterText } from '../../ui/typewriter_text';
 import { FLAME_TIERS, getTierProgress } from '../../core/flame_tiers';
 import { playSfx } from '../../sound/sfx_engine';
+import { useStreak } from '../../stores/progress_store';
 import { useT } from '../../i18n/use_t';
 import { tierNameKey, tierWordsKey } from '../../i18n/strings';
 import { LowPolyFlame } from './low_poly_flame';
@@ -13,15 +14,15 @@ import styles from './streak_screen.module.css';
 
 // Journey tab: the current flame, its words of support, progress to the
 // next tier, and a strip of every tier that can be tapped to preview.
-// Streak data is not stored yet (phase 2), so the streak is 0 for now.
+// The streak comes from real session history (progress_store + core/streak_engine).
 
-const DEMO_STREAK_DAYS = 0;
 const LAST_TIER_INDEX = FLAME_TIERS.length - 1;
 
 export function StreakScreen()
 {
     const t = useT();
-    const progress = getTierProgress(DEMO_STREAK_DAYS);
+    const streak = useStreak();
+    const progress = getTierProgress(streak.current_streak);
     const [selected_index, setSelectedIndex] = useState(progress.current.index);
 
     const selected_tier = FLAME_TIERS[selected_index];
@@ -40,7 +41,7 @@ export function StreakScreen()
 
     const selected_name = t(tierNameKey(selected_index));
 
-    let ribbon_text = t('journey_streak', { n: DEMO_STREAK_DAYS });
+    let ribbon_text = t('journey_streak', { n: streak.current_streak });
     if (is_locked)
     {
         ribbon_text = t('journey_unlock_at', { n: selected_tier.min_days });

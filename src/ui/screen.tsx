@@ -9,6 +9,7 @@ interface ScreenProps
     kicker?: string;        // small mono label above the title
     title?: string;         // big condensed uppercase title
     align?: 'left' | 'center';
+    onKickerTap?: () => void;
     children: ReactNode;
 }
 
@@ -19,7 +20,7 @@ export function Screen(props: ScreenProps)
         <section className={styles.screen}>
             {(props.kicker || props.title) && (
                 <header className={align === 'center' ? `${styles.header} ${styles.center}` : styles.header}>
-                    {props.kicker && <span className="mono_label">{props.kicker}</span>}
+                    {props.kicker && <span className="mono_label" onClick={props.onKickerTap}>{props.kicker}</span>}
                     {props.title && <h1 className={styles.title}>{props.title}</h1>}
                 </header>
             )}

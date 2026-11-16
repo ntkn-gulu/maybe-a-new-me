@@ -33,18 +33,19 @@ It is built as a **Progressive Web App**, so it runs on an iPhone home screen an
 ## Features
 
 ### Available now
+- ⏱️ **Strict focus sessions** — 25 / 50 minute sessions on a black OLED screen that stays awake, limits on leaving the app, random "Still there?" checks with a chime that grows louder, and a one-line note to finish. A real streak builds from your history.
+- 🎯 **Daily goal** — pick 1–12 pomodoros a day; changes apply from tomorrow.
 - 🎛️ **Tactile design system** — extruded 3D buttons that sink and spring back, switches, ribbons, a floating dock tab bar, all on a warm-paper theme.
 - 🔊 **Synthesized sound** — every click, tick, whoosh, sparkle and chime is generated live with the Web Audio API (no audio files), set up to keep playing with the iPhone silent switch on.
 - 📳 **Experimental iOS haptics** — light taps on iOS 18+ Safari without a native app.
 - 🔥 **Journey screen** — a faceted low-poly flame that assembles itself, words of support typed out like a typewriter, progress to the next tier, and a strip to preview all 9 tiers.
-- ⏱️ **Focus dial** — a kitchen-timer style dial for 25 / 50 minute sessions, with a springy needle and ratchet clicks.
+- 🕰️ **Focus dial** — a kitchen-timer style dial with a springy needle and ratchet clicks.
 - 🎁 **Chest preview** — a 2.5D chest and rarity cards; Epic shimmers, Legendary has a spinning gold border, glow and sparkles.
 - 🌐 **Vietnamese / English** — switch languages in Settings; every string exists in both.
 - 📲 **Installable & offline** — add to the iPhone home screen; fonts and assets are cached for offline use.
 
 ### On the way (V1)
-- Strict, cheat-resistant Pomodoro timer
-- Daily goals, sport days and streak freezes
+- Sport-day check-ins, streak freezes and the monthly calendar
 - Real chests with gacha drops, pity and a collection
 - Lofi music and ambient sounds
 - Onboarding and JSON backup
@@ -68,7 +69,7 @@ Your streak grows a flame through nine tiers. Locked tiers can be previewed in f
 | 7 | 180 | Thất Sắc Hỏa | Prism Flame |
 | 8 | 365 | Thiên Hà Hỏa | Galaxy Flame |
 
-### Strict mode *(planned)*
+### Strict mode
 A session only counts if you actually stayed with it:
 
 - **Fixed lengths** — 25 or 50 minutes, nothing shorter.
@@ -77,7 +78,7 @@ A session only counts if you actually stayed with it:
 - **"What did you do?"** — a one-line note is required to finish a session.
 - **Clock tampering** — sessions recorded with a clock that moved backwards are rejected.
 - **Daily goal changes apply tomorrow**, so the goal can't be lowered just to save today.
-- **Sport days** — on chosen weekdays, a workout check-in plus one session keeps the flame.
+- **Sport days** — on chosen weekdays, a workout check-in plus one session keeps the flame *(check-in screen coming in phase 3)*.
 - **Streak freezes** — earned every 7 days; you can hold 2, rising to 5 as your streak grows.
 
 ### Chests *(planned)*
@@ -181,7 +182,7 @@ One-time setup: **Settings → Pages → Source: GitHub Actions**.
 
 - [x] **Phase 0** — Project setup, tactile design system, journey preview, bilingual UI, PWA
 - [x] **Phase 1** — Game rules in `core/` with tests (streak, freezes, anti-cheat, gacha + pity)
-- [ ] **Phase 2** — Real focus timer with strict mode, wake lock and presence checks
+- [x] **Phase 2** — Real focus timer with strict mode, wake lock and presence checks
 - [ ] **Phase 3** — Live flame journey: level-up moments, monthly calendar, sport check-ins
 - [ ] **Phase 4** — Chests, opening animation, collection and shard exchange
 - [ ] **Phase 5** — Lofi music and ambient sound mixer

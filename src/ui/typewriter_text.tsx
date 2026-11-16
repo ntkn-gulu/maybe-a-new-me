@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { playSfx } from '../sound/sfx_engine';
 import styles from './typewriter_text.module.css';
 
-// Types text out one character at a time with soft key ticks,
-// like the narration lines in a journey. Restarts when `text` changes.
+// Types text out one character at a time with soft key ticks. Each new
+// character fades in from a soft glow, like ink settling on paper.
+// Restarts when `text` changes.
 
 interface TypewriterTextProps
 {
@@ -52,16 +53,17 @@ export function TypewriterText(props: TypewriterTextProps)
         };
     }, [props.text, is_sound_on, start_delay_ms]);
 
-    const is_done = visible_count >= props.text.length;
+    // Plain inline spans (not inline-block) so words still wrap normally
+    const typed_chars = [...props.text.slice(0, visible_count)];
 
     return (
         <p className={styles.text} aria-label={props.text}>
             {/* Invisible full text reserves the final size, so layout never jumps */}
             <span className={styles.ghost} aria-hidden="true">{props.text}</span>
             <span className={styles.typed} aria-hidden="true">
-                {props.text.slice(0, visible_count)}
-                {/* Caret only while typing; it disappears once the line is complete */}
-                {!is_done && <span className={styles.caret} />}
+                {typed_chars.map((char, index) => (
+                    <span key={index} className={styles.char}>{char}</span>
+                ))}
             </span>
         </p>
     );

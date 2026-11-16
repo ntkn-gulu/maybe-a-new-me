@@ -1,23 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useSpring, useTransform } from 'motion/react';
 import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { playSfx } from '../../sound/sfx_engine';
 import { SPRING_POP } from '../../ui/motion_presets';
 import { useT } from '../../i18n/use_t';
+import { useFocusStore, DEV_TIME_SCALE } from '../../stores/focus_store';
+import { useTodayProgress } from '../../stores/progress_store';
+import { useSettingsStore } from '../../stores/settings_store';
+import { detectDevice } from '../../stores/clock';
+import type { FocusLength } from '../../core/types';
 import styles from './focus_screen.module.css';
 
 // Focus tab. A chunky kitchen-timer dial: the colored wedge shows how long
-// the session is, the needle sits at its end. Phase 0 shows the layout;
-// the real countdown, anti-cheat guard and wake lock arrive in phase 2.
-
-type FocusLength = 25 | 50;
+// the session is, the needle sits at its end. Start opens the session layer.
+// Tapping the kicker 5 times toggles dev mode (sessions run 25x faster).
 
 const FOCUS_LENGTHS: FocusLength[] = [25, 50];
+const DEV_MODE_TAPS = 5;
+const DEV_TAP_WINDOW_MS = 2000;
+const DEV_TOAST_MS = 1800;
 const DEGREES_PER_MINUTE = 6;          // 60 minutes = full circle
 const TICK_COUNT = 60;
-const DEMO_DAILY_GOAL = 4;
-const DEMO_DONE_TODAY = 0;
 
 const RATCHET_CLICKS = 7;
 const RATCHET_INTERVAL_MS = 45;
@@ -52,8 +56,14 @@ function wedgePath(degrees: number): string
 export function FocusScreen()
 {
     const t = useT();
-    const [focus_length, setFocusLength] = useState<FocusLength>(25);
-    const [is_preview_note_visible, setIsPreviewNoteVisible] = useState(false);
+    const focus_length = useFocusStore((state) => state.selected_length);
+    const setFocusLength = useFocusStore((state) => state.setSelectedLength);
+    const start = useFocusStore((state) => state.start);
+    const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
+    const toggleDevMode = useSettingsStore((state) => state.toggleDevMode);
+    const today = useTodayProgress();
+    const [dev_toast, setDevToast] = useState<string | null>(null);
+    const kicker_taps = useRef<number[]>([]);
 
     const sweep_degrees = useSpring(focus_length * DEGREES_PER_MINUTE, DIAL_SPRING);
     const wedge_d = useTransform(sweep_degrees, wedgePath);
@@ -79,12 +89,32 @@ export function FocusScreen()
 
     function handleStart(): void
     {
-        playSfx('chime');
-        setIsPreviewNoteVisible(true);
+        playSfx('whoosh');
+        start(detectDevice(), is_dev_mode);
     }
 
+    // 5 quick taps on the kicker toggle dev mode
+    function handleKickerTap(): void
+    {
+        const now = Date.now();
+        kicker_taps.current = [...kicker_taps.current.filter((time) => now - time < DEV_TAP_WINDOW_MS), now];
+        if (kicker_taps.current.length < DEV_MODE_TAPS)
+        {
+            return;
+        }
+        kicker_taps.current = [];
+        toggleDevMode();
+        playSfx('sparkle');
+        setDevToast(is_dev_mode ? t('dev_mode_off') : t('dev_mode_on', { n: DEV_TIME_SCALE }));
+        window.setTimeout(() => setDevToast(null), DEV_TOAST_MS);
+    }
+
+    const kicker = today.done >= today.goal
+        ? t('focus_kicker_done', { done: today.done })
+        : t('focus_kicker', { n: today.done + 1, goal: today.goal });
+
     return (
-        <Screen kicker={t('focus_kicker', { n: DEMO_DONE_TODAY + 1, goal: DEMO_DAILY_GOAL })} title={t('focus_title')}>
+        <Screen kicker={kicker} title={t('focus_title')} onKickerTap={handleKickerTap}>
             <div className={styles.dial}>
                 <div className={styles.dial_ring}>
                     {Array.from({ length: TICK_COUNT }, (_, index) => (
@@ -125,9 +155,9 @@ export function FocusScreen()
                 </AnimatePresence>
             </div>
 
-            <div className={styles.pips} aria-label={t('focus_pips_label', { done: DEMO_DONE_TODAY, goal: DEMO_DAILY_GOAL })}>
-                {Array.from({ length: DEMO_DAILY_GOAL }, (_, index) => (
-                    <span key={index} className={index < DEMO_DONE_TODAY ? `${styles.pip} ${styles.pip_done}` : styles.pip} />
+            <div className={styles.pips} aria-label={t('focus_pips_label', { done: today.done, goal: today.goal })}>
+                {Array.from({ length: Math.max(today.goal, today.done) }, (_, index) => (
+                    <span key={index} className={index < today.done ? `${styles.pip} ${styles.pip_done}` : styles.pip} />
                 ))}
             </div>
 
@@ -147,16 +177,17 @@ export function FocusScreen()
             <div className={styles.start_area}>
                 <TactileButton variant="accent" size="lg" is_full_width onClick={handleStart}>
                     {t('focus_start')}
+                    {is_dev_mode && <span className={styles.dev_badge}>{t('focus_dev_chip', { n: DEV_TIME_SCALE })}</span>}
                 </TactileButton>
                 <AnimatePresence>
-                    {is_preview_note_visible && (
+                    {dev_toast && (
                         <motion.p
                             className={styles.preview_note}
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                         >
-                            {t('focus_preview_note')}
+                            {dev_toast}
                         </motion.p>
                     )}
                 </AnimatePresence>

@@ -5,6 +5,7 @@ import { FocusScreen } from './features/focus/focus_screen';
 import { StreakScreen } from './features/streak/streak_screen';
 import { ChestScreen } from './features/rewards/chest_screen';
 import { SettingsScreen } from './features/settings/settings_screen';
+import { FocusSessionLayer } from './features/focus/focus_session_layer';
 import styles from './app.module.css';
 
 // App shell: one active screen + the bottom tab bar.
@@ -46,6 +47,7 @@ export function App()
                 </motion.main>
             </AnimatePresence>
             <TabBar active_tab={active_tab} onChange={setActiveTab} />
+            <FocusSessionLayer />
         </div>
     );
 }

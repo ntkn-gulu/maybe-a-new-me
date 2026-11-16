@@ -31,6 +31,28 @@ export interface DayRecord
 
 export type DayResult = 'kept' | 'frozen' | 'missed' | 'pending';
 
+// One finished focus session as kept in history (completed or broken)
+export interface SessionRecord
+{
+    id: string;
+    day_key: DayKey;                    // app day the session started on
+    started_at: number;                 // epoch ms
+    ended_at: number;
+    planned_minutes: FocusLength;
+    device: Device;
+    status: 'completed' | 'broken';
+    break_reason: string | null;
+    note: string;
+}
+
+// Workout check-in on a sport day
+export interface SportCheckIn
+{
+    day_key: DayKey;
+    activity: SportActivity;
+    note: string;
+}
+
 export interface PityState
 {
     since_epic: number;                 // chests opened since the last epic-or-better

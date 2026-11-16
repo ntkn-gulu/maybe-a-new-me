@@ -2,7 +2,7 @@
 // No audio files: every sound is generated from oscillators and noise,
 // so there is nothing to download and no licensing to worry about.
 
-export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle';
+export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle' | 'crack';
 
 interface AudioSessionLike
 {
@@ -20,6 +20,7 @@ let noise_buffer: AudioBuffer | null = null;
 let current_volume = 0.8;
 let is_enabled = true;
 let needs_rebuild = false;     // set when resume() failed: next tap builds a fresh context
+let loudness = 1;             // per-call multiplier set by playSfx (e.g. escalating alarms)
 
 // Safari 17+ exposes navigator.audioSession. "playback" lets sounds play
 // even when the iPhone silent switch is on (needed for focus alarms).
@@ -156,7 +157,7 @@ function playTone(options: ToneOptions): void
     // Fast attack + exponential decay = a natural "plucked" envelope
     const envelope = context.createGain();
     envelope.gain.setValueAtTime(0.0001, start_time);
-    envelope.gain.exponentialRampToValueAtTime(options.peak, start_time + 0.004);
+    envelope.gain.exponentialRampToValueAtTime(options.peak * loudness, start_time + 0.004);
     envelope.gain.exponentialRampToValueAtTime(0.0001, end_time);
 
     oscillator.connect(envelope).connect(master_gain!);
@@ -187,7 +188,7 @@ function playNoise(options: NoiseOptions): void
     filter.Q.value = options.q;
 
     const envelope = context.createGain();
-    envelope.gain.setValueAtTime(options.peak, start_time);
+    envelope.gain.setValueAtTime(options.peak * loudness, start_time);
     envelope.gain.exponentialRampToValueAtTime(0.0001, end_time);
 
     source.connect(filter).connect(envelope).connect(master_gain!);
@@ -241,6 +242,13 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
             playTone({ start_hz: hz, end_hz: hz, duration: 0.35, peak: 0.12, wave: 'triangle', delay: index * 0.06 });
         });
     },
+    // Something snaps: sharp noise crack, then a low thud and a falling tone
+    crack: () =>
+    {
+        playNoise({ duration: 0.09, peak: 0.55, filter_hz: 2400, q: 0.9 });
+        playTone({ start_hz: 140, end_hz: 55, duration: 0.35, peak: 0.45, wave: 'sine' });
+        playTone({ start_hz: 620, end_hz: 180, duration: 0.4, peak: 0.12, wave: 'sawtooth', delay: 0.05 });
+    },
     // Soft bell: fundamental + inharmonic partials, long decay
     chime: () =>
     {
@@ -251,12 +259,15 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
     },
 };
 
-export function playSfx(name: SfxName): void
+// `loudness_scale` > 1 makes a sound louder than normal (used by alarms that escalate)
+export function playSfx(name: SfxName, loudness_scale = 1): void
 {
     if (!is_enabled || current_volume === 0)
     {
         return;
     }
     unlockAudio();
+    loudness = loudness_scale;
     SFX_RECIPES[name]();
+    loudness = 1;
 }
