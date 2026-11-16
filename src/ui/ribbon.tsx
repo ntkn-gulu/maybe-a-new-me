@@ -1,0 +1,31 @@
+import type { ReactNode } from 'react';
+import { motion } from 'motion/react';
+import { SPRING_POP } from './motion_presets';
+import styles from './ribbon.module.css';
+
+// Banner ribbon with folded tails ("CẤP 1 / 8", "HOÀN THÀNH").
+
+export type RibbonColor = 'blue' | 'ink' | 'flame';
+
+interface RibbonProps
+{
+    children: ReactNode;
+    color?: RibbonColor;
+}
+
+export function Ribbon(props: RibbonProps)
+{
+    const color = props.color ?? 'blue';
+    return (
+        <motion.div
+            className={`${styles.ribbon} ${styles[color]}`}
+            initial={{ scaleX: 0.3, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={SPRING_POP}
+        >
+            <span className={`${styles.tail} ${styles.tail_left}`} />
+            <span className={`${styles.tail} ${styles.tail_right}`} />
+            <span className={styles.band}>{props.children}</span>
+        </motion.div>
+    );
+}

@@ -2,7 +2,7 @@
 // No audio files: every sound is generated from oscillators and noise,
 // so there is nothing to download and no licensing to worry about.
 
-export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime';
+export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle';
 
 interface AudioSessionLike
 {
@@ -168,6 +168,26 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
     {
         playNoise({ duration: 0.015, peak: 0.2, filter_hz: 3200, q: 2 });
         playTone({ start_hz: 900, end_hz: 700, duration: 0.04, peak: 0.12, wave: 'square', delay: 0.035 });
+    },
+    // Typewriter key: very short, quiet, slightly random pitch
+    tick: () =>
+    {
+        playNoise({ duration: 0.012, peak: 0.07, filter_hz: 3000 + Math.random() * 1500, q: 4 });
+    },
+    // Air sweep: filtered noise rising in pitch (things flying in)
+    whoosh: () =>
+    {
+        playNoise({ duration: 0.35, peak: 0.12, filter_hz: 900, q: 0.7 });
+        playTone({ start_hz: 300, end_hz: 900, duration: 0.3, peak: 0.05, wave: 'sine' });
+    },
+    // Rising arpeggio: something good happened
+    sparkle: () =>
+    {
+        const NOTES_HZ = [1046, 1318, 1568, 2093];
+        NOTES_HZ.forEach((hz, index) =>
+        {
+            playTone({ start_hz: hz, end_hz: hz, duration: 0.35, peak: 0.12, wave: 'triangle', delay: index * 0.06 });
+        });
     },
     // Soft bell: fundamental + inharmonic partials, long decay
     chime: () =>

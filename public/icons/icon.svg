@@ -13,7 +13,8 @@
       <stop offset="100%" stop-color="#fff4d6"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="112" fill="#0b0b0d"/>
+  <rect width="512" height="512" rx="112" fill="#f2eee7"/>
+  <ellipse cx="256" cy="438" rx="120" ry="18" fill="#d9cfbf"/>
   <circle cx="256" cy="300" r="200" fill="url(#glow)"/>
   <path d="M256 84c18 62 92 104 92 196a92 92 0 0 1-184 0c0-46 22-74 44-98 4 30 18 46 34 52-10-58 6-110 14-150z" fill="url(#outer)"/>
   <path d="M256 236c10 30 46 48 46 92a46 46 0 0 1-92 0c0-28 16-44 28-58 2 16 10 24 18 26-4-24 0-44 0-60z" fill="url(#inner)"/>

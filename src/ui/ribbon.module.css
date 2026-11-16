@@ -1,0 +1,61 @@
+.ribbon
+{
+    position: relative;
+    display: inline-flex;
+    padding: 0 18px;
+}
+
+.band
+{
+    position: relative;
+    z-index: 1;
+    padding: 6px 18px 7px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--ribbon-face);
+    box-shadow: 0 6px 14px rgba(20, 20, 40, 0.18);
+}
+
+/* Folded tails behind the band, notched at the outer end */
+.tail
+{
+    position: absolute;
+    top: 7px;
+    width: 30px;
+    height: 100%;
+    background: var(--ribbon-side);
+}
+
+.tail_left
+{
+    left: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 35% 50%);
+}
+
+.tail_right
+{
+    right: 0;
+    clip-path: polygon(0 0, 100% 0, 65% 50%, 100% 100%, 0 100%);
+}
+
+.blue
+{
+    --ribbon-face: var(--color-blue);
+    --ribbon-side: var(--color-blue-side);
+}
+
+.ink
+{
+    --ribbon-face: var(--btn-ink-face);
+    --ribbon-side: #3a3a3a;
+}
+
+.flame
+{
+    --ribbon-face: var(--color-accent);
+    --ribbon-side: var(--color-accent-side);
+}

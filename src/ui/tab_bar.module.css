@@ -1,16 +1,22 @@
+/* Floating extruded dock at the bottom */
 .bar
 {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 50%;
+    bottom: calc(12px + var(--safe-bottom));
     z-index: 10;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    /* On wide screens keep the tabs in a phone-width column, centered */
-    padding: 8px max(12px, calc((100vw - 560px) / 2)) calc(8px + var(--safe-bottom));
-    background: linear-gradient(180deg, rgba(11, 11, 13, 0), var(--color-bg) 28%);
+    width: min(calc(100% - 2 * var(--gutter)), var(--content-max));
+    padding: 8px;
+    transform: translateX(-50%);
+    border-radius: var(--radius-lg);
+    background: var(--tile-face);
+    box-shadow:
+        0 7px 0 var(--tile-side),
+        0 18px 34px rgba(60, 45, 25, 0.18),
+        inset 0 0 0 1.5px var(--tile-stroke);
 }
 
 .tab
@@ -25,23 +31,24 @@
     padding: 0;
     border: none;
     background: none;
-    color: var(--color-text-faint);
+    color: var(--color-ink-faint);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .active
 {
-    color: var(--color-accent);
+    color: #ffffff;
 }
 
+/* Ink pill behind the active tab, slides between tabs */
 .pill
 {
     position: absolute;
-    inset: 2px 6px;
+    inset: 0;
     border-radius: var(--radius-md);
-    background: var(--color-surface-raised);
-    box-shadow: var(--shadow-inner-top), 0 0 22px var(--color-accent-glow);
+    background: var(--btn-ink-face);
+    box-shadow: 0 4px 0 var(--btn-ink-side);
 }
 
 .icon,
@@ -57,7 +64,9 @@
 
 .label
 {
-    font-size: 11px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }

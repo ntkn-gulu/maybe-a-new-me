@@ -17,9 +17,12 @@ body,
 
 body
 {
-    background: var(--color-bg);
-    color: var(--color-text);
+    background:
+        radial-gradient(120% 70% at 50% 0%, #fbf9f5 0%, transparent 60%),
+        var(--color-bg);
+    color: var(--color-ink);
     font-family: var(--font-ui);
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
@@ -36,7 +39,18 @@ button
 
 input[type="range"]
 {
-    accent-color: var(--color-accent);
+    accent-color: var(--color-ink);
+}
+
+/* Small uppercase mono label used all over the app ("CẤP 1 / 8") */
+.mono_label
+{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
 }
 
 @media (prefers-reduced-motion: reduce)

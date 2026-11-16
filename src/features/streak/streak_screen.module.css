@@ -1,64 +1,84 @@
-.stage
+.tier_name
 {
-    position: relative;
-    display: grid;
-    place-items: center;
-    height: 260px;
-    margin-top: 12px;
+    margin: 4px 0 10px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 58px;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-align: center;
 }
 
-.glow
+.ribbon_row
 {
-    position: absolute;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(217, 120, 58, 0.28), transparent 65%);
-    filter: blur(8px);
+    display: flex;
+    justify-content: center;
 }
 
-.ember
+.scene
 {
-    position: relative;
-    width: 120px;
-    height: 160px;
+    display: flex;
+    justify-content: center;
+    margin: 6px 0 4px;
+    transition: filter 0.3s;
 }
 
-.count_block
+/* Locked preview stays in full color (a teaser), just slightly softened */
+.locked
+{
+    filter: saturate(0.85);
+    opacity: 0.9;
+}
+
+.words
+{
+    min-height: 52px;
+    margin-bottom: 18px;
+}
+
+.progress
 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 12px;
+    gap: 8px;
+    margin-bottom: 22px;
 }
 
-.count
+.counter
 {
-    font-family: var(--font-digits);
-    font-size: 72px;
-    font-weight: 800;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
 }
 
-.count_label
+.counter_slash
 {
-    margin-top: 6px;
-    color: var(--color-text-dim);
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
+    color: var(--color-ink-faint);
 }
 
-.hint
+.bar
 {
-    margin: 28px 0 0;
-    padding: 14px 16px;
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-    border: 1px solid var(--color-stroke);
-    color: var(--color-text-dim);
-    text-align: center;
-    font-size: 14px;
+    width: 160px;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-deep);
+    box-shadow: inset 0 1px 2px rgba(60, 45, 25, 0.18);
+    overflow: hidden;
+}
+
+.bar_fill
+{
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: var(--color-ink);
+}
+
+.strip_area
+{
+    margin-top: auto;
 }

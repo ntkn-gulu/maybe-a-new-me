@@ -1,51 +1,105 @@
-import { motion } from 'motion/react';
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Screen } from '../../ui/screen';
+import { Ribbon } from '../../ui/ribbon';
+import { TypewriterText } from '../../ui/typewriter_text';
+import { FLAME_TIERS, getTierProgress } from '../../core/flame_tiers';
+import { playSfx } from '../../sound/sfx_engine';
+import { LowPolyFlame } from './low_poly_flame';
+import { TierStrip } from './tier_strip';
 import styles from './streak_screen.module.css';
 
-// Streak tab. Phase 0 shows a simple flickering ember;
-// the 9-tier flame, calendar and level-up arrive in phase 3.
+// Journey tab: the current flame, its words of support, progress to the
+// next tier, and a strip of every tier that can be tapped to preview.
+// Streak data is not stored yet (phase 2), so the streak is 0 for now.
 
-// Flicker loop: small random-looking scale/skew changes on a long cycle
-const FLICKER_DURATION_SECONDS = 2.4;
+const DEMO_STREAK_DAYS = 0;
+const LAST_TIER_INDEX = FLAME_TIERS.length - 1;
 
 export function StreakScreen()
 {
+    const progress = getTierProgress(DEMO_STREAK_DAYS);
+    const [selected_index, setSelectedIndex] = useState(progress.current.index);
+
+    const selected_tier = FLAME_TIERS[selected_index];
+    const is_current = selected_index === progress.current.index;
+    const is_locked = selected_index > progress.current.index;
+
+    function selectTier(tier_index: number): void
+    {
+        if (tier_index === selected_index)
+        {
+            return;
+        }
+        playSfx('whoosh');
+        setSelectedIndex(tier_index);
+    }
+
+    let ribbon_text = `${DEMO_STREAK_DAYS} ngày liên tiếp`;
+    if (is_locked)
+    {
+        ribbon_text = `Mở khóa ở ${selected_tier.min_days} ngày`;
+    }
+    else if (!is_current)
+    {
+        ribbon_text = 'Đã đi qua';
+    }
+
     return (
-        <Screen title="Lửa" subtitle="Giữ lửa mỗi ngày bằng cách đạt mục tiêu">
-            <div className={styles.stage}>
-                <div className={styles.glow} />
-                <motion.svg
-                    className={styles.ember}
-                    viewBox="0 0 120 160"
-                    animate={{
-                        scaleY: [1, 1.06, 0.97, 1.04, 1],
-                        scaleX: [1, 0.96, 1.03, 0.98, 1],
-                        skewX: [0, -2, 1.5, -1, 0],
-                    }}
-                    transition={{ duration: FLICKER_DURATION_SECONDS, repeat: Infinity, ease: 'easeInOut' }}
-                    style={{ originY: 1 }}
+        <Screen kicker={`Hành trình · Cấp ${selected_index} / ${LAST_TIER_INDEX}`} align="center">
+            <AnimatePresence mode="wait" initial={false}>
+                <motion.h1
+                    key={selected_tier.name}
+                    className={styles.tier_name}
+                    initial={{ y: 16, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -16, opacity: 0 }}
+                    transition={{ duration: 0.18 }}
                 >
-                    <defs>
-                        <linearGradient id="ember-outer" x1="0" y1="1" x2="0" y2="0">
-                            <stop offset="0%" stopColor="#8a3a12" />
-                            <stop offset="100%" stopColor="#d9783a" />
-                        </linearGradient>
-                        <linearGradient id="ember-inner" x1="0" y1="1" x2="0" y2="0">
-                            <stop offset="0%" stopColor="#d9783a" />
-                            <stop offset="100%" stopColor="#ffd2a1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M60 8c8 30 44 50 44 94a44 44 0 0 1-88 0c0-22 10-36 21-47 2 15 9 22 16 25-5-28 3-52 7-72z" fill="url(#ember-outer)" />
-                    <path d="M60 80c5 15 22 23 22 44a22 22 0 0 1-44 0c0-13 8-21 13-27 1 8 5 11 9 12-2-11 0-21 0-29z" fill="url(#ember-inner)" />
-                </motion.svg>
+                    {selected_tier.name}
+                </motion.h1>
+            </AnimatePresence>
+
+            <div className={styles.ribbon_row}>
+                <Ribbon key={ribbon_text} color={is_locked ? 'ink' : 'blue'}>
+                    {is_locked ? '🔒 ' : ''}{ribbon_text}
+                </Ribbon>
             </div>
 
-            <div className={styles.count_block}>
-                <span className={styles.count}>0</span>
-                <span className={styles.count_label}>ngày liên tiếp</span>
+            <div className={is_locked ? `${styles.scene} ${styles.locked}` : styles.scene}>
+                <LowPolyFlame tier_index={selected_index} size={240} />
             </div>
 
-            <p className={styles.hint}>Tàn Lửa · còn 3 ngày nữa để lên Lửa Cam</p>
+            <div className={styles.words}>
+                <TypewriterText text={selected_tier.words} start_delay_ms={350} />
+            </div>
+
+            {is_current && progress.next && (
+                <div className={styles.progress}>
+                    <div className={styles.counter}>
+                        <span>{progress.days_into_tier}</span>
+                        <span className={styles.counter_slash}>/</span>
+                        <span>{progress.days_to_next}</span>
+                    </div>
+                    <div className={styles.bar}>
+                        <motion.div
+                            className={styles.bar_fill}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.max(progress.ratio * 100, 2)}%` }}
+                            transition={{ type: 'spring', stiffness: 120, damping: 20, delay: 0.4 }}
+                        />
+                    </div>
+                    <span className="mono_label">Tới {progress.next.name}</span>
+                </div>
+            )}
+
+            <div className={styles.strip_area}>
+                <TierStrip
+                    reached_index={progress.current.index}
+                    selected_index={selected_index}
+                    onSelect={selectTier}
+                />
+            </div>
         </Screen>
     );
 }

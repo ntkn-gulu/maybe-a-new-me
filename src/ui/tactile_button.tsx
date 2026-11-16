@@ -8,7 +8,7 @@ import styles from './tactile_button.module.css';
 // A physical-feeling 3D button: the face sinks into its base on press,
 // springs back on release, with a sound + haptic at both moments.
 
-export type TactileVariant = 'accent' | 'neutral';
+export type TactileVariant = 'accent' | 'neutral' | 'ink';
 export type TactileSize = 'sm' | 'md' | 'lg';
 
 interface TactileButtonProps
@@ -24,7 +24,7 @@ interface TactileButtonProps
 }
 
 // Thickness of the button "side" in pixels, per size
-const DEPTH_BY_SIZE: Record<TactileSize, number> = { sm: 4, md: 6, lg: 8 };
+const DEPTH_BY_SIZE: Record<TactileSize, number> = { sm: 5, md: 7, lg: 10 };
 
 // How far a selected (latched) button stays sunk, as a share of depth
 const SELECTED_SINK_RATIO = 0.6;

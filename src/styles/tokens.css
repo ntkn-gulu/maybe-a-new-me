@@ -1,46 +1,67 @@
-/* Design tokens. Themes (unlocked from chests later) override these variables. */
+/* Design tokens. Themes (unlocked from chests later) override these variables.
+   Look: warm paper background, chunky extruded objects with a visible
+   "thickness" edge, flat saturated colors, condensed display type + mono labels. */
 :root
 {
-    /* Surfaces: near-black base, layered greys on top */
-    --color-bg: #0b0b0d;
-    --color-surface: #141418;
-    --color-surface-raised: #1c1c22;
-    --color-stroke: rgba(255, 255, 255, 0.06);
+    /* Paper + ink */
+    --color-bg: #f2eee7;
+    --color-bg-deep: #e9e3d9;
+    --color-ink: #141414;
+    --color-ink-soft: #57534c;
+    --color-ink-faint: #a49d92;
 
-    /* Text */
-    --color-text: #f4f1ea;
-    --color-text-dim: #8d8b93;
-    --color-text-faint: #55535b;
+    /* Extruded tiles: top face + darker side band (like a thick card) */
+    --tile-face: #fbf8f3;
+    --tile-side: #d9cfbf;
+    --tile-stroke: rgba(20, 20, 20, 0.06);
 
-    /* Accent follows the current flame color */
-    --color-accent: #ff7a1a;
-    --color-accent-bright: #ffa04d;
-    --color-accent-side: #a8430a;
-    --color-accent-glow: rgba(255, 122, 26, 0.35);
+    /* Playful flat palette */
+    --color-flame: #ff5a1f;
+    --color-flame-side: #c23a0c;
+    --color-pink: #ff4d6d;
+    --color-cyan: #3ccfe0;
+    --color-yellow: #ffc21a;
+    --color-blue: #2d4bff;
+    --color-blue-side: #1a2fb0;
+    --color-lilac: #b69cff;
 
-    /* Tactile buttons: face = top surface, side = visible thickness */
-    --btn-neutral-face: #2a2a31;
-    --btn-neutral-face-top: #34343c;
-    --btn-neutral-side: #111114;
-    --btn-highlight: rgba(255, 255, 255, 0.14);
+    /* Accent = current flame color (changes with tier / equipped flame) */
+    --color-accent: var(--color-flame);
+    --color-accent-side: var(--color-flame-side);
+    --color-accent-glow: rgba(255, 90, 31, 0.28);
+
+    /* Tactile buttons */
+    --btn-neutral-face: #ffffff;
+    --btn-neutral-side: #d4c9b7;
+    --btn-ink-face: #1b1b1b;
+    --btn-ink-side: #000000;
+    --btn-highlight: rgba(255, 255, 255, 0.55);
+
+    /* Rarity colors (chests) */
+    --rarity-common: #9c958a;
+    --rarity-rare: #2d9bff;
+    --rarity-epic: #9a5bff;
+    --rarity-legendary: #ffb400;
 
     /* Shape */
     --radius-sm: 12px;
     --radius-md: 18px;
-    --radius-lg: 28px;
+    --radius-lg: 26px;
     --radius-pill: 999px;
 
     /* Depth */
-    --shadow-drop: 0 10px 24px rgba(0, 0, 0, 0.45);
-    --shadow-inner-top: inset 0 1px 0 var(--btn-highlight);
+    --shadow-soft: 0 14px 30px rgba(60, 45, 25, 0.12);
+    --shadow-contact: 0 3px 0 rgba(60, 45, 25, 0.08);
 
-    /* Type: SF Pro Rounded on Apple devices, system UI elsewhere */
-    --font-ui: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, "Segoe UI", sans-serif;
-    --font-digits: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, "Segoe UI", sans-serif;
+    /* Type */
+    --font-display: "Anton", "Be Vietnam Pro", Impact, sans-serif;
+    --font-ui: "Be Vietnam Pro", -apple-system, system-ui, "Segoe UI", sans-serif;
+    --font-mono: "Space Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
     /* Layout */
-    --tab-bar-height: 76px;
+    --tab-bar-height: 92px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --gutter: 20px;
+    --content-max: 520px;
 }

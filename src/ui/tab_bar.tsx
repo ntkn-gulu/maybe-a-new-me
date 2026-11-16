@@ -16,7 +16,7 @@ interface TabDefinition
 }
 
 export const TABS: TabDefinition[] = [
-    { id: 'streak', label: 'Lửa', icon: <FlameIcon /> },
+    { id: 'streak', label: 'Hành trình', icon: <FlameIcon /> },
     { id: 'focus', label: 'Tập trung', icon: <TimerIcon /> },
     { id: 'rewards', label: 'Rương', icon: <ChestIcon /> },
     { id: 'settings', label: 'Cài đặt', icon: <GearIcon /> },

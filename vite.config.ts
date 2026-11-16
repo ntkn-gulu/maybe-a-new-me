@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // GitHub Pages serves the app from /<repo-name>/, local dev serves it from /
 const REPO_BASE_PATH = '/maybe-a-new-me/';
-const APP_BACKGROUND = '#0b0b0d';
+const APP_BACKGROUND = '#f2eee7';
 
 export default defineConfig(({ command }) => ({
     base: command === 'build' ? REPO_BASE_PATH : '/',
@@ -12,6 +12,8 @@ export default defineConfig(({ command }) => ({
         react(),
         VitePWA({
             registerType: 'autoUpdate',
+            // Precache fonts too, so the app looks right offline
+            workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2}'] },
             includeAssets: ['icons/icon.svg'],
             manifest: {
                 name: 'Maybe A New Me',

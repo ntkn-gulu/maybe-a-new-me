@@ -1,0 +1,48 @@
+.text
+{
+    position: relative;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: pre-line;
+    color: var(--color-ink);
+}
+
+.ghost
+{
+    visibility: hidden;
+}
+
+.typed
+{
+    position: absolute;
+    inset: 0;
+}
+
+.caret
+{
+    display: inline-block;
+    width: 0.6em;
+    height: 1.05em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--color-ink);
+}
+
+.blink
+{
+    animation: caret_blink 1s steps(1) infinite;
+}
+
+@keyframes caret_blink
+{
+    50%
+    {
+        opacity: 0;
+    }
+}

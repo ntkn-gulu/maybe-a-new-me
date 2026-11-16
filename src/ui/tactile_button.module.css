@@ -12,17 +12,17 @@
 
 .button:focus-visible .face
 {
-    outline: 2px solid var(--color-accent-bright);
+    outline: 3px solid var(--color-blue);
     outline-offset: 3px;
 }
 
-/* The "side" of the button, visible below the face */
+/* The "side" (thickness) of the button, visible below the face */
 .base
 {
     position: absolute;
     inset: 0;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-drop);
+    box-shadow: var(--shadow-soft);
 }
 
 /* The top surface that moves */
@@ -34,10 +34,9 @@
     justify-content: center;
     gap: 8px;
     border-radius: var(--radius-md);
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.01em;
     white-space: nowrap;
-    box-shadow: var(--shadow-inner-top);
 }
 
 /* Variants */
@@ -48,36 +47,55 @@
 
 .neutral .face
 {
-    background: linear-gradient(180deg, var(--btn-neutral-face-top), var(--btn-neutral-face));
-    color: var(--color-text);
+    background: var(--btn-neutral-face);
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 1.5px var(--tile-stroke), inset 0 2px 0 var(--btn-highlight);
 }
 
 .accent .base
 {
     background: var(--color-accent-side);
-    box-shadow: var(--shadow-drop), 0 6px 28px var(--color-accent-glow);
+    box-shadow: var(--shadow-soft), 0 10px 30px var(--color-accent-glow);
 }
 
 .accent .face
 {
-    background: linear-gradient(180deg, var(--color-accent-bright), var(--color-accent));
-    color: #1a0d03;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    background: var(--color-accent);
+    color: #ffffff;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
 }
 
-/* Latched (selected) neutral button: darker face, glowing accent label */
+.ink .base
+{
+    background: var(--btn-ink-side);
+}
+
+.ink .face
+{
+    background: var(--btn-ink-face);
+    color: #ffffff;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Latched (selected) state: ink face, reads as "pushed in" */
 .neutral.selected .face
 {
-    background: linear-gradient(180deg, var(--btn-neutral-face), #202026);
-    color: var(--color-accent-bright);
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45), 0 0 18px var(--color-accent-glow);
+    background: var(--btn-ink-face);
+    color: #ffffff;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12);
+}
+
+.neutral.selected .base
+{
+    background: var(--btn-ink-side);
 }
 
 /* Sizes */
 .sm .face
 {
-    min-height: 38px;
-    padding: 0 14px;
+    min-height: 40px;
+    padding: 0 16px;
     font-size: 14px;
     border-radius: var(--radius-sm);
 }
@@ -89,16 +107,20 @@
 
 .md .face
 {
-    min-height: 50px;
-    padding: 0 20px;
+    min-height: 52px;
+    padding: 0 22px;
     font-size: 16px;
 }
 
 .lg .face
 {
-    min-height: 64px;
+    min-height: 68px;
     padding: 0 28px;
-    font-size: 20px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     border-radius: var(--radius-lg);
 }
 

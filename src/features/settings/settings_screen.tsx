@@ -12,6 +12,8 @@ import styles from './settings_screen.module.css';
 const PREVIEW_SOUNDS: { name: SfxName; label: string }[] = [
     { name: 'tab', label: 'Tab' },
     { name: 'toggle', label: 'Gạt' },
+    { name: 'sparkle', label: 'Lấp lánh' },
+    { name: 'whoosh', label: 'Vút' },
     { name: 'chime', label: 'Chuông' },
 ];
 
@@ -47,8 +49,8 @@ export function SettingsScreen()
     const setHapticEnabled = useSettingsStore((state) => state.setHapticEnabled);
 
     return (
-        <Screen title="Cài đặt">
-            <h2 className={styles.group_title}>Âm thanh & rung</h2>
+        <Screen kicker="Tùy chỉnh" title="Cài đặt">
+            <h2 className={`mono_label ${styles.group_title}`}>Âm thanh & rung</h2>
             <div className={styles.group}>
                 <SettingRow
                     label="Âm thanh"
@@ -77,7 +79,7 @@ export function SettingsScreen()
                 />
             </div>
 
-            <h2 className={styles.group_title}>Nghe thử</h2>
+            <h2 className={`mono_label ${styles.group_title}`}>Nghe thử</h2>
             <div className={styles.preview_row}>
                 {PREVIEW_SOUNDS.map((sound) => (
                     <TactileButton key={sound.name} size="sm" onClick={() => playSfx(sound.name)}>
@@ -86,7 +88,7 @@ export function SettingsScreen()
                 ))}
             </div>
 
-            <p className={styles.footer}>Maybe A New Me · v{APP_VERSION}</p>
+            <p className={`mono_label ${styles.footer}`}>Maybe A New Me · v{APP_VERSION}</p>
         </Screen>
     );
 }

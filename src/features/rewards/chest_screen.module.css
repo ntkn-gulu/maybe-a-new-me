@@ -1,32 +1,159 @@
-.empty
+.hero
 {
-    flex: 1;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 4px;
+}
+
+.glow
+{
+    position: absolute;
+    top: 0;
+    width: 260px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 194, 26, 0.35), transparent 65%);
+}
+
+.chest_button
+{
+    position: relative;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    filter: drop-shadow(0 6px 0 rgba(60, 45, 25, 0.12));
+}
+
+.shadow
+{
+    width: 170px;
+    height: 18px;
+    margin-top: -14px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(60, 45, 25, 0.25), transparent);
+}
+
+.ribbon_row
+{
+    display: flex;
     justify-content: center;
-    text-align: center;
-    padding: 40px 0;
+    margin-top: 14px;
 }
 
-.chest
+.words
 {
-    color: var(--color-text-faint);
-    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
+    margin: 16px 0 26px;
 }
 
-.title
+.section_label
 {
-    margin: 24px 0 6px;
-    font-size: 20px;
-    font-weight: 800;
+    margin: 0 0 12px 4px;
 }
 
-.caption
+.grid
 {
-    margin: 0;
-    max-width: 260px;
-    color: var(--color-text-dim);
-    font-size: 15px;
-    line-height: 1.45;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+/* Extruded tile per rarity */
+.card
+{
+    --rarity: var(--rarity-common);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 14px 16px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+    overflow: hidden;
+}
+
+.common
+{
+    --rarity: var(--rarity-common);
+}
+
+.rare
+{
+    --rarity: var(--rarity-rare);
+}
+
+.epic
+{
+    --rarity: var(--rarity-epic);
+}
+
+.legendary
+{
+    --rarity: var(--rarity-legendary);
+}
+
+/* Moving shine across the legendary card */
+.legendary::after
+{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 200, 60, 0.35) 50%, transparent 70%);
+    background-size: 250% 100%;
+    animation: shine 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shine
+{
+    from
+    {
+        background-position: 120% 0;
+    }
+    to
+    {
+        background-position: -120% 0;
+    }
+}
+
+/* Faceted gem: a rotated square with a lit half */
+.gem
+{
+    width: 22px;
+    height: 22px;
+    margin-bottom: 8px;
+    transform: rotate(45deg);
+    border-radius: 4px;
+    background: linear-gradient(135deg, #ffffff 0%, var(--rarity) 45%, var(--rarity) 100%);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.card_label
+{
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--rarity);
+}
+
+.card_example
+{
+    font-size: 13px;
+    color: var(--color-ink-soft);
+}
+
+.card_rate
+{
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-ink);
 }

@@ -3,6 +3,15 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app';
 import { unlockAudio } from './sound/sfx_engine';
 import './stores/settings_store';
+
+// Fonts are bundled (not loaded from Google) so the PWA works offline.
+// Each file includes the Vietnamese subset.
+import '@fontsource/anton/400.css';
+import '@fontsource/be-vietnam-pro/500.css';
+import '@fontsource/be-vietnam-pro/700.css';
+import '@fontsource/be-vietnam-pro/800.css';
+import '@fontsource/space-mono/400.css';
+import '@fontsource/space-mono/700.css';
 import './styles/global.css';
 
 // iOS only allows audio after a real user gesture: unlock on the first touch.
