@@ -4,3 +4,9 @@ dev-dist
 *.local
 .DS_Store
 Thumbs.db
+
+# Local-only: personal notes and AI context, kept on this machine, never pushed
+CLAUDE.md
+maybe_a_new_me_ke_hoach.md
+maybe_a_new_me_playbook.md
+.vscode/

@@ -13,6 +13,4 @@ npm run build
 ```
 
 ## Tài liệu
-- `maybe_a_new_me_ke_hoach.md` — kế hoạch, luật chơi, quyết định kỹ thuật
-- `maybe_a_new_me_playbook.md` — các giai đoạn build, checklist, prompt
 - `architecture.md` — bản đồ code hiện tại

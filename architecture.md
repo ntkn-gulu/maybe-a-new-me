@@ -1,6 +1,6 @@
 # Architecture — Maybe A New Me
 
-> Map of the code as it is now. Plan and game rules: `maybe_a_new_me_ke_hoach.md`. Build phases: `maybe_a_new_me_playbook.md`.
+> Map of the code as it is now.
 
 ## Current state
 App shell with 4 tabs and a tactile design system in a light "warm paper + extruded objects" style: 3D buttons, switches, ribbons, typewriter text, synthesized sounds, experimental iOS haptics. All UI text is bilingual (Vietnamese / English) with a switch in Settings. The Journey tab shows a low-poly flame for all 9 tiers (preview by tapping the tier strip). Focus and Rewards show layout/teasers only. Streak data is not stored yet (shown as 0). `src/core/` holds the flame tier thresholds.
@@ -12,12 +12,11 @@ App shell with 4 tabs and a tactile design system in a light "warm paper + extru
 | `vite.config.ts` | React plugin; PWA manifest + service worker (auto update, precaches js/css/html/svg/png/woff2; PNG + SVG manifest icons); base path `/maybe-a-new-me/` for builds (GitHub Pages); Vitest config (`tests/**/*.test.ts`) |
 | `tsconfig.json` | Strict TypeScript, bundler resolution, no emit (Vite compiles) |
 | `eslint.config.js` | typescript-eslint + @stylistic (Allman braces, 4-space indent, semicolons, single quotes) + react-hooks |
-| `.vscode/settings.json` | Disables format-on-save/Prettier, fixes ESLint issues on explicit save action |
 | `index.html` | Entry page with iOS standalone meta tags, `apple-touch-icon`, light theme color, `viewport-fit=cover` |
 | `public/icons/icon.svg` | App icon: low-poly flame (Xích Hỏa palette) on cream, used as favicon and manifest icon |
 | `public/icons/apple-touch-icon.png`, `icon-192.png`, `icon-512.png` | PNG renders of the same icon (iOS home screen needs PNG; 192/512 for the manifest). Generated from the flame facet coordinates with Windows System.Drawing |
 | `.github/workflows/deploy.yml` | On push to `main`: `npm ci`, `npm test`, `npm run build`, publish `dist/` to GitHub Pages |
-| `CLAUDE.md` | Master context for Claude Code |
+| `.gitignore` | Ignores build output plus local-only files that never go to GitHub: `CLAUDE.md` (AI context), the plan and playbook notes, `.vscode/` |
 
 ## Source files
 
