@@ -11,11 +11,15 @@ interface AudioSessionLike
 
 const NOISE_BUFFER_SECONDS = 0.5;
 
+// If the context is still not running this long after resume(), treat it as stuck
+const RESUME_TIMEOUT_MS = 400;
+
 let audio_context: AudioContext | null = null;
 let master_gain: GainNode | null = null;
 let noise_buffer: AudioBuffer | null = null;
 let current_volume = 0.8;
 let is_enabled = true;
+let needs_rebuild = false;     // set when resume() failed: next tap builds a fresh context
 
 // Safari 17+ exposes navigator.audioSession. "playback" lets sounds play
 // even when the iPhone silent switch is on (needed for focus alarms).
@@ -56,15 +60,63 @@ function getNoiseBuffer(context: AudioContext): AudioBuffer
     return noise_buffer;
 }
 
-// iOS keeps audio locked until the first user gesture; call this from a tap.
+// Throw away the current context and start a new one. Must run inside a
+// user tap so iOS lets the new context start in the "running" state.
+function rebuildContext(): void
+{
+    if (audio_context && audio_context.state !== 'closed')
+    {
+        void audio_context.close();
+    }
+    audio_context = null;
+    master_gain = null;
+    noise_buffer = null;
+    needs_rebuild = false;
+    getContext();
+}
+
+// Ask a non-running context to start again. iOS Safari also has an
+// "interrupted" state (screenshot shutter, phone call, another app's audio),
+// so anything other than "running" gets a resume. If that does not work
+// in time, the next tap rebuilds the context.
+function tryResume(context: AudioContext): void
+{
+    void context.resume().catch(() =>
+    {
+        needs_rebuild = true;
+    });
+    window.setTimeout(() =>
+    {
+        if (audio_context === context && context.state !== 'running')
+        {
+            needs_rebuild = true;
+        }
+    }, RESUME_TIMEOUT_MS);
+}
+
+// iOS keeps audio locked until a user gesture: call this from a tap.
 export function unlockAudio(): void
 {
-    const context = getContext();
-    if (context.state === 'suspended')
+    if (needs_rebuild || audio_context?.state === 'closed')
     {
-        void context.resume();
+        rebuildContext();
+    }
+    const context = getContext();
+    if (context.state !== 'running')
+    {
+        tryResume(context);
     }
 }
+
+// Coming back to the app (after a screenshot, app switch, lock screen...)
+// often leaves the context suspended/interrupted: wake it up right away.
+document.addEventListener('visibilitychange', () =>
+{
+    if (document.visibilityState === 'visible' && audio_context && audio_context.state !== 'running')
+    {
+        tryResume(audio_context);
+    }
+});
 
 export function setSfxVolume(volume: number): void
 {

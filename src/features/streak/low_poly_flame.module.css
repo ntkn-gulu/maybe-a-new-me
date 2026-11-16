@@ -1,5 +1,8 @@
 .stage
 {
+    /* Default size; parents can override --flame-size (e.g. based on screen height) */
+    width: var(--flame-size, 220px);
+    height: calc(var(--flame-size, 220px) * 1.3);
     position: relative;
     display: grid;
     place-items: center;

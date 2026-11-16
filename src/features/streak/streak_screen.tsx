@@ -72,7 +72,7 @@ export function StreakScreen()
             </div>
 
             <div className={is_locked ? `${styles.scene} ${styles.locked}` : styles.scene}>
-                <LowPolyFlame tier_index={selected_index} size={240} />
+                <LowPolyFlame tier_index={selected_index} />
             </div>
 
             <div className={styles.words}>

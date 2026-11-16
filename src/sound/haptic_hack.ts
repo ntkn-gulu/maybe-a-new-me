@@ -35,7 +35,8 @@ export function triggerHaptic(): void
     {
         const label = document.createElement('label');
         label.setAttribute('aria-hidden', 'true');
-        label.style.display = 'none';
+        // Rendered but invisible: newer iOS may skip the haptic for display:none elements
+        label.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;';
 
         const input = document.createElement('input');
         input.type = 'checkbox';
@@ -43,9 +44,9 @@ export function triggerHaptic(): void
         label.appendChild(input);
 
         // A fresh element each time: iOS only ticks when the switch state changes
-        document.head.appendChild(label);
+        document.body.appendChild(label);
         label.click();
-        document.head.removeChild(label);
+        document.body.removeChild(label);
     }
     catch
     {

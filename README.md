@@ -12,6 +12,13 @@
 
 [**Open the app →**](https://ntkn-gulu.github.io/maybe-a-new-me/)
 
+<br>
+
+<img src="docs/screenshots/journey.jpg" alt="Journey screen with a low-poly flame" width="200">&nbsp;
+<img src="docs/screenshots/focus.jpg" alt="Focus screen with a kitchen-timer dial" width="200">&nbsp;
+<img src="docs/screenshots/chests.jpg" alt="Chests screen with rarity cards" width="200">&nbsp;
+<img src="docs/screenshots/settings.jpg" alt="Settings screen with language and sound options" width="200">
+
 </div>
 
 ---

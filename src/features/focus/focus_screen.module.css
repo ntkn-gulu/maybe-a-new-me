@@ -2,7 +2,8 @@
 .dial
 {
     position: relative;
-    width: min(76vw, 280px);
+    /* Also capped by screen height, so short/notched screens still fit the start button */
+    width: min(72vw, 260px, 30dvh);
     aspect-ratio: 1;
     margin: 4px auto 0;
     border-radius: 50%;
@@ -120,8 +121,8 @@
 {
     display: flex;
     justify-content: center;
-    height: 86px;
-    margin-top: 30px;
+    height: 74px;
+    margin-top: 20px;
     overflow: hidden;
 }
 
@@ -129,8 +130,8 @@
 {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 68px;
-    line-height: 1.25;
+    font-size: 60px;
+    line-height: 1.22;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.04em;
 }
@@ -140,7 +141,7 @@
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin: 6px 0 22px;
+    margin: 4px 0 18px;
 }
 
 .pip
@@ -163,7 +164,7 @@
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 26px;
+    margin-bottom: 20px;
 }
 
 .start_area

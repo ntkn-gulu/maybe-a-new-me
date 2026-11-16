@@ -28,6 +28,10 @@ const LANGUAGE_OPTIONS: SegmentOption<Language>[] = [
 
 const APP_VERSION = '0.1.0';
 
+// Safari 17.4+ renders <input type="checkbox" switch> as an iOS switch.
+// React 18 types don't know the attribute yet, so it is passed through a spread.
+const NATIVE_SWITCH_ATTRIBUTE = { switch: '' } as Record<string, string>;
+
 interface SettingRowProps
 {
     label: string;
@@ -104,6 +108,15 @@ export function SettingsScreen()
                     label={t('settings_haptic')}
                     caption={t('settings_haptic_caption')}
                     control={<ToggleSwitch is_on={is_haptic_enabled} onChange={setHapticEnabled} aria_label={t('settings_haptic')} />}
+                />
+                <SettingRow
+                    label={t('settings_native_switch')}
+                    caption={t('settings_native_switch_caption')}
+                    control={
+                        // Diagnostic: the browser's own switch. If flipping this one by hand does
+                        // not buzz, iOS gives no web haptics on this device and our trick can't either.
+                        <input type="checkbox" {...NATIVE_SWITCH_ATTRIBUTE} className={styles.native_switch} aria-label={t('settings_native_switch')} />
+                    }
                 />
             </div>
 

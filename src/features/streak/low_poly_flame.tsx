@@ -96,13 +96,12 @@ function scatter(seed: number): number
 interface LowPolyFlameProps
 {
     tier_index: number;
-    size?: number;     // rendered width in px
+    size?: number;     // rendered width in px; omit to size from the --flame-size CSS variable
 }
 
 export function LowPolyFlame(props: LowPolyFlameProps)
 {
     const palette = FLAME_PALETTES[props.tier_index] ?? FLAME_PALETTES[0];
-    const width = props.size ?? 220;
 
     function fillFor(shade: Facet['shade']): string
     {
@@ -120,7 +119,7 @@ export function LowPolyFlame(props: LowPolyFlameProps)
     const flame_class = palette.effect === 'rainbow' ? `${styles.flame} ${styles.rainbow}` : styles.flame;
 
     return (
-        <div className={styles.stage} style={{ width, height: width * 1.3 }}>
+        <div className={styles.stage} style={props.size ? { width: props.size, height: props.size * 1.3 } : undefined}>
             <motion.div
                 className={styles.glow}
                 style={{ background: `radial-gradient(circle, ${palette.glow} 0%, transparent 65%)` }}

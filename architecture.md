@@ -14,6 +14,7 @@ App shell with 4 tabs and a tactile design system in a light "warm paper + extru
 | `eslint.config.js` | typescript-eslint + @stylistic (Allman braces, 4-space indent, semicolons, single quotes) + react-hooks |
 | `index.html` | Entry page with iOS standalone meta tags, `apple-touch-icon`, light theme color, `viewport-fit=cover` |
 | `public/icons/icon.svg` | App icon: low-poly flame (Xích Hỏa palette) on cream, used as favicon and manifest icon |
+| `docs/screenshots/` | iPhone screenshots used in the README |
 | `public/icons/apple-touch-icon.png`, `icon-192.png`, `icon-512.png` | PNG renders of the same icon (iOS home screen needs PNG; 192/512 for the manifest). Generated from the flame facet coordinates with Windows System.Drawing |
 | `.github/workflows/deploy.yml` | On push to `main`: `npm ci`, `npm test`, `npm run build`, publish `dist/` to GitHub Pages |
 | `.gitignore` | Ignores build output plus local-only files that never go to GitHub: `CLAUDE.md` (AI context), the plan and playbook notes, `.vscode/` |
@@ -59,8 +60,8 @@ App shell with 4 tabs and a tactile design system in a light "warm paper + extru
 ### Sound (`src/sound/`)
 | File | Role |
 |---|---|
-| `sfx_engine.ts` | Web Audio synthesizer. `playSfx(name)` for `press`, `release`, `tab`, `toggle`, `chime`, `tick`, `whoosh`, `sparkle`; `unlockAudio()`; volume/enable setters. Sets `navigator.audioSession.type = 'playback'` so sounds play with the silent switch on |
-| `haptic_hack.ts` | `triggerHaptic()`: `navigator.vibrate` on Android; on iOS 18+ creates a hidden label wrapping `<input type="checkbox" switch>` in `<head>`, clicks it, removes it (system haptic tick). Must be called from a click handler (user activation) |
+| `sfx_engine.ts` | Web Audio synthesizer. Context lifecycle: `unlockAudio()` resumes any non-running state (incl. iOS `interrupted`), re-resumes on `visibilitychange`, and rebuilds a fresh context on the next tap if a resume fails or times out (400 ms). `playSfx(name)` for `press`, `release`, `tab`, `toggle`, `chime`, `tick`, `whoosh`, `sparkle`; `unlockAudio()`; volume/enable setters. Sets `navigator.audioSession.type = 'playback'` so sounds play with the silent switch on |
+| `haptic_hack.ts` | `triggerHaptic()`: `navigator.vibrate` on Android; on iOS 18+ appends an invisible (opacity 0, still rendered) label wrapping `<input type="checkbox" switch>` to `<body>`, clicks it, removes it (system haptic tick). Must be called from a click handler (user activation) |
 
 ### Stores (`src/stores/`)
 | File | Role |
@@ -71,13 +72,13 @@ App shell with 4 tabs and a tactile design system in a light "warm paper + extru
 | File | Role |
 |---|---|
 | `streak/streak_screen.tsx` | Journey tab: translated tier name (display font), ribbon (streak count / "Đã đi qua" / lock with unlock day), `LowPolyFlame`, typewriter words, progress counter + bar to next tier, `TierStrip`. Uses `getTierProgress()` with a demo streak of 0 |
-| `streak/low_poly_flame.tsx` | SVG flame of 20 shell facets + 5 core facets with 4-shade lighting; facets fly in and assemble on mount / tier change; whole flame sways; floating triangle shards; glow + ground shadow; `rainbow` (hue rotation) and `galaxy` (twinkling stars) effects |
+| `streak/low_poly_flame.tsx` | SVG flame sized by the `size` prop or the `--flame-size` CSS variable (journey uses `min(230px, 25dvh)`) of 20 shell facets + 5 core facets with 4-shade lighting; facets fly in and assemble on mount / tier change; whole flame sways; floating triangle shards; glow + ground shadow; `rainbow` (hue rotation) and `galaxy` (twinkling stars) effects |
 | `streak/flame_palettes.ts` | `FLAME_PALETTES[tier_index]`: facet shades, core colors, glow, shard colors, effect |
 | `streak/tier_strip.tsx` | Extruded strip of 9 mini flame badges (colored when reached, outlined when locked) with sliding marker; tap to preview |
-| `focus/focus_screen.tsx` | Kitchen-timer dial: extruded cream ring with 60 ticks, pink disc clipping an SVG pie-slice wedge (`wedgePath()`, radius larger than the disc so no rim shows) for the session length, blue needle in an unclipped layer whose drop shadow stays fixed while it rotates (spring-driven, ratchet `tick` sounds on change); big mono time; daily goal pips; 25/50 selector; start button (plays chime, timer not implemented) |
+| `focus/focus_screen.tsx` | Kitchen-timer dial: extruded cream ring with 60 ticks, dial size capped by screen height (`30dvh`) so the start button clears the tab bar on notched phones; pink disc clipping an SVG pie-slice wedge (`wedgePath()`, radius larger than the disc so no rim shows) for the session length, blue needle in an unclipped layer whose drop shadow stays fixed while it rotates (spring-driven, ratchet `tick` sounds on change); big mono time; daily goal pips; 25/50 selector; start button (plays chime, timer not implemented) |
 | `rewards/chest_screen.tsx` | 2.5D chest that floats and rattles when tapped (typewriter line changes after 3 taps), chest count ribbon, rarity teaser cards with drop rates. Epic: purple light sweep, pulsing gem, sparkles. Legendary: rotating conic gold border (`@property --border-angle`), pulsing glow, gold sweep, spinning gem, shiny gradient text (deep golds for contrast), more sparkles. Card content is layered above the sweep |
 | `rewards/chest_art.tsx` | Flat-shaded SVG chest (front, side, lid, bands, lock) |
-| `settings/settings_screen.tsx` | General group (VI / EN language switch), sound toggle, volume slider, haptic toggle, sound preview buttons + a haptic-only test button, version |
+| `settings/settings_screen.tsx` | General group (VI / EN language switch), sound toggle, volume slider, haptic toggle, native iOS `<input switch>` row to diagnose whether the device gives web haptics at all, sound preview buttons + a haptic-only test button, version |
 
 Each `.tsx` with styles has a sibling `<name>.module.css` (CSS Modules).
 
