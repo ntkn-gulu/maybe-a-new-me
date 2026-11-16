@@ -83,6 +83,44 @@ const VI = {
     tier_7_words: 'Nửa năm.\nMỗi ngày một màu, vẫn là bạn.',
     tier_8_name: 'Thiên Hà Hỏa',
     tier_8_words: 'Một năm.\nCả dải ngân hà cháy trong tay bạn.',
+
+    // Reward items (ids match REWARD_CATALOG in core)
+    item_flame_follow_tier: 'Lửa theo cấp',
+    item_timer_classic: 'Đồng hồ cổ điển',
+    item_sound_classic: 'Âm thanh gốc',
+    item_theme_paper: 'Giấy kem',
+    item_title_beginner: 'Người mới bắt đầu',
+    item_title_night_owl: 'Cú Đêm',
+    item_title_early_bird: 'Chim Dậy Sớm',
+    item_title_cafe_warrior: 'Chiến Thần Cà Phê',
+    item_title_deadline_slayer: 'Kẻ Hủy Diệt Deadline',
+    item_title_focus_monk: 'Thiền Sư Tập Trung',
+    item_title_exam_survivor: 'Chiến Binh Mùa Thi',
+    item_theme_midnight: 'Nửa đêm',
+    item_theme_matcha: 'Trà xanh',
+    item_theme_sunset: 'Hoàng hôn',
+    item_theme_ocean: 'Đại dương',
+    item_sound_mechanical: 'Bàn phím cơ',
+    item_sound_wood: 'Gõ gỗ',
+    item_sound_retro: 'Máy chơi game 8-bit',
+    item_sound_wind_chime: 'Chuông gió',
+    item_timer_retro_lcd: 'Màn LCD cổ',
+    item_timer_nixie: 'Đèn Nixie',
+    item_timer_neon: 'Ống neon',
+    item_timer_paper: 'Giấy gấp',
+    item_flame_ice: 'Lửa Băng',
+    item_flame_toxic: 'Lửa Độc',
+    item_flame_shadow: 'Lửa Bóng Tối',
+    item_flame_gold_24k: 'Lửa Vàng 24K',
+    item_flame_aurora: 'Lửa Cực Quang',
+    item_flame_tier_1: 'Màu Xích Hỏa',
+    item_flame_tier_2: 'Màu Kim Hỏa',
+    item_flame_tier_3: 'Màu Lam Hỏa',
+    item_flame_tier_4: 'Màu Tử Hỏa',
+    item_flame_tier_5: 'Màu Huyễn Hỏa',
+    item_flame_tier_6: 'Màu Bạch Hỏa',
+    item_flame_tier_7: 'Màu Thất Sắc Hỏa',
+    item_flame_tier_8: 'Màu Thiên Hà Hỏa',
 };
 
 export type StringKey = keyof typeof VI;
@@ -160,6 +198,43 @@ const EN: Record<StringKey, string> = {
     tier_7_words: 'Half a year.\nA new color each day, still you.',
     tier_8_name: 'Galaxy Flame',
     tier_8_words: 'One year.\nA whole galaxy burns in your hands.',
+
+    item_flame_follow_tier: 'Tier flame',
+    item_timer_classic: 'Classic dial',
+    item_sound_classic: 'Classic sounds',
+    item_theme_paper: 'Paper',
+    item_title_beginner: 'Beginner',
+    item_title_night_owl: 'Night Owl',
+    item_title_early_bird: 'Early Bird',
+    item_title_cafe_warrior: 'Café Warrior',
+    item_title_deadline_slayer: 'Deadline Slayer',
+    item_title_focus_monk: 'Focus Monk',
+    item_title_exam_survivor: 'Exam Survivor',
+    item_theme_midnight: 'Midnight',
+    item_theme_matcha: 'Matcha',
+    item_theme_sunset: 'Sunset',
+    item_theme_ocean: 'Ocean',
+    item_sound_mechanical: 'Mechanical keys',
+    item_sound_wood: 'Woodblock',
+    item_sound_retro: '8-bit console',
+    item_sound_wind_chime: 'Wind chime',
+    item_timer_retro_lcd: 'Retro LCD',
+    item_timer_nixie: 'Nixie tubes',
+    item_timer_neon: 'Neon tube',
+    item_timer_paper: 'Folded paper',
+    item_flame_ice: 'Ice Flame',
+    item_flame_toxic: 'Toxic Flame',
+    item_flame_shadow: 'Shadow Flame',
+    item_flame_gold_24k: '24K Gold Flame',
+    item_flame_aurora: 'Aurora Flame',
+    item_flame_tier_1: 'Blaze color',
+    item_flame_tier_2: 'Gold Flame color',
+    item_flame_tier_3: 'Blue Flame color',
+    item_flame_tier_4: 'Violet Flame color',
+    item_flame_tier_5: 'Neon Flame color',
+    item_flame_tier_6: 'White Flame color',
+    item_flame_tier_7: 'Prism Flame color',
+    item_flame_tier_8: 'Galaxy Flame color',
 };
 
 export const STRINGS: Record<Language, Record<StringKey, string>> = { vi: VI, en: EN };
@@ -188,4 +263,9 @@ export function tierNameKey(tier_index: number): StringKey
 export function tierWordsKey(tier_index: number): StringKey
 {
     return `tier_${tier_index}_words` as StringKey;
+}
+
+export function itemNameKey(item_id: string): StringKey
+{
+    return `item_${item_id}` as StringKey;
 }

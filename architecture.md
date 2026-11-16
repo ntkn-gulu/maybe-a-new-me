@@ -3,7 +3,7 @@
 > Map of the code as it is now.
 
 ## Current state
-App shell with 4 tabs and a tactile design system in a light "warm paper + extruded objects" style: 3D buttons, switches, ribbons, typewriter text, synthesized sounds, experimental iOS haptics. All UI text is bilingual (Vietnamese / English) with a switch in Settings. The Journey tab shows a low-poly flame for all 9 tiers (preview by tapping the tier strip). Focus and Rewards show layout/teasers only. Streak data is not stored yet (shown as 0). `src/core/` holds the flame tier thresholds.
+App shell with 4 tabs and a tactile design system in a light "warm paper + extruded objects" style: 3D buttons, switches, ribbons, typewriter text, synthesized sounds, experimental iOS haptics. All UI text is bilingual (Vietnamese / English) with a switch in Settings. The Journey tab shows a low-poly flame for all 9 tiers (preview by tapping the tier strip). Focus and Rewards show layout/teasers only. Streak data is not stored yet (shown as 0). `src/core/` holds the complete, tested game rules (day boundary, streak + freezes, strict-mode session guard, gacha + pity, reward catalog); screens do not use them yet except flame tiers.
 
 ## Tooling (project root)
 | File | Role |
@@ -22,14 +22,25 @@ App shell with 4 tabs and a tactile design system in a light "warm paper + extru
 ## Source files
 
 ### Core (pure TypeScript, no React / browser APIs)
+Time, time zone and randomness are always passed in, so every rule is deterministic and tested.
+
 | File | Role |
 |---|---|
+| `src/core/types.ts` | Shared types: `DayKey`, `RandomFn`, `Device`, `FocusLength`, `SportActivity`, `Rarity`, `ChestType`, `ItemSlot`, `DayRecord`, `DayResult`, `PityState` |
+| `src/core/day_key.ts` | App days start at `DAY_START_HOUR` = 4 AM. `getDayKey(epoch_ms, timezone_offset_minutes)`, `addDays()`, `daysBetween()`, `getWeekday()` (0 = Sunday), `compareDayKeys()` |
+| `src/core/rng.ts` | `createSeededRandom(seed)`: mulberry32 generator for reproducible tests |
+| `src/core/scheduled_value.ts` | Settings that change from tomorrow (daily goal, sport weekdays): `Schedule<Value>` history, `createSchedule()`, `getValueForDay()`, `scheduleChange()` (same-day changes replace each other), `getPendingChange()` |
 | `src/core/flame_tiers.ts` | `FLAME_TIERS` (9 tiers: `index`, `min_days`), `getTierForStreak()`, `getNextTier()`, `getTierProgress()` → `{ current, next, days_into_tier, days_to_next, ratio }`. Tier names/words live in i18n |
+| `src/core/streak_engine.ts` | `isDayKept()` (goal met, or sport day with check-in + `SPORT_DAY_MIN_SESSIONS`), `FREEZE_EARN_EVERY_DAYS` = 7, `FREEZE_CAP_BY_STREAK` / `getFreezeCap()` (2 → 3 at 30 → 4 at 100 → 5 at 180), `computeStreak(records, today)` → `StreakState` (`current_streak`, `best_streak`, `freezes_owned`, `current_tier_index`, `day_results` per day: kept / frozen / missed / pending). Recomputed from full history; today stays pending until kept |
+| `src/core/session_rules.ts` | Strict-mode state machine `FocusGuardState` (status `running` → `awaiting_note` → `completed`, or `broken` with `BreakReason`: left_app, away_too_long, missed_check, clock_jump, gave_up). Events: `startSession`, `tickSession`, `onAppHidden`, `onAppVisible`, `answerPresenceCheck`, `giveUpSession`, `completeSession`. Rules: 60 s per trip away / 180 s total per 25 min (phone only), random "still there?" checks (`planPresenceChecks`: phone 1, desktop 2 per 25 min, 90 s to answer, never in the first/last 3 min), clock moving back > 5 s breaks, note ≥ 5 chars |
+| `src/core/reward_config.ts` | Tuning knobs: `CHEST_RATES` (daily / silver / milestone), `SILVER_CHEST_EVERY_DAYS`, pity (`PITY_EPIC_AT` 10, soft legendary from 35 at +2 % per chest, hard at 50), `SHARDS_FOR_DUPLICATE`, `SHARD_COST` |
+| `src/core/reward_catalog.ts` | `REWARD_CATALOG`: 36 items (`id`, `slot`, `rarity`, `source` default / gacha / milestone): 5 defaults, 6 titles, 4 themes, 4 sound packs, 4 timer skins, 5 rare flames, 8 tier flames. `getItem()`, `getDefaultItemIds()`, `getGachaPool(rarity)`, `getMilestoneFlameId(tier)` |
+| `src/core/gacha_engine.ts` | `getEffectiveRates()` (soft pity takes odds from the lowest rarities), `rollRarity()` (hard epic pity upgrades low rolls keeping the epic : legendary ratio), `nextPity()`, `openChest()` → `{ rarity, item_id, is_duplicate, shards_gained, next_pity }`, `exchangeShards()`, `getChestsForKeptDay(prev, new)` (daily always, silver every 7th day, milestone on a new tier) |
 
 ### i18n (`src/i18n/`)
 | File | Role |
 |---|---|
-| `strings.ts` | `Language` (`vi` / `en`), `STRINGS` tables (Vietnamese defines `StringKey`, English must match), `translate(language, key, params)` fills `{name}` placeholders, `tierNameKey()` / `tierWordsKey()` build `tier_<index>_name/_words` keys |
+| `strings.ts` | `Language` (`vi` / `en`), `STRINGS` tables (Vietnamese defines `StringKey`, English must match), `translate(language, key, params)` fills `{name}` placeholders, `tierNameKey()` / `tierWordsKey()` / `itemNameKey()` build `tier_<index>_name/_words` and `item_<id>` keys |
 | `use_t.ts` | `useT()` hook: returns `t(key, params)` bound to `settings_store.language`; components re-render when it changes |
 
 ### App shell
@@ -87,6 +98,12 @@ Each `.tsx` with styles has a sibling `<name>.module.css` (CSS Modules).
 |---|---|
 | `flame_tiers.test.ts` | Milestones, tier lookup for every boundary, next tier, progress ratio |
 | `i18n_strings.test.ts` | English and Vietnamese have identical keys, every tier has a name + words in both languages, placeholder filling |
+| `day_key.test.ts` | 4 AM boundary, time zones, year/leap-year math, weekdays, scheduled values applying tomorrow |
+| `streak_engine.test.ts` | Kept-day rules (goal, sport day), freeze earning/spending, freeze caps by streak, resets, best streak, pending today |
+| `session_rules.test.ts` | Presence-check planning, honest session to completion, leave-app limits (phone vs desktop, 25 vs 50 min), missed / late checks, clock rollback, give up |
+| `gacha_engine.test.ts` | Config sums, catalog integrity + i18n names, soft/hard pity, 10,000-chest simulation, duplicates → shards, shard exchange, chests per kept day |
+
+Each core test file also pins the numbers agreed in the plan, so an accidental edit to a rule fails a test.
 
 ## Empty folders reserved by the plan
 `src/features/music/`, `src/features/onboarding/`, `public/audio/lofi/`, `public/audio/ambient/`.

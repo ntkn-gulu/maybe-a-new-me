@@ -180,7 +180,7 @@ One-time setup: **Settings → Pages → Source: GitHub Actions**.
 ## Roadmap
 
 - [x] **Phase 0** — Project setup, tactile design system, journey preview, bilingual UI, PWA
-- [ ] **Phase 1** — Game rules in `core/` with tests (streak, freezes, anti-cheat, gacha + pity)
+- [x] **Phase 1** — Game rules in `core/` with tests (streak, freezes, anti-cheat, gacha + pity)
 - [ ] **Phase 2** — Real focus timer with strict mode, wake lock and presence checks
 - [ ] **Phase 3** — Live flame journey: level-up moments, monthly calendar, sport check-ins
 - [ ] **Phase 4** — Chests, opening animation, collection and shard exchange
