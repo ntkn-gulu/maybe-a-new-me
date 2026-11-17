@@ -3,7 +3,6 @@
 .track
 {
     --sk-fill: var(--color-bg-deep);            /* sketch theme */
-    --sk-radius: 999px;
     position: relative;
     flex-shrink: 0;
     width: 58px;

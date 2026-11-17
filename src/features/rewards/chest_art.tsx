@@ -1,7 +1,7 @@
-import { INK_BOIL_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
+import { INK_ROUGH_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
 
 // 2.5D treasure chest in the paper + ink style: flat colored faces (front,
-// side, lid) like cut paper, every face outlined in boiling ink.
+// side, lid) like cut paper, every face outlined in hand-drawn ink.
 // Purely visual; animation is done by the parent.
 
 const CHEST_COLORS = {
@@ -49,7 +49,7 @@ export function ChestArt(props: ChestArtProps)
             <polygon points="24,56 128,56 128,61 24,61" fill="#ffffff" opacity="0.35" />
             <polygon points="24,88 128,88 128,92 24,92" fill="#ffffff" opacity="0.25" />
 
-            <g filter={INK_BOIL_FILTER} fill="none" stroke={INK_COLOR} strokeWidth={2.6} strokeLinejoin="round">
+            <g filter={INK_ROUGH_FILTER} fill="none" stroke={INK_COLOR} strokeWidth={2.6} strokeLinejoin="round">
                 {FACES.map(([points]) => <polygon key={points} points={points} />)}
                 <rect x="62" y="77" width="28" height="26" rx="5" />
                 <circle cx="76" cy="87" r="3.5" fill={INK_COLOR} stroke="none" />

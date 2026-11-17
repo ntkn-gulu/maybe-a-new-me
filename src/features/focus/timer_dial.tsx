@@ -1,11 +1,15 @@
 import { motion, useTransform, type MotionValue } from 'motion/react';
-import { INK_BOIL_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
+import { INK_ROUGH_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
 import styles from './timer_dial.module.css';
 
 // Kitchen-timer dial in the paper + ink style of the flame: a paper face,
-// a pink paper disc and a blue paper needle, all outlined in boiling ink.
+// a pink paper disc and a blue paper needle, all outlined in hand-drawn ink.
 // The lighter wedge shows the session length; the needle sits at its end.
 // `sweep_degrees` is a spring value owned by the Focus screen (6° per minute).
+//
+// Stacked layers, so turning the dial stays smooth on iPhone: the paper face and
+// the inked ticks are drawn once; only the small wedge path redraws while the
+// spring runs, and the needle turns as an HTML layer (GPU rotation, no redraw).
 
 const CENTER = 100;                   // viewBox 0 0 200 200
 const FACE_RADIUS = 94;
@@ -65,21 +69,27 @@ export function TimerDial(props: TimerDialProps)
 
     return (
         <div className={`${styles.dial} sk-no-shadow`}>
-            <svg className={styles.svg} viewBox="0 0 200 200" aria-hidden="true">
+            {/* 1. Paper: face + disc (static) */}
+            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
+                {/* Hatched "shadow" only drawn in the sketch theme */}
+                <circle className="sk-only" cx={CENTER + 5} cy={CENTER + 6} r={FACE_RADIUS} fill="url(#sketch-hatch)" />
+                <circle cx={CENTER} cy={CENTER} r={FACE_RADIUS} fill={FACE_COLOR} filter={PAPER_LIFT_FILTER} />
+                <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} fill={DISC_COLOR} filter={PAPER_LIFT_FILTER} />
+            </svg>
+
+            {/* 2. Wedge: the only part that redraws while the dial turns */}
+            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
                 <defs>
                     <clipPath id="dial-disc-clip">
                         <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} />
                     </clipPath>
                 </defs>
-
-                {/* Hatched "shadow" only drawn in the sketch theme */}
-                <circle className="sk-only" cx={CENTER + 5} cy={CENTER + 6} r={FACE_RADIUS} fill="url(#sketch-hatch)" />
-
-                <circle cx={CENTER} cy={CENTER} r={FACE_RADIUS} fill={FACE_COLOR} filter={PAPER_LIFT_FILTER} />
-                <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} fill={DISC_COLOR} filter={PAPER_LIFT_FILTER} />
                 <motion.path d={wedge_d} fill={WEDGE_COLOR} clipPath="url(#dial-disc-clip)" />
+            </svg>
 
-                <g filter={INK_BOIL_FILTER} stroke={INK_COLOR} strokeLinecap="round" fill="none">
+            {/* 3. Ink: outlines + ticks (static) */}
+            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
+                <g filter={INK_ROUGH_FILTER} stroke={INK_COLOR} strokeLinecap="round" fill="none">
                     <circle cx={CENTER} cy={CENTER} r={FACE_RADIUS} strokeWidth={3} />
                     <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} strokeWidth={2.4} />
                     <line x1={CENTER} y1={CENTER} x2={CENTER} y2={CENTER - DISC_RADIUS} strokeWidth={1.4} />
@@ -95,9 +105,11 @@ export function TimerDial(props: TimerDialProps)
                         />
                     ))}
                 </g>
+            </svg>
 
-                {/* Needle turns around the hub; its ink outline turns with it */}
-                <motion.g style={{ rotate: props.sweep_degrees, originX: 0.5, originY: 0.5, transformBox: 'view-box' }}>
+            {/* 4. Needle: drawn once, turned by the GPU */}
+            <motion.div className={styles.layer} style={{ rotate: props.sweep_degrees }}>
+                <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
                     <rect
                         x={CENTER - NEEDLE_WIDTH / 2}
                         y={NEEDLE_TOP}
@@ -105,26 +117,17 @@ export function TimerDial(props: TimerDialProps)
                         height={CENTER - NEEDLE_TOP + 4}
                         rx={NEEDLE_WIDTH / 2}
                         fill={NEEDLE_COLOR}
-                        filter={PAPER_LIFT_FILTER}
-                    />
-                    <rect
-                        x={CENTER - NEEDLE_WIDTH / 2}
-                        y={NEEDLE_TOP}
-                        width={NEEDLE_WIDTH}
-                        height={CENTER - NEEDLE_TOP + 4}
-                        rx={NEEDLE_WIDTH / 2}
-                        fill="none"
                         stroke={INK_COLOR}
                         strokeWidth={2.2}
-                        filter={INK_BOIL_FILTER}
+                        filter={PAPER_LIFT_FILTER}
                     />
-                </motion.g>
+                </svg>
+            </motion.div>
 
-                <circle cx={CENTER} cy={CENTER} r={HUB_RADIUS} fill={NEEDLE_COLOR} filter={PAPER_LIFT_FILTER} />
-                <g filter={INK_BOIL_FILTER} fill="none" stroke={INK_COLOR}>
-                    <circle cx={CENTER} cy={CENTER} r={HUB_RADIUS} strokeWidth={2.4} />
-                    <circle cx={CENTER - 4} cy={CENTER - 4} r={3} fill="#ffffff" stroke="none" opacity={0.7} />
-                </g>
+            {/* 5. Hub on top (static) */}
+            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx={CENTER} cy={CENTER} r={HUB_RADIUS} fill={NEEDLE_COLOR} stroke={INK_COLOR} strokeWidth={2.4} filter={PAPER_LIFT_FILTER} />
+                <circle cx={CENTER - 4} cy={CENTER - 4} r={3} fill="#ffffff" opacity={0.7} />
             </svg>
         </div>
     );

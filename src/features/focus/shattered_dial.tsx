@@ -1,10 +1,11 @@
 import { motion } from 'motion/react';
-import { INK_BOIL_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
+import { INK_ROUGH_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
 import styles from './shattered_dial.module.css';
 
 // The Focus dial (same paper + ink style as TimerDial) breaking apart: the
 // pink paper disc tears into shards along jagged cracks, each outlined in
-// boiling ink; they burst out and drop a little, the needle snaps off.
+// ink; they burst out and drop a little, the needle snaps off. Moving parts
+// carry no filter, so the break animates without redrawing filters each frame.
 // Geometry is computed once; shards share their crack edges exactly, so the
 // disc looks whole at the first frame.
 
@@ -96,7 +97,7 @@ export function ShatteredDial()
             <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill="#fbf8f3" filter={PAPER_LIFT_FILTER} />
             {/* Empty socket where the disc was */}
             <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} fill="var(--color-bg-deep)" />
-            <g filter={INK_BOIL_FILTER} fill="none" stroke={INK_COLOR} strokeLinecap="round">
+            <g filter={INK_ROUGH_FILTER} fill="none" stroke={INK_COLOR} strokeLinecap="round">
                 <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} strokeWidth={3} />
                 <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} strokeWidth={1.4} strokeDasharray="4 6" opacity={0.5} />
                 {TICKS.map((angle) =>
@@ -119,7 +120,7 @@ export function ShatteredDial()
                         transition={{ type: 'spring', stiffness: 140, damping: 11, delay: 0.28 + index * 0.025 }}
                     >
                         <polygon points={toPoints(shard.points)} fill={SHARD_FACES[index]} filter={PAPER_LIFT_FILTER} />
-                        <polygon points={toPoints(shard.points)} fill="none" stroke={INK_COLOR} strokeWidth={2.2} strokeLinejoin="round" filter={INK_BOIL_FILTER} />
+                        <polygon points={toPoints(shard.points)} fill="none" stroke={INK_COLOR} strokeWidth={2.2} strokeLinejoin="round" />
                     </motion.g>
                 );
             })}
@@ -135,7 +136,7 @@ export function ShatteredDial()
                 <circle cx={CENTER[0]} cy={CENTER[1]} r="56" fill="none" />
                 <rect x={CENTER[0] - 5} y={CENTER[1] - 54} width="10" height="50" rx="5" className={styles.needle} />
                 <circle cx={CENTER[0]} cy={CENTER[1]} r="13" className={styles.needle} />
-                <g filter={INK_BOIL_FILTER} fill="none" stroke={INK_COLOR} strokeWidth={2.2}>
+                <g fill="none" stroke={INK_COLOR} strokeWidth={2.2}>
                     <rect x={CENTER[0] - 5} y={CENTER[1] - 54} width="10" height="50" rx="5" />
                     <circle cx={CENTER[0]} cy={CENTER[1]} r="13" />
                 </g>

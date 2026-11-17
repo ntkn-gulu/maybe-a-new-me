@@ -32,7 +32,7 @@ export function ToggleSwitch(props: ToggleSwitchProps)
             {...getPressableProps(flip, false, 'switch')}
             aria-checked={props.is_on}
             aria-label={props.aria_label}
-            className={props.is_on ? `${styles.track} ${styles.on} sk-frame sk-flat` : `${styles.track} sk-frame sk-flat`}
+            className={props.is_on ? `${styles.track} ${styles.on} sk-frame sk-flat sk-pill` : `${styles.track} sk-frame sk-flat sk-pill`}
         >
             <motion.span
                 className={`${styles.knob} sk-frame sk-flat sk-round sk-abs`}

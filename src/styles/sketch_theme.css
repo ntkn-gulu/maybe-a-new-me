@@ -1,14 +1,19 @@
 /* Sketch theme ("Phác thảo"): the whole app drawn in a sketchbook.
    On when <html data-theme="sketch"> (settings_store). Components opt in with
-   these global classes, which do nothing in the default paper theme:
-   - sk-frame        wobbly ink border, paper (or --sk-fill) inside, hatched shadow
+   these global classes, which do nothing in the other themes:
+   - sk-frame        hand-drawn ink frame, paper (or --sk-fill) inside, hatched shadow
    - sk-flat         an sk-frame without the hatched shadow
+   - sk-pill         an sk-frame shaped like a pill (switch tracks and thumbs)
    - sk-round        an sk-frame that is a circle
    - sk-abs/sk-fixed keep an absolutely/fixed positioned sk-frame in place
    - sk-hatch-block  a solid "thickness" band becomes a hatched shadow
-   - sk-input        text field with an ink border
+   - sk-input        text field with a hand-drawn ink frame
    - sk-hide         hidden in the sketch theme; sk-only: shown only in it
-   - sk-no-shadow    drops a soft drop shadow (paper on paper needs none) */
+   - sk-no-shadow    drops a soft drop shadow (paper on paper needs none)
+
+   Performance: the wobbly lines are pre-drawn SVG images used through
+   border-image / background. No SVG filter runs on the UI, so switching theme,
+   pressing buttons and sliding thumbs stay smooth on iPhone. */
 
 .sk-only
 {
@@ -34,9 +39,13 @@
     --font-ui: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
     --font-mono: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
 
-    --sk-rough: url(#ink-rough);
     --sk-hatch: repeating-linear-gradient(-45deg, var(--color-ink) 0 1.1px, transparent 1.1px 5px);
-    --sk-radius: 13px 17px 12px 16px;
+
+    /* Pre-drawn wobbly ink outlines (#1f1c18). 9-slice frames: corners stay
+       crisp, edges stretch to any size. */
+    --sk-frame-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M14 5 C38 3.6 82 6.4 106 4.6 C112 4.4 115.4 8 115.2 14 C116.4 40 114 82 115.6 106 C115.8 112 112 115.6 106 115.2 C80 116.6 40 114.2 14 115.8 C8 116 4.4 112 4.8 106 C3.6 80 6 40 4.4 14 C4.4 8 8 5 14 5 Z' fill='none' stroke='%231f1c18' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --sk-pill-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60' viewBox='0 0 120 60'%3E%3Cpath d='M30 4.5 C55 3.4 70 5.6 90 4.4 C106 4 115.6 16 115.4 30 C115.6 45 105 55.8 90 55.4 C70 56.4 52 54.6 30 55.6 C15 56 4.4 44 4.6 30 C4.6 16 15 4.8 30 4.5 Z' fill='none' stroke='%231f1c18' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --sk-circle-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 4.5 C76 3.6 96.4 24 95.5 50 C96.2 76 75 96.6 49 95.5 C23.6 96.4 3.6 75 4.6 49 C4 24 25 4.2 50 4.5 Z' fill='none' stroke='%231f1c18' stroke-width='5'/%3E%3C/svg%3E");
 }
 
 /* Patrick Hand has one weight: never let the browser fake a bold */
@@ -89,21 +98,37 @@
     position: fixed;
 }
 
-/* Ink border + fill. Drawn on a pseudo-element so the wobble filter never blurs the text */
+/* Ink outline (border-image) + fill (background inside the line) */
 :root[data-theme="sketch"] .sk-frame::before
 {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
-    border: 2px solid var(--color-ink);
-    border-radius: var(--sk-radius);
-    background: var(--sk-fill, var(--tile-face));
-    filter: var(--sk-rough);
+    border: 3px solid transparent;
+    border-image: var(--sk-frame-image) 26 / 16px stretch;
+    border-radius: 12px;
+    background: var(--sk-fill, var(--tile-face)) padding-box;
     pointer-events: none;
 }
 
-/* Hatched shadow, offset down-right like a pen shading under an object */
+:root[data-theme="sketch"] .sk-pill::before
+{
+    border-image: var(--sk-pill-image) 30 / 17px stretch;
+    border-radius: 999px;
+}
+
+:root[data-theme="sketch"] .sk-round::before
+{
+    border: 0;
+    border-image: none;
+    border-radius: 50%;
+    background:
+        var(--sk-circle-image) center / 100% 100% no-repeat,
+        radial-gradient(circle closest-side, var(--sk-fill, var(--tile-face)) 93%, transparent 94%);
+}
+
+/* Hatched shadow, offset down-right like pen shading under an object */
 :root[data-theme="sketch"] .sk-frame::after
 {
     content: "";
@@ -111,11 +136,15 @@
     inset: 0;
     z-index: -2;
     transform: translate(4px, 5px);
-    border-radius: var(--sk-radius);
+    border-radius: 12px;
     background: var(--sk-hatch);
-    opacity: 0.7;
-    filter: var(--sk-rough);
+    opacity: 0.6;
     pointer-events: none;
+}
+
+:root[data-theme="sketch"] .sk-round::after
+{
+    border-radius: 50%;
 }
 
 :root[data-theme="sketch"] .sk-flat::after
@@ -123,25 +152,18 @@
     content: none;
 }
 
-:root[data-theme="sketch"] .sk-round::before,
-:root[data-theme="sketch"] .sk-round::after
-{
-    border-radius: 50%;
-}
-
 :root[data-theme="sketch"] .sk-hatch-block
 {
     background: var(--sk-hatch) !important;
     box-shadow: none !important;
-    opacity: 0.7;
-    border-radius: var(--sk-radius);
-    filter: var(--sk-rough);
+    opacity: 0.6;
+    border-radius: 12px;
 }
 
 :root[data-theme="sketch"] .sk-input
 {
-    border: 2px solid var(--color-ink) !important;
-    border-radius: var(--sk-radius) !important;
-    background: var(--tile-face) !important;
+    border: 3px solid transparent !important;
+    border-image: var(--sk-frame-image) 26 / 16px stretch !important;
+    background: var(--tile-face) padding-box !important;
     box-shadow: none !important;
 }

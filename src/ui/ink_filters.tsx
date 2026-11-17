@@ -1,38 +1,33 @@
-import { useReducedMotion } from 'motion/react';
-
 // Shared SVG filters for the paper + ink look, mounted once in App.
-// - ink-boil:   hand-drawn wobble whose noise seed steps a few times a second,
-//               so ink lines "boil" like traditional hand-drawn animation
-// - ink-rough:  the same wobble, frozen (cheap enough for many UI frames)
-// - paper-lift: soft drop shadow under a cut-out paper layer
-// - sketch-hatch: diagonal pen hatching, used for shadows in the sketch theme
-// Browsers stop the seed animation while the app is hidden; with
-// "reduce motion" on, the boil is frozen too.
+// - ink-rough-a/b/c: three hand-drawn wobbles with different noise. Ink that
+//                    "boils" is drawn three times, one per filter, and CSS shows
+//                    one copy at a time (see paper_flame.module.css). Each copy is
+//                    rendered once, so the boil costs no redraw at all.
+// - ink-rough:       a single frozen wobble for ink that does not boil (dial, chest)
+// - paper-lift:      soft drop shadow under a cut-out paper layer
+// - sketch-hatch:    diagonal pen hatching, used for shadows in the sketch theme
+// None of these filters is animated: animating a filter makes the browser
+// recompute it every frame, which is slow on iPhone.
 
-export const INK_BOIL_FILTER = 'url(#ink-boil)';
+export const INK_BOIL_FRAMES = ['url(#ink-rough-a)', 'url(#ink-rough-b)', 'url(#ink-rough-c)'];
 export const INK_ROUGH_FILTER = 'url(#ink-rough)';
 export const PAPER_LIFT_FILTER = 'url(#paper-lift)';
 
-const BOIL_SEEDS = '1;5;9';               // three line shapes, cycled
-const BOIL_CYCLE = '0.375s';              // 3 frames in 0.375 s = 8 changes per second
-const BOIL_STRENGTH = 3.2;                // how far lines wobble, in SVG units
+const BOIL_SEEDS = [1, 5, 9];             // one noise pattern per boil frame
+const BOIL_STRENGTH = 3.2;                // how far boiling lines wobble, in SVG units
 const ROUGH_STRENGTH = 2.6;
 
 export function InkFilters()
 {
-    const is_reduced_motion = useReducedMotion();
-
     return (
         <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
             <defs>
-                <filter id="ink-boil" x="-15%" y="-15%" width="130%" height="130%">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves={2} seed={1} result="noise">
-                        {!is_reduced_motion && (
-                            <animate attributeName="seed" values={BOIL_SEEDS} dur={BOIL_CYCLE} calcMode="discrete" repeatCount="indefinite" />
-                        )}
-                    </feTurbulence>
-                    <feDisplacementMap in="SourceGraphic" in2="noise" scale={BOIL_STRENGTH} xChannelSelector="R" yChannelSelector="G" />
-                </filter>
+                {BOIL_SEEDS.map((seed, index) => (
+                    <filter key={seed} id={`ink-rough-${'abc'[index]}`} x="-15%" y="-15%" width="130%" height="130%">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves={2} seed={seed} result="noise" />
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale={BOIL_STRENGTH} xChannelSelector="R" yChannelSelector="G" />
+                    </filter>
+                ))}
 
                 <filter id="ink-rough" x="-5%" y="-5%" width="110%" height="110%">
                     <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves={2} seed={3} result="noise" />
