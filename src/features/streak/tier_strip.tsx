@@ -7,15 +7,11 @@ import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
 import { tierNameKey } from '../../i18n/strings';
 import { useArtStyle } from '../../stores/settings_store';
+import { INK_COLOR, MINI_FLAME_MARKER, MINI_FLAME_OUTLINE } from './sketch_flame_art';
 import styles from './tier_strip.module.css';
 
 // Row of all tiers as small flame badges. Reached tiers are colored,
 // locked ones are outlines (their names stay hidden too). Tapping one shows it above.
-
-// Same three-tongue silhouette as the big paper flame (viewBox 0 0 200 260)
-const MINI_FLAME_PATH = 'M100 12 C108 46 126 66 132 92 C140 80 146 68 146 54 C166 84 176 120 172 160 '
-    + 'C168 214 136 248 100 248 C62 248 30 214 30 168 C30 130 40 100 52 62 C64 84 70 100 76 112 C74 76 84 44 100 12 Z';
-const INK_COLOR = '#1f1c18';
 
 // The 3D theme keeps the original faceted outline
 const MINI_LOW_POLY_POINTS = '104,8 130,62 157,118 167,170 150,222 100,250 50,222 33,170 47,122 70,86 60,40 84,94';
@@ -62,14 +58,16 @@ export function TierStrip(props: TierStripProps)
                                     />
                                 )
                                 : (
-                                    <path
-                                        d={MINI_FLAME_PATH}
-                                        fill={is_reached ? colors.shades[2] : 'none'}
-                                        stroke={is_reached ? INK_COLOR : 'var(--color-ink-faint)'}
-                                        strokeWidth={is_reached ? 12 : 13}
-                                        strokeDasharray={is_reached ? undefined : '24 20'}
-                                        strokeLinejoin="round"
-                                    />
+                                    // Sketch theme: marker color slipping past a hand-drawn ink line
+                                    <g strokeLinecap="round" strokeLinejoin="round">
+                                        {is_reached && <path d={MINI_FLAME_MARKER} fill={colors.shades[2]} />}
+                                        <path
+                                            d={MINI_FLAME_OUTLINE}
+                                            fill="none"
+                                            stroke={is_reached ? INK_COLOR : 'var(--color-ink-faint)'}
+                                            strokeWidth={is_reached ? 13 : 11}
+                                        />
+                                    </g>
                                 )}
                         </svg>
                         <span className={styles.days}>{tier.min_days}</span>

@@ -8,26 +8,6 @@
     place-items: center;
 }
 
-.glow
-{
-    position: absolute;
-    inset: 4% -10% 8%;
-    border-radius: 50%;
-    filter: blur(6px);
-}
-
-/* Flat oval "floor" the flame stands on */
-.ground
-{
-    position: absolute;
-    left: 18%;
-    right: 18%;
-    bottom: 2%;
-    height: 9%;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(60, 45, 25, 0.22), transparent);
-}
-
 /* Same proportions as the flame viewBox (200 x 260) */
 .flame_box
 {
@@ -41,9 +21,9 @@
 {
     position: absolute;
     inset: 0;
-    transform-origin: 50% 100%;
+    transform-origin: 50% 96%;
     will-change: transform;
-    animation: sway 3.4s ease-in-out 1.55s infinite;
+    animation: sway 3.4s ease-in-out 1.8s infinite;
 }
 
 @keyframes sway
@@ -67,24 +47,23 @@
     }
 }
 
-/* Baked paper layers, the ink box and each ink frame cover the flame box exactly */
+/* Every layer covers the flame box exactly */
 .layer,
-.ink_frame
+.boil_frame
 {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     overflow: visible;
-    -webkit-user-drag: none;
 }
 
-/* Line boil: three baked ink images, shown one at a time (8 changes per second).
+/* Line boil: three finished outlines, shown one at a time (6 changes per second).
    Only opacity changes, so the GPU flips between finished pictures. */
-.ink_frame
+.boil_frame
 {
     will-change: opacity;
-    animation: boil 0.375s steps(1, end) infinite;
+    animation: boil 0.5s steps(1, end) infinite;
 }
 
 @keyframes boil
@@ -111,7 +90,7 @@
 
 .spark
 {
-    width: 6%;
+    width: 7%;
 }
 
 .rainbow
@@ -127,17 +106,16 @@
     }
 }
 
-/* Big inked question mark over a locked (blank paper) flame */
+/* Handwritten ink question mark over a locked flame */
 .mystery_mark
 {
     position: absolute;
-    top: 56%;
+    top: 52%;
     left: 50%;
     width: 0.6em;
     margin: -0.5em 0 0 -0.3em;
     font-family: var(--font-display);
-    font-size: calc(var(--flame-size, 220px) * 0.34);
-    font-weight: 700;
+    font-size: calc(var(--flame-size, 220px) * 0.38);
     line-height: 1;
     text-align: center;
     color: #1f1c18;
@@ -151,14 +129,14 @@
         animation: none;
     }
 
-    /* Keep only the first ink frame */
-    .ink_frame
+    /* Keep only the first outline */
+    .boil_frame
     {
         animation: none;
         opacity: 0;
     }
 
-    .ink_frame_first
+    .boil_frame_first
     {
         opacity: 1;
     }

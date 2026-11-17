@@ -1,0 +1,98 @@
+body
+{
+    margin: 0;
+    background: var(--color-bg);
+}
+
+.demo
+{
+    max-width: 520px;
+    margin: 0 auto;
+    padding-block: 24px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    text-align: center;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+}
+
+.demo h1
+{
+    margin: 0;
+    font-size: 34px;
+}
+
+.demo h2
+{
+    margin: 36px 0 8px;
+    font-size: 24px;
+}
+
+.hint
+{
+    margin: 4px 0 0;
+    color: var(--color-ink-soft);
+}
+
+.hero
+{
+    display: grid;
+    place-items: center;
+    min-height: 310px;
+}
+
+.chips,
+.actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.chip,
+.action
+{
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border: 2.5px solid var(--color-ink);
+    border-radius: 12px 10px 13px 9px / 9px 13px 10px 12px;
+    background: #fbf7ef;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.chip_on
+{
+    background: var(--color-ink);
+    color: #fbf7ef;
+}
+
+.action_hot
+{
+    background: #ff8a3d;
+}
+
+.grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.cell
+{
+    display: grid;
+    justify-items: center;
+    margin: 0;
+}
+
+.cell figcaption
+{
+    font-size: 17px;
+    color: var(--color-ink-soft);
+}

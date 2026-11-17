@@ -1,6 +1,6 @@
 // How each flame looks. Two separate parts:
 // - colors: from the tier by default, or from an equipped flame color item
-// - effects: always from the tier (more paper layers, more sparks, stars...)
+// - effects: always from the tier (more sparks, stars...)
 // so an equipped color changes the paint but never hides the tier you earned.
 
 export interface FlameColors
@@ -14,7 +14,7 @@ export interface FlameColors
 
 export interface FlameEffects
 {
-    layer_count: number;                           // cut paper layers, outer to core (3..6)
+    layer_count: number;                           // layers of the flame (3..6), grows with the tier
     spark_count: number;                           // little flame tips drifting up (max 6)
     glow_pulse: number;                            // how much the halo breathes (scale amplitude)
     has_stars: boolean;                            // twinkling stars inside the flame
@@ -148,12 +148,12 @@ const RARE_FLAME_COLORS: Record<string, FlameColors> = {
     },
 };
 
-// Locked tiers are blank, uncolored paper so their color stays a surprise
+// Locked tiers are a plain gray sketch so their color stays a surprise
 export const MYSTERY_COLORS: FlameColors = {
-    shades: ['#e2dacd', '#ece5da', '#f5f0e8', '#fbf8f3'],
-    core: ['#ffffff', '#ffffff'],
+    shades: ['#4a443d', '#6b645a', '#8a8276', '#a49d92'],
+    core: ['#b5ada1', '#d6cfc4'],
     glow: 'rgba(60, 45, 25, 0.1)',
-    shard_colors: ['#d9cfbf'],
+    shard_colors: ['#bdb5a8'],
     is_hue_cycling: false,
 };
 

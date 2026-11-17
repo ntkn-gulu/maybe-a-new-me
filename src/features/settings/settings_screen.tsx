@@ -78,7 +78,6 @@ export function SettingsScreen()
     const setTheme = useSettingsStore((state) => state.setTheme);
     const theme_options: SegmentOption<AppTheme>[] = [
         { value: 'classic_3d', label: t('theme_3d') },
-        { value: 'paper_ink', label: t('theme_paper_ink') },
         { value: 'sketch', label: t('theme_sketch') },
     ];
     const goal = useGoalSetting();
@@ -111,18 +110,21 @@ export function SettingsScreen()
 
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_general')}</h2>
             <div className={`${styles.group} sk-frame`}>
-                <SettingRow
-                    label={t('settings_theme')}
-                    caption={t('settings_theme_caption')}
-                    control={
-                        <SegmentedSwitch
-                            options={theme_options}
-                            value={theme}
-                            onChange={setTheme}
-                            aria_label={t('settings_theme')}
-                        />
-                    }
-                />
+                {/* The sketch theme is a dev-mode preview until it can be won from a chest */}
+                {is_dev_mode && (
+                    <SettingRow
+                        label={t('settings_theme')}
+                        caption={t('settings_theme_caption')}
+                        control={
+                            <SegmentedSwitch
+                                options={theme_options}
+                                value={theme}
+                                onChange={setTheme}
+                                aria_label={t('settings_theme')}
+                            />
+                        }
+                    />
+                )}
                 <SettingRow
                     label={t('settings_language')}
                     caption="Tiếng Việt · English"
