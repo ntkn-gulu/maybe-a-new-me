@@ -1,17 +1,19 @@
 import { motion, useTransform, type MotionValue } from 'motion/react';
-import { INK_ROUGH_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
+import { INK_COLOR, paperLiftFilter, svgImage } from '../../ui/ink_svg';
 import styles from './timer_dial.module.css';
 
 // Kitchen-timer dial in the paper + ink style of the flame: a paper face,
-// a pink paper disc and a blue paper needle, all outlined in hand-drawn ink.
+// a pink paper disc and a blue paper needle, outlined in clean ink lines.
 // The lighter wedge shows the session length; the needle sits at its end.
 // `sweep_degrees` is a spring value owned by the Focus screen (6° per minute).
 //
-// Stacked layers, so turning the dial stays smooth on iPhone: the paper face and
-// the inked ticks are drawn once; only the small wedge path redraws while the
-// spring runs, and the needle turns as an HTML layer (GPU rotation, no redraw).
+// Stacked layers, so turning the dial stays smooth on iPhone: the paper,
+// the ink and the hub are images baked once (see ink_svg.ts); only the small
+// wedge path redraws while the spring runs, and the needle image is turned
+// by the GPU.
 
 const CENTER = 100;                   // viewBox 0 0 200 200
+const VIEW_BOX = '0 0 200 200';
 const FACE_RADIUS = 94;
 const DISC_RADIUS = 64;
 const TICK_COUNT = 60;
@@ -24,11 +26,11 @@ const NEEDLE_WIDTH = 11;
 const NEEDLE_TOP = 46;                // y of the needle tip
 const HUB_RADIUS = 14;
 
-const INK_COLOR = '#1f1c18';
 const FACE_COLOR = '#fbf8f3';
 const DISC_COLOR = '#ff4d6d';
 const WEDGE_COLOR = 'rgba(255, 255, 255, 0.42)';
 const NEEDLE_COLOR = '#2d4bff';
+const HATCH_COLOR = '#1f1c18';
 
 // SVG pie slice from 12 o'clock, clockwise, to `degrees`
 function wedgePath(degrees: number): string
@@ -42,21 +44,48 @@ function wedgePath(degrees: number): string
         + `A ${WEDGE_RADIUS} ${WEDGE_RADIUS} 0 ${large_arc} 1 ${end_x} ${end_y} Z`;
 }
 
-function tickLine(index: number): { x1: number; y1: number; x2: number; y2: number; is_major: boolean }
+function tickMarkup(index: number): string
 {
     const is_major = index % 5 === 0;
     const radians = (index * 6 * Math.PI) / 180;
     const inner = is_major ? TICK_INNER_MAJOR : TICK_INNER_MINOR;
-    return {
-        x1: CENTER + inner * Math.sin(radians),
-        y1: CENTER - inner * Math.cos(radians),
-        x2: CENTER + TICK_OUTER * Math.sin(radians),
-        y2: CENTER - TICK_OUTER * Math.cos(radians),
-        is_major,
-    };
+    const x1 = CENTER + inner * Math.sin(radians);
+    const y1 = CENTER - inner * Math.cos(radians);
+    const x2 = CENTER + TICK_OUTER * Math.sin(radians);
+    const y2 = CENTER - TICK_OUTER * Math.cos(radians);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${is_major ? 3 : 1.3}" opacity="${is_major ? 1 : 0.55}"/>`;
 }
 
-const TICKS = Array.from({ length: TICK_COUNT }, (_, index) => tickLine(index));
+// ---------- Baked once when the module loads ----------
+
+const PAPER_IMAGE = svgImage(VIEW_BOX,
+    `<defs>${paperLiftFilter('lift')}</defs>`
+    + `<circle cx="${CENTER}" cy="${CENTER}" r="${FACE_RADIUS}" fill="${FACE_COLOR}" filter="url(#lift)"/>`
+    + `<circle cx="${CENTER}" cy="${CENTER}" r="${DISC_RADIUS}" fill="${DISC_COLOR}" filter="url(#lift)"/>`);
+
+const INK_IMAGE = svgImage(VIEW_BOX,
+    `<g stroke="${INK_COLOR}" stroke-linecap="round" fill="none">`
+    + `<circle cx="${CENTER}" cy="${CENTER}" r="${FACE_RADIUS}" stroke-width="3"/>`
+    + `<circle cx="${CENTER}" cy="${CENTER}" r="${DISC_RADIUS}" stroke-width="2.4"/>`
+    + `<line x1="${CENTER}" y1="${CENTER}" x2="${CENTER}" y2="${CENTER - DISC_RADIUS}" stroke-width="1.4"/>`
+    + Array.from({ length: TICK_COUNT }, (_, index) => tickMarkup(index)).join('')
+    + '</g>');
+
+const NEEDLE_IMAGE = svgImage(VIEW_BOX,
+    `<defs>${paperLiftFilter('lift')}</defs>`
+    + `<rect x="${CENTER - NEEDLE_WIDTH / 2}" y="${NEEDLE_TOP}" width="${NEEDLE_WIDTH}" height="${CENTER - NEEDLE_TOP + 4}" `
+    + `rx="${NEEDLE_WIDTH / 2}" fill="${NEEDLE_COLOR}" stroke="${INK_COLOR}" stroke-width="2.2" filter="url(#lift)"/>`);
+
+const HUB_IMAGE = svgImage(VIEW_BOX,
+    `<defs>${paperLiftFilter('lift')}</defs>`
+    + `<circle cx="${CENTER}" cy="${CENTER}" r="${HUB_RADIUS}" fill="${NEEDLE_COLOR}" stroke="${INK_COLOR}" stroke-width="2.4" filter="url(#lift)"/>`
+    + `<circle cx="${CENTER - 4}" cy="${CENTER - 4}" r="3" fill="#ffffff" opacity="0.7"/>`);
+
+// Hatched "shadow" under the face, only shown in the sketch theme
+const HATCH_IMAGE = svgImage(VIEW_BOX,
+    '<defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+    + `<line x1="0" y1="0" x2="0" y2="5" stroke="${HATCH_COLOR}" stroke-width="1.1" opacity="0.7"/></pattern></defs>`
+    + `<circle cx="${CENTER + 5}" cy="${CENTER + 6}" r="${FACE_RADIUS}" fill="url(#hatch)"/>`);
 
 interface TimerDialProps
 {
@@ -69,16 +98,11 @@ export function TimerDial(props: TimerDialProps)
 
     return (
         <div className={`${styles.dial} sk-no-shadow`}>
-            {/* 1. Paper: face + disc (static) */}
-            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
-                {/* Hatched "shadow" only drawn in the sketch theme */}
-                <circle className="sk-only" cx={CENTER + 5} cy={CENTER + 6} r={FACE_RADIUS} fill="url(#sketch-hatch)" />
-                <circle cx={CENTER} cy={CENTER} r={FACE_RADIUS} fill={FACE_COLOR} filter={PAPER_LIFT_FILTER} />
-                <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} fill={DISC_COLOR} filter={PAPER_LIFT_FILTER} />
-            </svg>
+            <img className={`${styles.layer} sk-only`} src={HATCH_IMAGE} alt="" draggable={false} />
+            <img className={styles.layer} src={PAPER_IMAGE} alt="" draggable={false} />
 
-            {/* 2. Wedge: the only part that redraws while the dial turns */}
-            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
+            {/* The only part that redraws while the dial turns */}
+            <svg className={styles.layer} viewBox={VIEW_BOX} aria-hidden="true">
                 <defs>
                     <clipPath id="dial-disc-clip">
                         <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} />
@@ -87,48 +111,18 @@ export function TimerDial(props: TimerDialProps)
                 <motion.path d={wedge_d} fill={WEDGE_COLOR} clipPath="url(#dial-disc-clip)" />
             </svg>
 
-            {/* 3. Ink: outlines + ticks (static) */}
-            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
-                <g filter={INK_ROUGH_FILTER} stroke={INK_COLOR} strokeLinecap="round" fill="none">
-                    <circle cx={CENTER} cy={CENTER} r={FACE_RADIUS} strokeWidth={3} />
-                    <circle cx={CENTER} cy={CENTER} r={DISC_RADIUS} strokeWidth={2.4} />
-                    <line x1={CENTER} y1={CENTER} x2={CENTER} y2={CENTER - DISC_RADIUS} strokeWidth={1.4} />
-                    {TICKS.map((tick, index) => (
-                        <line
-                            key={index}
-                            x1={tick.x1}
-                            y1={tick.y1}
-                            x2={tick.x2}
-                            y2={tick.y2}
-                            strokeWidth={tick.is_major ? 3 : 1.3}
-                            opacity={tick.is_major ? 1 : 0.55}
-                        />
-                    ))}
-                </g>
-            </svg>
+            <img className={styles.layer} src={INK_IMAGE} alt="" draggable={false} />
 
-            {/* 4. Needle: drawn once, turned by the GPU */}
-            <motion.div className={styles.layer} style={{ rotate: props.sweep_degrees }}>
-                <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
-                    <rect
-                        x={CENTER - NEEDLE_WIDTH / 2}
-                        y={NEEDLE_TOP}
-                        width={NEEDLE_WIDTH}
-                        height={CENTER - NEEDLE_TOP + 4}
-                        rx={NEEDLE_WIDTH / 2}
-                        fill={NEEDLE_COLOR}
-                        stroke={INK_COLOR}
-                        strokeWidth={2.2}
-                        filter={PAPER_LIFT_FILTER}
-                    />
-                </svg>
-            </motion.div>
+            {/* Needle turned by the GPU */}
+            <motion.img
+                className={styles.layer}
+                src={NEEDLE_IMAGE}
+                alt=""
+                draggable={false}
+                style={{ rotate: props.sweep_degrees }}
+            />
 
-            {/* 5. Hub on top (static) */}
-            <svg className={styles.layer} viewBox="0 0 200 200" aria-hidden="true">
-                <circle cx={CENTER} cy={CENTER} r={HUB_RADIUS} fill={NEEDLE_COLOR} stroke={INK_COLOR} strokeWidth={2.4} filter={PAPER_LIFT_FILTER} />
-                <circle cx={CENTER - 4} cy={CENTER - 4} r={3} fill="#ffffff" opacity={0.7} />
-            </svg>
+            <img className={styles.layer} src={HUB_IMAGE} alt="" draggable={false} />
         </div>
     );
 }

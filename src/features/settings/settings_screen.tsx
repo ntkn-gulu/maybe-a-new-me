@@ -195,7 +195,7 @@ export function SettingsScreen()
                 </>
             )}
 
-            <p className={`mono_label ${styles.footer}`}>Maybe A New Me · v{APP_VERSION}</p>
+            <p className={`mono_label ${styles.footer}`}>Maybe A New Me · v{APP_VERSION} · {__BUILD_TIME__} UTC</p>
         </Screen>
     );
 }

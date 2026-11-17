@@ -11,9 +11,10 @@
    - sk-hide         hidden in the sketch theme; sk-only: shown only in it
    - sk-no-shadow    drops a soft drop shadow (paper on paper needs none)
 
-   Performance: the wobbly lines are pre-drawn SVG images used through
-   border-image / background. No SVG filter runs on the UI, so switching theme,
-   pressing buttons and sliding thumbs stay smooth on iPhone. */
+   Performance (iPhone Safari): everything textured is a small pre-drawn SVG
+   image, either 9-sliced (border-image) or tiled (background). No SVG filter
+   and no repeating/radial gradient pattern: Safari redraws gradients piece by
+   piece on every repaint, while an image tile is drawn once and reused. */
 
 .sk-only
 {
@@ -39,7 +40,9 @@
     --font-ui: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
     --font-mono: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
 
-    --sk-hatch: repeating-linear-gradient(-45deg, var(--color-ink) 0 1.1px, transparent 1.1px 5px);
+    /* Pen hatching tile (diagonal lines) and paper grain tile (two specks) */
+    --sk-hatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M-1 1 L1 -1 M0 6 L6 0 M5 7 L7 5' stroke='%231f1c18' stroke-width='1.1'/%3E%3C/svg%3E") 0 0 / 6px 6px;
+    --sk-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='2' cy='3' r='0.7' fill='%233c2d19' fill-opacity='0.12'/%3E%3Ccircle cx='7' cy='8' r='0.6' fill='%233c2d19' fill-opacity='0.1'/%3E%3C/svg%3E") 0 0 / 10px 10px;
 
     /* Pre-drawn wobbly ink outlines (#1f1c18). 9-slice frames: corners stay
        crisp, edges stretch to any size. */
@@ -58,9 +61,7 @@
 /* Paper grain */
 :root[data-theme="sketch"] body
 {
-    background:
-        radial-gradient(rgba(60, 45, 25, 0.07) 0.8px, transparent 0.9px) 0 0 / 5px 5px,
-        var(--color-bg);
+    background: var(--sk-grain), var(--color-bg);
 }
 
 :root[data-theme="sketch"] .sk-only
@@ -123,9 +124,7 @@
     border: 0;
     border-image: none;
     border-radius: 50%;
-    background:
-        var(--sk-circle-image) center / 100% 100% no-repeat,
-        radial-gradient(circle closest-side, var(--sk-fill, var(--tile-face)) 93%, transparent 94%);
+    background: var(--sk-circle-image) center / 100% 100% no-repeat, var(--sk-fill, var(--tile-face));
 }
 
 /* Hatched shadow, offset down-right like pen shading under an object */

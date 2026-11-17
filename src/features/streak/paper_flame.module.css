@@ -67,18 +67,19 @@
     }
 }
 
-.paper,
-.ink_frame,
-.ink_svg
+/* Baked paper layers, the ink box and each ink frame cover the flame box exactly */
+.layer,
+.ink_frame
 {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     overflow: visible;
+    -webkit-user-drag: none;
 }
 
-/* Line boil: three pre-drawn ink frames, shown one at a time (8 changes per second).
+/* Line boil: three baked ink images, shown one at a time (8 changes per second).
    Only opacity changes, so the GPU flips between finished pictures. */
 .ink_frame
 {

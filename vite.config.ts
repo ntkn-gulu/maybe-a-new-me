@@ -6,8 +6,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 const REPO_BASE_PATH = '/maybe-a-new-me/';
 const APP_BACKGROUND = '#f2eee7';
 
+// Shown in Settings, so it is easy to check which build a phone is running
+const BUILD_TIME = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
 export default defineConfig(({ command }) => ({
     base: command === 'build' ? REPO_BASE_PATH : '/',
+    define: { __BUILD_TIME__: JSON.stringify(BUILD_TIME) },
     plugins: [
         react(),
         VitePWA({

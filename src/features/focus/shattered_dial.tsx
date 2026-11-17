@@ -1,11 +1,10 @@
 import { motion } from 'motion/react';
-import { INK_ROUGH_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
 import styles from './shattered_dial.module.css';
 
 // The Focus dial (same paper + ink style as TimerDial) breaking apart: the
 // pink paper disc tears into shards along jagged cracks, each outlined in
-// ink; they burst out and drop a little, the needle snaps off. Moving parts
-// carry no filter, so the break animates without redrawing filters each frame.
+// ink; they burst out and drop a little, the needle snaps off. No SVG
+// filters at all: everything here moves, and moving filtered shapes stutter on iPhone.
 // Geometry is computed once; shards share their crack edges exactly, so the
 // disc looks whole at the first frame.
 
@@ -94,10 +93,10 @@ export function ShatteredDial()
             <ellipse cx="120" cy="236" rx="78" ry="9" className={styles.shadow} />
 
             {/* Paper face with ink ticks (stays intact) */}
-            <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill="#fbf8f3" filter={PAPER_LIFT_FILTER} />
+            <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill="#fbf8f3" />
             {/* Empty socket where the disc was */}
             <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} fill="var(--color-bg-deep)" />
-            <g filter={INK_ROUGH_FILTER} fill="none" stroke={INK_COLOR} strokeLinecap="round">
+            <g fill="none" stroke={INK_COLOR} strokeLinecap="round">
                 <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} strokeWidth={3} />
                 <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} strokeWidth={1.4} strokeDasharray="4 6" opacity={0.5} />
                 {TICKS.map((angle) =>
@@ -119,7 +118,7 @@ export function ShatteredDial()
                         animate={{ x: shard.direction[0] * distance, y: shard.direction[1] * distance + drop, rotate: rotation }}
                         transition={{ type: 'spring', stiffness: 140, damping: 11, delay: 0.28 + index * 0.025 }}
                     >
-                        <polygon points={toPoints(shard.points)} fill={SHARD_FACES[index]} filter={PAPER_LIFT_FILTER} />
+                        <polygon points={toPoints(shard.points)} fill={SHARD_FACES[index]} />
                         <polygon points={toPoints(shard.points)} fill="none" stroke={INK_COLOR} strokeWidth={2.2} strokeLinejoin="round" />
                     </motion.g>
                 );
