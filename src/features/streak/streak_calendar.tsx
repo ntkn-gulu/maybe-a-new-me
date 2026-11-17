@@ -9,12 +9,15 @@ import { addMonths, buildMonthGrid, getMonthKey, getMonthParts, getWeekdayOrder,
 import { compareDayKeys } from '../../core/day_key';
 import type { DayKey, DayRecord, DayResult } from '../../core/types';
 import { useT } from '../../i18n/use_t';
+import { formatDayMonth } from '../../i18n/date_format';
+import { useSettingsStore } from '../../stores/settings_store';
 import { monthNameKey, sportActivityKey, weekdayKey, type StringKey } from '../../i18n/strings';
 import styles from './streak_calendar.module.css';
 
 // Month heatmap of the streak: every day is a little tile colored by its
-// result (kept / frozen / missed / today). Arrows page between months from
-// the first app day up to this month. Tapping a day shows its details.
+// result (kept / frozen / missed / today). Arrows page a year back and forward
+// (further back if history is older); days outside history are just faint
+// numbers. Tapping a day shows its details.
 
 const RESULT_LABEL_KEYS: Record<DayResult, StringKey> = {
     kept: 'calendar_kept',
@@ -25,6 +28,7 @@ const RESULT_LABEL_KEYS: Record<DayResult, StringKey> = {
 
 const LEGEND: DayResult[] = ['kept', 'frozen', 'missed', 'pending'];
 const SLIDE_DISTANCE = 40;            // px the grid slides when paging months
+const MONTHS_AROUND_TODAY = 12;       // how far the arrows can page from this month
 
 // `custom` = paging direction (-1 back, 1 forward). Passed through AnimatePresence
 // so the leaving month uses the newest direction, not the one it was created with.
@@ -47,18 +51,28 @@ export function StreakCalendar(props: StreakCalendarProps)
     const t = useT();
     const this_month = getMonthKey(props.today);
     const first_month = getMonthKey(props.first_day_key);
+    const earliest_month = [first_month, addMonths(this_month, -MONTHS_AROUND_TODAY)].sort()[0];
+    const latest_month = addMonths(this_month, MONTHS_AROUND_TODAY);
     const [month_key, setMonthKey] = useState<MonthKey>(this_month);
     const [direction, setDirection] = useState(0);
     const [selected_day, setSelectedDay] = useState<DayKey>(props.today);
 
-    const can_go_back = month_key > first_month;
-    const can_go_forward = month_key < this_month;
+    const can_go_back = month_key > earliest_month;
+    const can_go_forward = month_key < latest_month;
+    const is_this_month = month_key === this_month;
     const { year, month } = getMonthParts(month_key);
 
-    function pageMonth(step: number): void
+    // `target` jumps straight to a month; otherwise move by `step`
+    function pageMonth(step: number, target: MonthKey = addMonths(month_key, step)): void
     {
         setDirection(step);
-        setMonthKey(addMonths(month_key, step));
+        setMonthKey(target);
+    }
+
+    function backToThisMonth(): void
+    {
+        playSfx('tab');
+        pageMonth(this_month > month_key ? 1 : -1, this_month);
     }
 
     function selectDay(day_key: DayKey): void
@@ -72,7 +86,14 @@ export function StreakCalendar(props: StreakCalendarProps)
             <div className={styles.header}>
                 <TactileButton size="sm" is_disabled={!can_go_back} onClick={() => pageMonth(-1)} aria_label={t('calendar_prev')}>‹</TactileButton>
                 <div className={styles.header_text}>
-                    <span className="mono_label">{t('calendar_title')}</span>
+                    {is_this_month
+                        ? <span className="mono_label">{t('calendar_title')}</span>
+                        : (
+                            <span {...getPressableProps(backToThisMonth)} className={`mono_label ${styles.back_link}`}>
+                                {t('calendar_this_month')}
+                                <HapticOverlay />
+                            </span>
+                        )}
                     <span className={styles.month}>{t('calendar_month', { month: t(monthNameKey(month)), year })}</span>
                 </div>
                 <TactileButton size="sm" is_disabled={!can_go_forward} onClick={() => pageMonth(1)} aria_label={t('calendar_next')}>›</TactileButton>
@@ -183,15 +204,15 @@ interface DayDetailProps
 function DayDetail(props: DayDetailProps)
 {
     const t = useT();
+    const date_format = useSettingsStore((state) => state.date_format);
     const record = props.records.find((entry) => entry.day_key === props.day_key);
     if (!record || !props.result)
     {
         return <p className={styles.detail}>&nbsp;</p>;
     }
 
-    const [, month, day] = props.day_key.split('-').map(Number);
     const parts = [
-        t('calendar_date', { d: day, m: month }),
+        formatDayMonth(props.day_key, date_format),
         t('calendar_day_sessions', { done: record.completed_count, goal: record.goal }),
         t(RESULT_LABEL_KEYS[props.result]),
     ];

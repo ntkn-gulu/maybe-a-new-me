@@ -23,6 +23,13 @@
     gap: 4px;
 }
 
+.back_link
+{
+    position: relative;
+    color: var(--color-accent);
+    cursor: pointer;
+}
+
 .month
 {
     font-family: var(--font-display);

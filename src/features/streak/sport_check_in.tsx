@@ -11,7 +11,8 @@ import { useT } from '../../i18n/use_t';
 import { sportActivityKey } from '../../i18n/strings';
 import styles from './sport_check_in.module.css';
 
-// Sport-day card on the Journey tab. Only rendered on a sport day.
+// Sport-day card on the Journey tab. Rendered on a sport day, or as a dev
+// preview on any day (the check-in card opens, but saving stores nothing).
 // Before the check-in: a button that opens the check-in card (activity + one line).
 // After: what was trained and how many sessions are still needed.
 
@@ -28,6 +29,7 @@ const NOTE_MAX_LENGTH = 80;
 interface SportCheckInProps
 {
     today: TodayProgress;
+    is_preview?: boolean;         // dev: try the check-in card on a normal day
 }
 
 export function SportCheckIn(props: SportCheckInProps)
@@ -58,6 +60,12 @@ export function SportCheckIn(props: SportCheckInProps)
     {
         if (!activity || !can_save)
         {
+            return;
+        }
+        if (props.is_preview)
+        {
+            setIsOpen(false);
+            playSfx('tab');
             return;
         }
         checkInSport({ day_key: props.today.today, activity, note: note.trim() });

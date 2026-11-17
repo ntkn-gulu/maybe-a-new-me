@@ -28,7 +28,7 @@ export function SessionDone()
             <h2 className={styles.paper_title}>{t('done_title')}</h2>
 
             <div className={styles.done_pips}>
-                {Array.from({ length: Math.max(today.goal, today.done) }, (_, index) =>
+                {Array.from({ length: Math.max(today.target, today.done) }, (_, index) =>
                 {
                     const is_filled = index < today.done;
                     const is_new = index === today.done - 1;

@@ -9,7 +9,8 @@ import { getFlameColors } from './flame_palettes';
 import styles from './dev_journey_panel.module.css';
 
 // Journey tools shown only in dev mode: fake a streak (0..400 days) to walk
-// through every tier, replay the level-up screen, and try flame color items.
+// through every tier, replay the level-up screen, try flame color items, and
+// show the sport-day check-in card on any day.
 // Nothing here is saved; the real streak is untouched.
 
 export const DEV_MAX_STREAK = 400;
@@ -28,6 +29,7 @@ interface DevJourneyPanelProps
     onStreakChange: (streak: number | null) => void;     // null = back to the real streak
     onColorChange: (color_id: string) => void;
     onPlayLevelUp: () => void;
+    onPreviewSport: () => void;
 }
 
 export function DevJourneyPanel(props: DevJourneyPanelProps)
@@ -77,6 +79,7 @@ export function DevJourneyPanel(props: DevJourneyPanelProps)
 
             <div className={styles.actions}>
                 <TactileButton size="sm" variant="ink" onClick={props.onPlayLevelUp}>{t('dev_level_up')}</TactileButton>
+                <TactileButton size="sm" onClick={props.onPreviewSport}>{t('dev_sport_preview')}</TactileButton>
                 <TactileButton size="sm" is_disabled={!props.is_faked} onClick={() => props.onStreakChange(null)}>
                     {t('dev_streak_real')}
                 </TactileButton>

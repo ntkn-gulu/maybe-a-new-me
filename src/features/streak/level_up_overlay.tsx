@@ -1,9 +1,11 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useAnimate, type TargetAndTransition, type Transition } from 'motion/react';
 import { TactileButton } from '../../ui/tactile_button';
 import { Ribbon } from '../../ui/ribbon';
 import { TypewriterText } from '../../ui/typewriter_text';
+import { getPressableProps } from '../../ui/pressable';
+import { HapticOverlay } from '../../ui/haptic_overlay';
 import { OPACITY_FADE, SPRING_POP } from '../../ui/motion_presets';
 import { playSfx } from '../../sound/sfx_engine';
 import { triggerHaptic } from '../../sound/haptic_hack';
@@ -14,17 +16,24 @@ import { LowPolyFlame } from './low_poly_flame';
 import { getFlameColors } from './flame_palettes';
 import styles from './level_up_overlay.module.css';
 
-// Full-screen level-up moment, in three beats:
+// Full-screen level-up moment, in four beats:
 // 1. charge: the old flame shakes and swells while a rising run of notes plays
-// 2. burst:  it blows apart with a flash and a boom
-// 3. reveal: the new flame assembles, its name, ribbon and words appear
+// 2. ready:  the user taps the flame TAPS_TO_BURST times; each tap jolts and
+//            cracks it. The finger lands on a HapticOverlay, so iPhones buzz on
+//            every tap (iOS never lets a page vibrate on its own).
+// 3. burst:  on the last tap it blows apart with a flash and a boom
+// 4. reveal: the new flame assembles, its name, ribbon and words appear
 // Rendered into <body> so it covers the tab bar and any transformed parent.
 
-type Phase = 'charge' | 'burst' | 'reveal';
+type Phase = 'charge' | 'ready' | 'burst' | 'reveal';
 
-const CHARGE_MS = 1150;               // old flame shaking
+const CHARGE_MS = 1150;               // old flame shaking before taps are accepted
 const BURST_MS = 520;                 // facets flying apart before the new flame
 const BUTTON_DELAY_MS = 1300;         // after reveal, so the moment is not skipped by accident
+const TAPS_TO_BURST = 3;
+const CHARGED_SCALE = 1.1;            // flame size once charged
+const TAP_SCALE_STEP = 0.06;          // extra swell per tap
+const TAP_CRACK_LOUDNESS = [0.35, 0.6];   // crack sound for each tap before the burst
 
 interface LevelUpOverlayProps
 {
@@ -61,32 +70,82 @@ function LevelUpStage(props: LevelUpStageProps)
 {
     const t = useT();
     const [phase, setPhase] = useState<Phase>('charge');
+    const [tap_count, setTapCount] = useState(0);
     const [is_button_ready, setIsButtonReady] = useState(false);
+    const [jolt_scope, animateJolt] = useAnimate<HTMLDivElement>();
+    const timers = useRef<number[]>([]);
     const new_tier = FLAME_TIERS[props.level_up.to_index];
     const new_colors = getFlameColors(props.level_up.to_index, props.color_id);
 
-    // One timeline per level-up: timers are set once on mount
+    function later(callback: () => void, delay_ms: number): void
+    {
+        timers.current.push(window.setTimeout(callback, delay_ms));
+    }
+
     useEffect(() =>
     {
         playSfx('rise');
-        const timers = [
-            window.setTimeout(() =>
-            {
-                setPhase('burst');
-                playSfx('burst');
-                triggerHaptic();
-            }, CHARGE_MS),
-            window.setTimeout(() =>
-            {
-                setPhase('reveal');
-                playSfx('sparkle');
-            }, CHARGE_MS + BURST_MS),
-            window.setTimeout(() => setIsButtonReady(true), CHARGE_MS + BURST_MS + BUTTON_DELAY_MS),
-        ];
-        return () => timers.forEach((timer) => window.clearTimeout(timer));
+        const charge_timer = window.setTimeout(() => setPhase('ready'), CHARGE_MS);
+        const pending = timers.current;
+        return () =>
+        {
+            window.clearTimeout(charge_timer);
+            pending.forEach((timer) => window.clearTimeout(timer));
+        };
     }, []);
 
+    function tapFlame(): void
+    {
+        if (phase !== 'ready')
+        {
+            return;
+        }
+        triggerHaptic();                          // Android; iPhones buzz through the HapticOverlay
+        const next_count = tap_count + 1;
+        setTapCount(next_count);
+
+        if (next_count < TAPS_TO_BURST)
+        {
+            playSfx('crack', TAP_CRACK_LOUDNESS[next_count - 1]);
+            // Alternate the jolt direction so each tap feels like a new hit
+            const direction = next_count % 2 === 0 ? 1 : -1;
+            animateJolt(jolt_scope.current, { rotate: [0, 9 * direction, -6 * direction, 2 * direction, 0] }, { duration: 0.35 });
+            return;
+        }
+
+        setPhase('burst');
+        playSfx('burst');
+        later(() =>
+        {
+            setPhase('reveal');
+            playSfx('sparkle');
+        }, BURST_MS);
+        later(() => setIsButtonReady(true), BURST_MS + BUTTON_DELAY_MS);
+    }
+
     const is_revealed = phase === 'reveal';
+    const is_ready = phase === 'ready';
+    const charged_scale = CHARGED_SCALE + tap_count * TAP_SCALE_STEP;
+
+    let swell_animate: TargetAndTransition;
+    let swell_transition: Transition;
+    if (phase === 'charge')
+    {
+        // Shakes harder and swells while charging
+        swell_animate = { x: [0, -2, 2, -3, 3, -5, 5, -7, 7, 0], scale: [1, 1.02, 1.05, 1.08, CHARGED_SCALE] };
+        swell_transition = { duration: CHARGE_MS / 1000, ease: 'easeIn' };
+    }
+    else if (is_ready)
+    {
+        // Breathes while waiting for taps; each tap makes it a bit bigger
+        swell_animate = { x: 0, scale: [charged_scale, charged_scale + 0.03, charged_scale] };
+        swell_transition = { duration: 0.9, repeat: Infinity, ease: 'easeInOut' };
+    }
+    else
+    {
+        swell_animate = { x: 0, scale: 1 };
+        swell_transition = SPRING_POP;
+    }
 
     return (
         <motion.div
@@ -125,7 +184,12 @@ function LevelUpStage(props: LevelUpStageProps)
                     </AnimatePresence>
                 </div>
 
-                <div className={styles.flame_area}>
+                {/* The whole flame area is the tap target while waiting for taps */}
+                <div
+                    {...getPressableProps(tapFlame, !is_ready)}
+                    className={is_ready ? `${styles.flame_area} ${styles.flame_area_ready}` : styles.flame_area}
+                    aria-label={t('level_up_tap_hint', { n: TAPS_TO_BURST - tap_count })}
+                >
                     {/* White flash right when the old flame bursts */}
                     <motion.div
                         className={styles.flash}
@@ -136,29 +200,36 @@ function LevelUpStage(props: LevelUpStageProps)
                         transition={{ duration: 0.55, ease: 'easeOut' }}
                     />
 
-                    <motion.div
-                        // Shakes harder and swells while charging
-                        animate={phase === 'charge'
-                            ? { x: [0, -2, 2, -3, 3, -5, 5, -7, 7, 0], scale: [1, 1.02, 1.05, 1.08, 1.12] }
-                            : { x: 0, scale: 1 }}
-                        transition={phase === 'charge'
-                            ? { duration: CHARGE_MS / 1000, ease: 'easeIn' }
-                            : SPRING_POP}
-                    >
-                        {is_revealed
-                            ? <LowPolyFlame key="new" tier_index={props.level_up.to_index} color_id={props.color_id} />
-                            : (
-                                <LowPolyFlame
-                                    key="old"
-                                    tier_index={props.level_up.from_index}
-                                    color_id={props.color_id}
-                                    is_bursting={phase === 'burst'}
-                                />
-                            )}
+                    <motion.div animate={swell_animate} transition={swell_transition}>
+                        <div ref={jolt_scope}>
+                            {is_revealed
+                                ? <LowPolyFlame key="new" tier_index={props.level_up.to_index} color_id={props.color_id} />
+                                : (
+                                    <LowPolyFlame
+                                        key="old"
+                                        tier_index={props.level_up.from_index}
+                                        color_id={props.color_id}
+                                        is_bursting={phase === 'burst'}
+                                    />
+                                )}
+                        </div>
                     </motion.div>
+
+                    <HapticOverlay is_disabled={!is_ready} />
                 </div>
 
                 <div className={styles.details}>
+                    {is_ready && (
+                        <motion.span
+                            key={tap_count}
+                            className={`mono_label ${styles.tap_hint}`}
+                            initial={{ y: 6, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ y: SPRING_POP, opacity: OPACITY_FADE }}
+                        >
+                            {t('level_up_tap_hint', { n: TAPS_TO_BURST - tap_count })}
+                        </motion.span>
+                    )}
                     {is_revealed && (
                         <>
                             <Ribbon color="flame">{t('level_up_ribbon', { level: new_tier.index, n: new_tier.min_days })}</Ribbon>

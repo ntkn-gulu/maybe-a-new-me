@@ -9,10 +9,11 @@ import { getTodayKey } from '../../stores/clock';
 import { playSfx, type SfxName } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
 import type { Language, StringKey } from '../../i18n/strings';
+import type { DateFormat } from '../../i18n/date_format';
 import styles from './settings_screen.module.css';
 
-// Settings tab: language, sound + haptic preferences and a sound tester.
-// Goal, sport days, backup and credits arrive in later phases.
+// Settings tab: daily goal, language, date format, sound + haptic preferences.
+// The sound tester only shows in dev mode. Sport days, backup and credits arrive in later phases.
 
 const PREVIEW_SOUNDS: { name: SfxName; label_key: StringKey }[] = [
     { name: 'tab', label_key: 'sfx_tab' },
@@ -20,12 +21,20 @@ const PREVIEW_SOUNDS: { name: SfxName; label_key: StringKey }[] = [
     { name: 'sparkle', label_key: 'sfx_sparkle' },
     { name: 'whoosh', label_key: 'sfx_whoosh' },
     { name: 'chime', label_key: 'sfx_chime' },
+    { name: 'rise', label_key: 'sfx_rise' },
+    { name: 'burst', label_key: 'sfx_burst' },
 ];
 
 // Language names are written in their own language, never translated
 const LANGUAGE_OPTIONS: SegmentOption<Language>[] = [
     { value: 'vi', label: 'VI' },
     { value: 'en', label: 'EN' },
+];
+
+// Written the same in every language, like the VI / EN labels
+const DATE_FORMAT_OPTIONS: SegmentOption<DateFormat>[] = [
+    { value: 'day_first', label: 'DD/MM' },
+    { value: 'month_first', label: 'MM/DD' },
 ];
 
 const APP_VERSION = '0.1.0';
@@ -62,6 +71,9 @@ export function SettingsScreen()
     const setSoundEnabled = useSettingsStore((state) => state.setSoundEnabled);
     const setSfxVolume = useSettingsStore((state) => state.setSfxVolume);
     const setHapticEnabled = useSettingsStore((state) => state.setHapticEnabled);
+    const date_format = useSettingsStore((state) => state.date_format);
+    const setDateFormat = useSettingsStore((state) => state.setDateFormat);
+    const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
     const goal = useGoalSetting();
     const setDailyGoal = useProgressStore((state) => state.setDailyGoal);
 
@@ -104,6 +116,18 @@ export function SettingsScreen()
                         />
                     }
                 />
+                <SettingRow
+                    label={t('settings_date_format')}
+                    caption={t('settings_date_format_caption')}
+                    control={
+                        <SegmentedSwitch
+                            options={DATE_FORMAT_OPTIONS}
+                            value={date_format}
+                            onChange={setDateFormat}
+                            aria_label={t('settings_date_format')}
+                        />
+                    }
+                />
             </div>
 
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_sound')}</h2>
@@ -135,18 +159,22 @@ export function SettingsScreen()
                 />
             </div>
 
-            <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_preview')}</h2>
-            <div className={styles.preview_row}>
-                {PREVIEW_SOUNDS.map((sound) => (
-                    <TactileButton key={sound.name} size="sm" onClick={() => playSfx(sound.name)}>
-                        {t(sound.label_key)}
-                    </TactileButton>
-                ))}
-                {/* Every tactile button already buzzes on click; this one only buzzes */}
-                <TactileButton size="sm" variant="ink">
-                    {t('haptic_test')}
-                </TactileButton>
-            </div>
+            {is_dev_mode && (
+                <>
+                    <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_preview')}</h2>
+                    <div className={styles.preview_row}>
+                        {PREVIEW_SOUNDS.map((sound) => (
+                            <TactileButton key={sound.name} size="sm" onClick={() => playSfx(sound.name)}>
+                                {t(sound.label_key)}
+                            </TactileButton>
+                        ))}
+                        {/* Every tactile button already buzzes on click; this one only buzzes */}
+                        <TactileButton size="sm" variant="ink">
+                            {t('haptic_test')}
+                        </TactileButton>
+                    </div>
+                </>
+            )}
 
             <p className={`mono_label ${styles.footer}`}>Maybe A New Me · v{APP_VERSION}</p>
         </Screen>

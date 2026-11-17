@@ -21,7 +21,9 @@
 .typed
 {
     position: absolute;
-    inset: 0;
+    /* A hair wider than the ghost: per-character spans can round a fraction of a
+       pixel wider than the same text in one run, which would wrap a line early */
+    inset: 0 -2px;
 }
 
 /* Each new character settles in: from a faint warm glow to solid ink */

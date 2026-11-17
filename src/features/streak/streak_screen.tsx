@@ -39,6 +39,7 @@ export function StreakScreen()
     const [dev_streak, setDevStreak] = useState<number | null>(null);
     const [dev_color_id, setDevColorId] = useState<string | null>(null);
     const [dev_level_up, setDevLevelUp] = useState<LevelUp | null>(null);
+    const [is_dev_sport_preview, setIsDevSportPreview] = useState(false);
 
     const shown_streak = is_dev_mode && dev_streak !== null ? dev_streak : streak.current_streak;
     const color_id = is_dev_mode ? dev_color_id : null;
@@ -157,6 +158,9 @@ export function StreakScreen()
                     day_results={streak.day_results}
                 />
 
+                {/* Dev preview sits right above the panel, next to the button that opens it */}
+                {!today.is_sport_day && is_dev_mode && is_dev_sport_preview && <SportCheckIn today={today} is_preview />}
+
                 {is_dev_mode && (
                     <DevJourneyPanel
                         streak={shown_streak}
@@ -166,6 +170,7 @@ export function StreakScreen()
                         onStreakChange={setDevStreak}
                         onColorChange={setDevColorId}
                         onPlayLevelUp={playDevLevelUp}
+                        onPreviewSport={() => setIsDevSportPreview(true)}
                     />
                 )}
             </div>

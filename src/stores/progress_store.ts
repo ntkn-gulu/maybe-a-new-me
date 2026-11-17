@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { buildDayRecord, buildDayRecords, type DayRecordInput } from '../core/day_records';
 import { createSchedule, getPendingChange, getValueForDay, scheduleChange, type Schedule } from '../core/scheduled_value';
-import { computeStreak, getSessionsToKeep, isDayKept, type StreakState } from '../core/streak_engine';
+import { computeStreak, getDayTarget, getSessionsToKeep, isDayKept, type StreakState } from '../core/streak_engine';
 import { canCheckInSport } from '../core/sport_rules';
 import type { DayKey, DayRecord, SessionRecord, SportCheckIn } from '../core/types';
 import { getTodayKey } from './clock';
@@ -13,7 +13,7 @@ import { getTodayKey } from './clock';
 // from this with the pure core, never stored. The only extra state is the
 // highest flame tier already celebrated, so each level-up is shown once.
 
-export const DEFAULT_DAILY_GOAL = 4;
+export const DEFAULT_DAILY_GOAL = 2;
 export const MIN_DAILY_GOAL = 1;
 export const MAX_DAILY_GOAL = 12;
 export const DEFAULT_SPORT_WEEKDAYS = [1, 4];     // Monday badminton, Thursday fitness
@@ -122,6 +122,7 @@ export interface TodayProgress
     today: DayKey;
     done: number;
     goal: number;
+    target: number;                           // sessions that keep today (goal, or 1 on a checked-in sport day)
     is_kept: boolean;
     sessions_to_keep: number;                 // 0 once kept; 1 on a checked-in sport day
     is_sport_day: boolean;
@@ -138,6 +139,7 @@ export function useTodayProgress(): TodayProgress
         today: record.day_key,
         done: record.completed_count,
         goal: record.goal,
+        target: getDayTarget(record),
         is_kept: isDayKept(record),
         sessions_to_keep: getSessionsToKeep(record),
         is_sport_day: record.is_sport_day,

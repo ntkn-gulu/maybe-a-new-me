@@ -111,7 +111,7 @@ export function FocusScreen()
 
     const kicker = today.is_kept
         ? t('focus_kicker_done', { done: today.done })
-        : t('focus_kicker', { n: today.done + 1, goal: today.goal });
+        : t('focus_kicker', { n: today.done + 1, goal: today.target });
 
     return (
         <Screen kicker={kicker} title={t('focus_title')} onKickerTap={handleKickerTap}>
@@ -157,8 +157,8 @@ export function FocusScreen()
                 </AnimatePresence>
             </div>
 
-            <div className={styles.pips} aria-label={t('focus_pips_label', { done: today.done, goal: today.goal })}>
-                {Array.from({ length: Math.max(today.goal, today.done) }, (_, index) => (
+            <div className={styles.pips} aria-label={t('focus_pips_label', { done: today.done, goal: today.target })}>
+                {Array.from({ length: Math.max(today.target, today.done) }, (_, index) => (
                     <span key={index} className={index < today.done ? `${styles.pip} ${styles.pip_done}` : styles.pip} />
                 ))}
             </div>

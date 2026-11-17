@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MIN_CHECK_IN_NOTE_LENGTH, SPORT_ACTIVITIES, canCheckInSport, isCheckInNoteValid } from '../src/core/sport_rules';
-import { SPORT_DAY_MIN_SESSIONS, getSessionsToKeep } from '../src/core/streak_engine';
+import { SPORT_DAY_MIN_SESSIONS, getDayTarget, getSessionsToKeep } from '../src/core/streak_engine';
 import type { DayRecord } from '../src/core/types';
 
 function record(extra: Partial<DayRecord> = {}): DayRecord
@@ -60,5 +60,15 @@ describe('getSessionsToKeep', () =>
     it('never asks for more than the goal', () =>
     {
         expect(getSessionsToKeep(record({ goal: 1, sport_checked_in: true }))).toBe(1);
+    });
+});
+
+describe('getDayTarget', () =>
+{
+    it('is the goal, or the sport minimum after a sport check-in', () =>
+    {
+        expect(getDayTarget(record({ is_sport_day: false }))).toBe(4);
+        expect(getDayTarget(record())).toBe(4);
+        expect(getDayTarget(record({ sport_checked_in: true }))).toBe(SPORT_DAY_MIN_SESSIONS);
     });
 });
