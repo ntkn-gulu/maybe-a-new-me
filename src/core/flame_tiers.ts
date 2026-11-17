@@ -61,3 +61,29 @@ export function getTierProgress(streak_days: number): TierProgress
     const days_to_next = next.min_days - current.min_days;
     return { current, next, days_into_tier, days_to_next, ratio: days_into_tier / days_to_next };
 }
+
+// ---------- Level up ----------
+
+export interface LevelUp
+{
+    from_index: number;
+    to_index: number;
+}
+
+// A level-up is due when the current tier is above the last tier the user
+// has already celebrated. The celebrated tier is stored, the current one is derived.
+export function getLevelUp(celebrated_index: number, current_index: number): LevelUp | null
+{
+    if (current_index <= celebrated_index)
+    {
+        return null;
+    }
+    return { from_index: celebrated_index, to_index: current_index };
+}
+
+// After a lost streak the celebrated tier drops with it,
+// so climbing back up to a tier celebrates it again.
+export function settleCelebratedTier(celebrated_index: number, current_index: number): number
+{
+    return Math.min(celebrated_index, current_index);
+}

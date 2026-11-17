@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FLAME_TIERS, getNextTier, getTierForStreak, getTierProgress } from '../src/core/flame_tiers';
+import { FLAME_TIERS, getLevelUp, getNextTier, getTierForStreak, getTierProgress, settleCelebratedTier } from '../src/core/flame_tiers';
 
 describe('FLAME_TIERS', () =>
 {
@@ -50,5 +50,26 @@ describe('getTierProgress', () =>
         const progress = getTierProgress(400);
         expect(progress.next).toBeNull();
         expect(progress.ratio).toBe(1);
+    });
+});
+
+describe('level up', () =>
+{
+    it('is due only when the current tier passes the celebrated one', () =>
+    {
+        expect(getLevelUp(1, 1)).toBeNull();
+        expect(getLevelUp(2, 1)).toBeNull();
+        expect(getLevelUp(1, 2)).toEqual({ from_index: 1, to_index: 2 });
+    });
+
+    it('jumps several tiers at once when needed', () =>
+    {
+        expect(getLevelUp(0, 4)).toEqual({ from_index: 0, to_index: 4 });
+    });
+
+    it('lets the celebrated tier fall with a lost streak, never rise', () =>
+    {
+        expect(settleCelebratedTier(5, 0)).toBe(0);
+        expect(settleCelebratedTier(2, 3)).toBe(2);
     });
 });

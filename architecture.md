@@ -6,12 +6,14 @@
 A bilingual (Vietnamese / English) PWA with a tactile "warm paper + extruded objects" design system, synthesized sounds and experimental iOS haptics.
 
 - **Focus** runs real strict-mode sessions: countdown on a black screen, wake lock, leave-the-app limits (phone), random "Still there?" checks with an escalating chime, a required note, and saved history.
-- **Journey** shows the real streak (from session history) with a low-poly flame for all 9 tiers; tiers can be previewed.
+- **Journey** shows the real streak (from session history) with a low-poly flame for all 9 tiers (tiers can be previewed), a sport-day check-in card on sport days, best streak + streak freezes, and a month calendar heatmap (kept / frozen / missed / today).
+- **Level up**: reaching a new tier opens a full-screen moment once (old flame shakes, bursts, the new one assembles) after any session screen closes.
 - **Chests** shows the chest and rarity teasers; chest earning/opening is not wired to the UI yet.
 - **Settings**: daily goal (applies tomorrow), language, sound, haptics, sound test.
 - Every tap target is a `div` with button semantics (`getPressableProps`) holding a `HapticOverlay`, so iPhones buzz on tap.
 - `src/core/` holds all game rules as pure, tested TypeScript.
-- Hidden dev mode (tap the Focus kicker 5 times): sessions run 25x faster; time limits stay in real seconds.
+- Hidden dev mode (tap the Focus kicker 5 times): sessions run 25x faster (time limits stay in real seconds); Journey shows a dev panel to fake the streak (0–400), try flame color items and replay the level-up screen.
+- Flames support an equipped color item (`color_id`); nothing equips one yet outside the dev panel.
 
 ## Tooling (project root)
 | File | Role |
@@ -39,8 +41,10 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 | `rng.ts` | `createSeededRandom(seed)`: mulberry32 generator for reproducible tests |
 | `scheduled_value.ts` | Settings that change from tomorrow (daily goal, sport weekdays): `Schedule<Value>` history, `createSchedule()`, `getValueForDay()`, `scheduleChange()` (same-day changes replace each other), `getPendingChange()` |
 | `day_records.ts` | `buildDayRecords(input)` / `buildDayRecord()`: sessions + sport check-ins + goal/sport schedules → one `DayRecord` per day from the first day to today. `countCompletedSessions()`, `isSportDay()` |
-| `flame_tiers.ts` | `FLAME_TIERS` (9 tiers: `index`, `min_days`), `getTierForStreak()`, `getNextTier()`, `getTierProgress()` → `{ current, next, days_into_tier, days_to_next, ratio }`. Tier names/words live in i18n |
-| `streak_engine.ts` | `isDayKept()` (goal met, or sport day with check-in + `SPORT_DAY_MIN_SESSIONS`), `FREEZE_EARN_EVERY_DAYS` = 7, `FREEZE_CAP_BY_STREAK` / `getFreezeCap()` (2 → 3 at 30 → 4 at 100 → 5 at 180), `computeStreak(records, today)` → `StreakState` (`current_streak`, `best_streak`, `freezes_owned`, `current_tier_index`, `day_results`: kept / frozen / missed / pending). Recomputed from full history; today stays pending until kept |
+| `flame_tiers.ts` | `FLAME_TIERS` (9 tiers: `index`, `min_days`), `getTierForStreak()`, `getNextTier()`, `getTierProgress()` → `{ current, next, days_into_tier, days_to_next, ratio }`. Level up: `getLevelUp(celebrated, current)` → `{ from_index, to_index }` or null, `settleCelebratedTier()` (the celebrated tier falls with a lost streak, never rises). Tier names/words live in i18n |
+| `streak_engine.ts` | `isDayKept()` (goal met, or sport day with check-in + `SPORT_DAY_MIN_SESSIONS`), `getSessionsToKeep(record)` (0 once kept; a checked-in sport day only needs the sport minimum), `FREEZE_EARN_EVERY_DAYS` = 7, `FREEZE_CAP_BY_STREAK` / `getFreezeCap()` (2 → 3 at 30 → 4 at 100 → 5 at 180), `computeStreak(records, today)` → `StreakState` (`current_streak`, `best_streak`, `freezes_owned`, `current_tier_index`, `day_results`: kept / frozen / missed / pending). Recomputed from full history; today stays pending until kept |
+| `sport_rules.ts` | `SPORT_ACTIVITIES` (badminton, gym, home_workout, running, other), `MIN_CHECK_IN_NOTE_LENGTH` = 3, `canCheckInSport(record)` (sport day, once), `isCheckInNoteValid()` |
+| `calendar_month.ts` | `MonthKey` (`YYYY-MM`), `getMonthKey()`, `getMonthParts()`, `addMonths()`, `getDaysInMonth()`, `getWeekdayOrder()` (Monday first, `WEEK_START_WEEKDAY`), `buildMonthGrid(month)` → day keys padded with `null` to whole weeks |
 | `session_rules.ts` | Strict-mode state machine `FocusGuardState` (status `running` → `awaiting_note` → `completed`, or `broken` with `BreakReason`: left_app, away_too_long, missed_check, clock_jump, gave_up). Events: `startSession(now, minutes, device, random, limit_scale)`, `tickSession`, `onAppHidden`, `onAppVisible`, `answerPresenceCheck`, `giveUpSession`, `completeSession`. Helpers: `getRemainingSeconds`, `getElapsedSeconds`, `getOpenPresenceCheck`, `getMaxAwayMs`, `getResponseSeconds`, `isNoteValid`. Rules: 60 s per trip away / 180 s total per 25 min (phone only), random checks (`planPresenceChecks`: phone 1, desktop 2 per 25 min, 90 s to answer, never in the first/last 3 min), clock moving back > 5 s breaks, note ≥ 5 chars. `limit_scale` multiplies all time limits (dev mode) |
 | `reward_config.ts` | Tuning knobs: `CHEST_RATES` (daily / silver / milestone), `SILVER_CHEST_EVERY_DAYS`, pity (`PITY_EPIC_AT` 10, soft legendary from 35 at +2 % per chest, hard at 50), `SHARDS_FOR_DUPLICATE`, `SHARD_COST` |
 | `reward_catalog.ts` | `REWARD_CATALOG`: 36 items (`id`, `slot`, `rarity`, `source` default / gacha / milestone): 5 defaults, 6 titles, 4 themes, 4 sound packs, 4 timer skins, 5 rare flames, 8 tier flames. `getItem()`, `getDefaultItemIds()`, `getGachaPool(rarity)`, `getMilestoneFlameId(tier)` |
@@ -49,14 +53,14 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 ### i18n (`src/i18n/`)
 | File | Role |
 |---|---|
-| `strings.ts` | `Language` (`vi` / `en`), `STRINGS` tables (Vietnamese defines `StringKey`, English must match), `translate(language, key, params)` fills `{name}` placeholders, `tierNameKey()` / `tierWordsKey()` / `itemNameKey()` build `tier_<index>_name/_words` and `item_<id>` keys |
+| `strings.ts` | `Language` (`vi` / `en`), `STRINGS` tables (Vietnamese defines `StringKey`, English must match), `translate(language, key, params)` fills `{name}` placeholders, `tierNameKey()` / `tierWordsKey()` / `itemNameKey()` / `monthNameKey()` / `weekdayKey()` / `sportActivityKey()` build `tier_<index>_name/_words`, `item_<id>`, `month_<1..12>`, `weekday_<0..6>` and `sport_<activity>` keys |
 | `use_t.ts` | `useT()` hook: returns `t(key, params)` bound to `settings_store.language`; components re-render when it changes |
 
 ### App shell
 | File | Role |
 |---|---|
 | `src/main.tsx` | Imports bundled fonts (Space Grotesk 500/700, Space Mono 400/700, Vietnamese subset) and global CSS; initializes the settings store; unlocks audio on the first `pointerdown` / `touchend` / `click`; calls `useFocusStore.recoverAfterReload()` so a session interrupted by closing the app is judged on launch; mounts `App` |
-| `src/app.tsx` | Holds `active_tab` state (no router), animates screen transitions, renders `TabBar` and the `FocusSessionLayer` above everything |
+| `src/app.tsx` | Holds `active_tab` state (no router), animates screen transitions, renders `TabBar`, the `FocusSessionLayer` and the `LevelUpGate` above everything |
 
 ### Styles (`src/styles/`)
 | File | Role |
@@ -76,6 +80,7 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 | `screen.tsx` | Page frame: safe-area padding, optional mono `kicker` (with optional `onKickerTap`) + display `title`, left or center aligned |
 | `ribbon.tsx` | Banner with folded notched tails; colors `blue`/`ink`/`flame`; pops in |
 | `typewriter_text.tsx` | Types text character by character with soft `tick` sounds; each new character fades in from a warm accent glow to ink (no caret); reserves final size so layout does not jump; restarts when `text` changes |
+| `modal_card.tsx` | `ModalCard`: paper card that drops in over a dimmed backdrop (tap the backdrop to close). Portaled into `<body>` so no transformed parent can trap it, and placed near the top so the iPhone keyboard never covers its fields |
 | `hold_button.tsx` | Press-and-hold to confirm (default 2 s): a fill grows while held, letting go cancels. Used for "give up"; a real `<button>` (no haptic overlay: a hold is not a tap) |
 | `haptic_overlay.tsx` | Nearly invisible real `<input type="checkbox" switch>` stretched over a tap area, so the finger itself toggles a switch and iOS buzzes (newer iOS ignores programmatic clicks). Renders nothing when haptics are off or the target is disabled. Parent must be `position: relative` and not a `<button>` |
 | `icons.tsx` | Inline SVG icons (flame, timer, chest, gear) using `currentColor` |
@@ -83,7 +88,7 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 ### Sound (`src/sound/`)
 | File | Role |
 |---|---|
-| `sfx_engine.ts` | Web Audio synthesizer. `playSfx(name, loudness_scale = 1)` for `press`, `release`, `tab`, `toggle`, `chime`, `tick`, `whoosh`, `sparkle`, `crack`; `loudness_scale` > 1 for escalating alarms. Context lifecycle: every return from the background marks the context stale (iOS can report "running" yet stay silent) and tries a resume; `unlockAudio()` rebuilds a fresh context only inside a real user gesture (`navigator.userActivation.isActive`), otherwise just resumes; a failed/timed-out resume (400 ms) also marks it stale. `isAudioStale()` tells the UI a tap is needed. Sets `navigator.audioSession.type = 'playback'` so sounds play with the silent switch on |
+| `sfx_engine.ts` | Web Audio synthesizer. `playSfx(name, loudness_scale = 1)` for `press`, `release`, `tab`, `toggle`, `chime`, `tick`, `whoosh`, `sparkle`, `crack`, `rise` (level-up charge: a pentatonic run that speeds up and gets louder), `burst` (boom + crack + major chord); `loudness_scale` > 1 for escalating alarms. Context lifecycle: every return from the background marks the context stale (iOS can report "running" yet stay silent) and tries a resume; `unlockAudio()` rebuilds a fresh context only inside a real user gesture (`navigator.userActivation.isActive`), otherwise just resumes; a failed/timed-out resume (400 ms) also marks it stale. `isAudioStale()` tells the UI a tap is needed. Sets `navigator.audioSession.type = 'playback'` so sounds play with the silent switch on |
 | `haptic_hack.ts` | `triggerHaptic()`: Vibration API only (Android), called from click handlers. iPhone haptics come from `HapticOverlay` |
 
 ### Stores (`src/stores/`)
@@ -91,27 +96,33 @@ Time, time zone and randomness are always passed in, so every rule is determinis
 |---|---|
 | `clock.ts` | Browser-side helpers: `getDayKeyAt(epoch_ms)` / `getTodayKey()` (device time zone), `detectDevice()` (`pointer: coarse` → phone), `createId()` |
 | `settings_store.ts` | Zustand + persist (`mnm-settings`): `language`, `is_sound_enabled`, `sfx_volume`, `is_haptic_enabled`, `is_dev_mode` (+ `toggleDevMode`). Subscribes the sound/haptic engines and `<html lang>` to every change |
-| `progress_store.ts` | Zustand + persist (`mnm-progress`): `first_day_key`, `sessions` (SessionRecord history), `sport_check_ins`, `goal_schedule` (default 4, range 1–12), `sport_weekday_schedule` (default Mon + Thu). Actions `addSession`, `setDailyGoal(goal, today)` (applies tomorrow). Derived via core, never stored: `useTodayProgress()` → `{ today, done, goal, is_kept, is_sport_day }`, `useStreak()` → `StreakState`, `useGoalSetting()` → `{ today_goal, tomorrow_goal }`, `getTodayRecord()` |
+| `progress_store.ts` | Zustand + persist (`mnm-progress`): `first_day_key`, `sessions` (SessionRecord history), `sport_check_ins`, `goal_schedule` (default 4, range 1–12), `sport_weekday_schedule` (default Mon + Thu), `celebrated_tier_index` (highest tier whose level-up was shown). Actions `addSession`, `setDailyGoal(goal, today)` (applies tomorrow), `checkInSport(check_in)` (ignored unless `canCheckInSport`), `setCelebratedTier`. Derived via core, never stored: `useDayRecords()` (memoized `DayRecord[]`, first day → today), `useTodayProgress()` → `{ today, done, goal, is_kept, sessions_to_keep, is_sport_day, sport_check_in }`, `useStreak()` → `StreakState`, `useGoalSetting()` → `{ today_goal, tomorrow_goal }`, `getTodayRecord()` |
 | `focus_store.ts` | Zustand + persist (`mnm-focus`): `selected_length`, `session` (`FocusGuardState`), `clock_origin`, `time_scale` (1, or `DEV_TIME_SCALE` = 25). `getSessionNow()` = real time sped up by `time_scale`. Actions run the core state machine: `start(device, is_dev_mode)` (limit_scale = time_scale), `tick`, `appHidden`, `appVisible`, `answerCheck`, `giveUp`, `submitNote(note)`, `dismiss`, `recoverAfterReload` (phone: time closed counts as time away). Broken and completed sessions are written to `progress_store`. A `merge` step upgrades sessions saved without `limit_scale` |
 
 ### Features (`src/features/`)
 | File | Role |
 |---|---|
-| `streak/streak_screen.tsx` | Journey tab: real streak from `useStreak()`; translated tier name, ribbon (streak count / passed / lock with unlock day), `LowPolyFlame`, typewriter words, progress counter + bar to next tier, `TierStrip` |
-| `streak/low_poly_flame.tsx` | SVG flame (size prop or `--flame-size` CSS variable; journey uses `min(230px, 25dvh)`): 20 shell + 5 core facets with 4-shade lighting; facets fly in and assemble on mount / tier change; sway; floating shards; glow + ground shadow; `rainbow` and `galaxy` effects |
-| `streak/flame_palettes.ts` | `FLAME_PALETTES[tier_index]`: facet shades, core colors, glow, shard colors, effect |
+| `streak/streak_screen.tsx` | Journey tab (scrolls). Hero: translated tier name, ribbon (streak count / passed / lock with unlock day), `LowPolyFlame`, typewriter words, progress counter + bar to next tier, `TierStrip` (the preview jumps back to the current tier whenever the tier changes). Below: `SportCheckIn` (sport days only), `StreakStats`, `StreakCalendar`, and `DevJourneyPanel` in dev mode. Dev overrides (fake streak, flame color, level-up replay) live in local state and are never saved |
+| `streak/low_poly_flame.tsx` | SVG flame (size prop or `--flame-size` CSS variable; journey uses `min(230px, 25dvh)`): 20 shell + 5 core facets with 4-shade lighting; facets fly in and assemble on mount / tier / color change; `is_bursting` blows them apart; sway; breathing glow; floating shards and rising embers (counts from the tier); stars on the galaxy tier; hue cycling for rainbow colors. `color_id` = equipped flame color item |
+| `streak/flame_palettes.ts` | Colors and effects are separate. `TIER_COLORS[tier]` (shades, core, glow, shard colors, `is_hue_cycling`), `TIER_EFFECTS[tier]` (`shard_count`, `ember_count`, `glow_pulse`, `has_stars`; they grow with the tier), rare flame item colors (ice, toxic, shadow, gold 24K, aurora). `getFlameColors(tier, color_id)` (no id / `flame_follow_tier` → tier colors, `flame_tier_N` → tier N colors), `getFlameEffects(tier)` |
 | `streak/tier_strip.tsx` | Extruded strip of 9 mini flame badges (colored when reached, outlined when locked) with a sliding marker; tap to preview |
-| `focus/focus_screen.tsx` | Idle Focus tab (time digits swap with spring movement + `OPACITY_FADE`): kitchen-timer dial (size capped at `30dvh`; SVG pie-slice wedge; needle in an unclipped layer with a fixed shadow; ratchet ticks on change), mono time, today's pips from `useTodayProgress()`, 25/50 selector (persisted), start button (starts a session; shows a DEV badge in dev mode). Kicker shows "session n / goal" or "goal done"; 5 taps on it toggle dev mode with a toast |
+| `focus/focus_screen.tsx` | Idle Focus tab (time digits swap with spring movement + `OPACITY_FADE`): kitchen-timer dial (size capped at `30dvh`; SVG pie-slice wedge; needle in an unclipped layer with a fixed shadow; ratchet ticks on change), mono time, today's pips from `useTodayProgress()`, 25/50 selector (persisted), start button (starts a session; shows a DEV badge in dev mode). Kicker shows "session n / goal", or "goal done" once the day is kept; 5 taps on it toggle dev mode with a toast |
 | `focus/focus_session_layer.tsx` | Fixed full-screen layer while a session exists; runs `useFocusGuard` and `useWakeLock`; picks the view by status; plays the time-up chime (3 rings), crack + haptic on break, sparkle on completion |
 | `focus/session_running.tsx` | Black running view: "tap to turn sound back on" pill while `isAudioStale()` (any tap on the view rebuilds audio), label (+ DEV chip), thin progress ring, big countdown, time-away budget (phone) or desktop check count, leave hint, hold-to-give-up; shows `PresenceCheck` when a check is open |
 | `focus/presence_check.tsx` | "Still there?" over a solid accent screen with a pulsing flash, countdown in real seconds, big answer button; chime rings every 8 s, louder each time (0.6 → 2.2) |
 | `focus/session_note.tsx` | "What did you do?" textarea (17 px so iOS doesn't zoom), live min-length hint, save button disabled until valid |
-| `focus/session_done.tsx` | Celebration: today's pips with the new one popping in, "flame kept today" ribbon when the goal is met, typewriter line (goal met / sessions left), continue |
+| `focus/session_done.tsx` | Celebration: today's pips with the new one popping in, "flame kept today" ribbon when the day is kept, typewriter line (goal met / `sessions_to_keep` left), continue |
 | `focus/session_broken.tsx` | `ShatteredDial`, reason card with an icon per `BreakReason`, typewriter encouragement, retry (starts a new session) / back |
 | `focus/shattered_dial.tsx` | The Focus dial breaking: pink disc split into 7 thick shards along bent cracks from an off-center origin (shared edges, so it starts whole), shards burst out and drop with springs, the needle snaps and falls (an invisible hub-centered circle makes it rotate around the hub), debris triangles fly and fade; the cream ring stays intact |
 | `focus/use_focus_guard.ts` | While running: 1 s tick interval, `visibilitychange` → hidden/visible, `pagehide` → hidden |
 | `focus/use_wake_lock.ts` | Screen wake lock while active; re-requested whenever the page becomes visible; fails silently |
 | `focus/format_time.ts` | `formatClock(seconds)` → `mm:ss` (rounded up) |
+| `streak/sport_check_in.tsx` | Sport-day card: before the check-in a hint + accent button opening a `ModalCard` (5 activities with emoji, "what did you train?" line of at least 3 chars, cancel / check-in); after it, the activity, the note and either the "flame kept" ribbon or the sessions still needed |
+| `streak/streak_stats.tsx` | Two tiles: best streak, and freezes as ice cubes (owned ones raised, empty slots sunken up to `getFreezeCap`) with "+1 in n days" or "full" |
+| `streak/streak_calendar.tsx` | Month heatmap from `day_results`: Monday-first grid; raised flame tiles (kept), ice tiles with ❄ (frozen), sunken crossed-out numbers (missed), outlined tile (today), faint numbers outside history. Arrows page from the first app month to this month (the grid slides with direction-aware variants). Tapping a day shows date · sessions · result (· workout). Legend |
+| `streak/level_up_overlay.tsx` | `LevelUpOverlay({ level_up, color_id, onClose })`, portaled into `<body>`, z-index 70. Timeline: charge 1.15 s (old flame shakes and swells, `rise`), burst 0.52 s (facets fly apart, white flash, `burst` + haptic), reveal (new flame assembles, `sparkle`, sunburst rays in the new glow color, "Level up!" + tier name, ribbon "Level n · d days", typewriter words); the continue button appears 1.3 s later |
+| `streak/level_up_gate.tsx` | Mounted in `App`: compares `useStreak().current_tier_index` with `celebrated_tier_index`; shows `LevelUpOverlay` when higher and no focus session is open, saves the tier on close; lowers the celebrated tier after a lost streak |
+| `streak/dev_journey_panel.tsx` | Dev-mode tools: streak slider 0–`DEV_MAX_STREAK` (400), flame color swatches (default + chest flame colors from `REWARD_CATALOG`), "play level up", "use real streak" |
 | `rewards/chest_screen.tsx` | 2.5D chest that floats and rattles when tapped (typewriter line changes after 3 taps), chest count ribbon, rarity teaser cards with drop rates. Epic: purple sweep, pulsing gem, sparkles. Legendary: rotating conic gold border (`@property --border-angle`), pulsing glow, gold sweep, spinning gem, gold gradient text, more sparkles |
 | `rewards/chest_art.tsx` | Flat-shaded SVG chest (front, side, lid, bands, lock) |
 | `settings/settings_screen.tsx` | Goal group (− / + stepper editing tomorrow's goal, caption shows today vs tomorrow when pending), General (VI / EN), Sound & haptics (sound, volume, haptic toggle), sound test buttons + haptic-only button, version |
@@ -121,12 +132,14 @@ Each `.tsx` with styles has a sibling `<name>.module.css` (CSS Modules); the foc
 ### Tests (`tests/`)
 | File | Role |
 |---|---|
-| `flame_tiers.test.ts` | Milestones, tier lookup for every boundary, next tier, progress ratio |
-| `i18n_strings.test.ts` | English and Vietnamese have identical keys, every tier has a name + words in both languages, placeholder filling |
+| `flame_tiers.test.ts` | Milestones, tier lookup for every boundary, next tier, progress ratio, level-up detection and celebrated-tier settling |
+| `i18n_strings.test.ts` | English and Vietnamese have identical keys, every tier has a name + words in both languages, placeholder filling, every month / weekday / sport activity key exists |
 | `day_key.test.ts` | 4 AM boundary, time zones, year/leap-year math, weekdays, scheduled values applying tomorrow |
 | `day_records.test.ts` | Completed-session counting, sport weekdays, one record per day, per-day goals, end-to-end streak from raw history |
 | `streak_engine.test.ts` | Kept-day rules (goal, sport day), freeze earning/spending, freeze caps by streak, resets, best streak, pending today |
 | `session_rules.test.ts` | Presence-check planning, honest session to completion, leave-app limits (phone vs desktop, 25 vs 50 min), missed / late checks, clock rollback, dev `limit_scale`, give up |
+| `calendar_month.test.ts` | Month keys and month math across years, days per month (leap years), Monday-first padding, 4-row February |
+| `sport_rules.test.ts` | Check-in once and only on sport days, note length, `getSessionsToKeep` on normal and sport days |
 | `gacha_engine.test.ts` | Config sums, catalog integrity + i18n names, soft/hard pity, 10,000-chest simulation, duplicates → shards, shard exchange, chests per kept day |
 
 Each core test file also pins the numbers agreed in the plan, so an accidental edit to a rule fails a test.
@@ -136,9 +149,11 @@ Each core test file also pins the numbers agreed in the plan, so an accidental e
 
 ## Data flow
 - **Session:** Focus start → `focus_store.start` → core `startSession`. `useFocusGuard` feeds ticks and visibility events → core state machine → new `session`. On break or completion, `focus_store` writes a `SessionRecord` to `progress_store`.
-- **Progress:** `progress_store` history → core `buildDayRecords` → `computeStreak` → Journey (streak, tier) and Focus/Done screens (today's done / goal).
+- **Progress:** `progress_store` history → core `buildDayRecords` (`useDayRecords`) → `computeStreak` → Journey (streak, tier, freezes, calendar) and Focus/Done screens (today's done / goal / sessions to keep).
+- **Sport day:** Journey `SportCheckIn` → `progress_store.checkInSport` → day record `sport_checked_in` → `isDayKept` needs only `SPORT_DAY_MIN_SESSIONS`.
+- **Level up:** `useStreak().current_tier_index` vs stored `celebrated_tier_index` → `getLevelUp` → `LevelUpGate` shows `LevelUpOverlay` → closing it saves the tier.
 - **Settings:** `settings_store` → subscription → `sfx_engine` / `haptic_hack`; `language` → `useT()` → every visible string.
-- **Flame visuals:** tier index → `FLAME_PALETTES` → `low_poly_flame` / `tier_strip`.
+- **Flame visuals:** tier index (+ optional color item id) → `getFlameColors` / `getFlameEffects` → `low_poly_flame`; `TIER_COLORS` → `tier_strip`.
 
 ## Conventions
 - Variables `snake_case`, functions `camelCase`, components/types/enums `PascalCase`, constants `UPPER_SNAKE_CASE`.

@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { FLAME_TIERS } from '../../core/flame_tiers';
-import { FLAME_PALETTES } from './flame_palettes';
+import { TIER_COLORS } from './flame_palettes';
 import { SPRING_PRESS, SPRING_SLIDE } from '../../ui/motion_presets';
 import { useT } from '../../i18n/use_t';
 import { getPressableProps } from '../../ui/pressable';
@@ -31,7 +31,7 @@ export function TierStrip(props: TierStripProps)
             {
                 const is_reached = tier.index <= props.reached_index;
                 const is_selected = tier.index === props.selected_index;
-                const palette = FLAME_PALETTES[tier.index];
+                const colors = TIER_COLORS[tier.index];
                 return (
                     <motion.div
                         key={tier.index}
@@ -44,8 +44,8 @@ export function TierStrip(props: TierStripProps)
                         <svg viewBox="0 0 200 260" className={styles.icon}>
                             <polygon
                                 points={MINI_FLAME_POINTS}
-                                fill={is_reached ? palette.shades[2] : 'none'}
-                                stroke={is_reached ? palette.shades[0] : 'var(--color-ink-faint)'}
+                                fill={is_reached ? colors.shades[2] : 'none'}
+                                stroke={is_reached ? colors.shades[0] : 'var(--color-ink-faint)'}
                                 strokeWidth={is_reached ? 10 : 14}
                                 strokeLinejoin="round"
                             />

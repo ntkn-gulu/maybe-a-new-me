@@ -121,6 +121,69 @@ const VI = {
     dev_mode_on: 'Đã bật chế độ thử (×{n})',
     dev_mode_off: 'Đã tắt chế độ thử',
 
+    // Journey: stats, sport day, calendar
+    journey_best: 'Kỷ lục',
+    journey_days: '{n} ngày',
+    journey_freezes: 'Băng giữ lửa',
+    journey_freeze_next: '+1 sau {n} ngày',
+    journey_freeze_full: 'Đã đầy',
+    sport_kicker: 'Hôm nay là ngày thể thao',
+    sport_hint: 'Check-in + 1 phiên là giữ lửa',
+    sport_check_in: 'Check-in thể thao',
+    sport_checked_in: 'Đã check-in · {activity}',
+    sport_kept_hint: 'Còn {n} phiên là giữ lửa',
+    sport_sheet_kicker: 'Check-in thể thao',
+    sport_sheet_title: 'Hôm nay tập gì?',
+    sport_note_placeholder: 'Vd: Cầu lông 2 tiếng',
+    sport_save: 'Check-in',
+    sport_cancel: 'Thôi',
+    sport_badminton: 'Cầu lông',
+    sport_gym: 'Gym',
+    sport_home_workout: 'Tập ở nhà',
+    sport_running: 'Chạy bộ',
+    sport_other: 'Khác',
+    calendar_title: 'Lịch giữ lửa',
+    calendar_month: '{month} · {year}',
+    calendar_prev: 'Tháng trước',
+    calendar_next: 'Tháng sau',
+    calendar_kept: 'Giữ lửa',
+    calendar_frozen: 'Đóng băng',
+    calendar_missed: 'Lỡ',
+    calendar_pending: 'Hôm nay',
+    calendar_date: '{d}/{m}',
+    calendar_day_sessions: '{done}/{goal} phiên',
+    month_1: 'Tháng 1',
+    month_2: 'Tháng 2',
+    month_3: 'Tháng 3',
+    month_4: 'Tháng 4',
+    month_5: 'Tháng 5',
+    month_6: 'Tháng 6',
+    month_7: 'Tháng 7',
+    month_8: 'Tháng 8',
+    month_9: 'Tháng 9',
+    month_10: 'Tháng 10',
+    month_11: 'Tháng 11',
+    month_12: 'Tháng 12',
+    weekday_0: 'CN',
+    weekday_1: 'T2',
+    weekday_2: 'T3',
+    weekday_3: 'T4',
+    weekday_4: 'T5',
+    weekday_5: 'T6',
+    weekday_6: 'T7',
+
+    // Level up
+    level_up_kicker: 'Lên cấp!',
+    level_up_ribbon: 'Cấp {level} · {n} ngày',
+    level_up_continue: 'Tuyệt vời',
+
+    // Dev panel (Journey, dev mode only)
+    dev_panel_title: 'Chế độ thử',
+    dev_streak: 'Streak giả lập: {n} ngày',
+    dev_streak_real: 'Dùng streak thật',
+    dev_level_up: 'Xem Level Up',
+    dev_flame_color: 'Màu lửa',
+
     // Reward items (ids match REWARD_CATALOG in core)
     item_flame_follow_tier: 'Lửa theo cấp',
     item_timer_classic: 'Đồng hồ cổ điển',
@@ -272,6 +335,69 @@ const EN: Record<StringKey, string> = {
     dev_mode_on: 'Dev mode on (×{n})',
     dev_mode_off: 'Dev mode off',
 
+    // Journey: stats, sport day, calendar
+    journey_best: 'Best',
+    journey_days: '{n} days',
+    journey_freezes: 'Streak freezes',
+    journey_freeze_next: '+1 in {n} days',
+    journey_freeze_full: 'Full',
+    sport_kicker: 'Today is a sport day',
+    sport_hint: 'Check in + 1 session keeps the flame',
+    sport_check_in: 'Sport check-in',
+    sport_checked_in: 'Checked in · {activity}',
+    sport_kept_hint: '{n} more session to keep the flame',
+    sport_sheet_kicker: 'Sport check-in',
+    sport_sheet_title: 'What did you train?',
+    sport_note_placeholder: 'E.g. 2 hours of badminton',
+    sport_save: 'Check in',
+    sport_cancel: 'Cancel',
+    sport_badminton: 'Badminton',
+    sport_gym: 'Gym',
+    sport_home_workout: 'Home workout',
+    sport_running: 'Running',
+    sport_other: 'Other',
+    calendar_title: 'Flame calendar',
+    calendar_month: '{month} {year}',
+    calendar_prev: 'Previous month',
+    calendar_next: 'Next month',
+    calendar_kept: 'Kept',
+    calendar_frozen: 'Frozen',
+    calendar_missed: 'Missed',
+    calendar_pending: 'Today',
+    calendar_date: '{m}/{d}',
+    calendar_day_sessions: '{done}/{goal} sessions',
+    month_1: 'January',
+    month_2: 'February',
+    month_3: 'March',
+    month_4: 'April',
+    month_5: 'May',
+    month_6: 'June',
+    month_7: 'July',
+    month_8: 'August',
+    month_9: 'September',
+    month_10: 'October',
+    month_11: 'November',
+    month_12: 'December',
+    weekday_0: 'Su',
+    weekday_1: 'Mo',
+    weekday_2: 'Tu',
+    weekday_3: 'We',
+    weekday_4: 'Th',
+    weekday_5: 'Fr',
+    weekday_6: 'Sa',
+
+    // Level up
+    level_up_kicker: 'Level up!',
+    level_up_ribbon: 'Level {level} · {n} days',
+    level_up_continue: 'Awesome',
+
+    // Dev panel (Journey, dev mode only)
+    dev_panel_title: 'Dev mode',
+    dev_streak: 'Fake streak: {n} days',
+    dev_streak_real: 'Use real streak',
+    dev_level_up: 'Play level up',
+    dev_flame_color: 'Flame color',
+
     item_flame_follow_tier: 'Tier flame',
     item_timer_classic: 'Classic dial',
     item_sound_classic: 'Classic sounds',
@@ -341,4 +467,20 @@ export function tierWordsKey(tier_index: number): StringKey
 export function itemNameKey(item_id: string): StringKey
 {
     return `item_${item_id}` as StringKey;
+}
+
+export function monthNameKey(month: number): StringKey
+{
+    return `month_${month}` as StringKey;
+}
+
+// 0 = Sunday ... 6 = Saturday
+export function weekdayKey(weekday: number): StringKey
+{
+    return `weekday_${weekday}` as StringKey;
+}
+
+export function sportActivityKey(activity: string): StringKey
+{
+    return `sport_${activity}` as StringKey;
 }

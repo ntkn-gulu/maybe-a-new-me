@@ -81,7 +81,11 @@
     background: var(--color-ink);
 }
 
-.strip_area
+/* Everything below the tier strip: sport day, stats, calendar (dev panel) */
+.sections
 {
-    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 26px;
 }

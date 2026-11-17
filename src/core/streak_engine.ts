@@ -42,6 +42,22 @@ export function isDayKept(record: DayRecord): boolean
     return record.is_sport_day && record.sport_checked_in && record.completed_count >= SPORT_DAY_MIN_SESSIONS;
 }
 
+// Valid sessions still needed to keep this day (0 once kept).
+// A checked-in sport day only needs SPORT_DAY_MIN_SESSIONS.
+export function getSessionsToKeep(record: DayRecord): number
+{
+    if (isDayKept(record))
+    {
+        return 0;
+    }
+    let target = record.goal;
+    if (record.is_sport_day && record.sport_checked_in)
+    {
+        target = Math.min(target, SPORT_DAY_MIN_SESSIONS);
+    }
+    return Math.max(0, target - record.completed_count);
+}
+
 export interface StreakState
 {
     current_streak: number;

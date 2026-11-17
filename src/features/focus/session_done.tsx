@@ -15,7 +15,7 @@ export function SessionDone()
     const t = useT();
     const dismiss = useFocusStore((state) => state.dismiss);
     const today = useTodayProgress();
-    const sessions_left = Math.max(0, today.goal - today.done);
+    const sessions_left = today.sessions_to_keep;
 
     return (
         <motion.div

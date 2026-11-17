@@ -61,3 +61,12 @@
     clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
     opacity: 0.85;
 }
+
+/* Sparks rising out of the flame (higher tiers only) */
+.ember
+{
+    position: absolute;
+    top: 40%;
+    border-radius: 50%;
+    pointer-events: none;
+}

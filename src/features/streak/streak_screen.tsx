@@ -3,17 +3,25 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Screen } from '../../ui/screen';
 import { Ribbon } from '../../ui/ribbon';
 import { TypewriterText } from '../../ui/typewriter_text';
-import { FLAME_TIERS, getTierProgress } from '../../core/flame_tiers';
+import { FLAME_TIERS, getTierProgress, type LevelUp } from '../../core/flame_tiers';
 import { playSfx } from '../../sound/sfx_engine';
-import { useStreak } from '../../stores/progress_store';
+import { useDayRecords, useProgressStore, useStreak, useTodayProgress } from '../../stores/progress_store';
+import { useSettingsStore } from '../../stores/settings_store';
 import { useT } from '../../i18n/use_t';
 import { tierNameKey, tierWordsKey } from '../../i18n/strings';
 import { LowPolyFlame } from './low_poly_flame';
 import { TierStrip } from './tier_strip';
+import { StreakStats } from './streak_stats';
+import { SportCheckIn } from './sport_check_in';
+import { StreakCalendar } from './streak_calendar';
+import { DevJourneyPanel } from './dev_journey_panel';
+import { LevelUpOverlay } from './level_up_overlay';
 import styles from './streak_screen.module.css';
 
-// Journey tab: the current flame, its words of support, progress to the
-// next tier, and a strip of every tier that can be tapped to preview.
+// Journey tab. Top: the current flame, its words, progress to the next tier
+// and a strip of every tier that can be tapped to preview.
+// Below: sport-day check-in (sport days only), best streak + freezes, and the
+// month calendar. In dev mode a panel can fake the streak and replay level-ups.
 // The streak comes from real session history (progress_store + core/streak_engine).
 
 const LAST_TIER_INDEX = FLAME_TIERS.length - 1;
@@ -22,12 +30,33 @@ export function StreakScreen()
 {
     const t = useT();
     const streak = useStreak();
-    const progress = getTierProgress(streak.current_streak);
-    const [selected_index, setSelectedIndex] = useState(progress.current.index);
+    const records = useDayRecords();
+    const today = useTodayProgress();
+    const first_day_key = useProgressStore((state) => state.first_day_key);
+    const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
+
+    // Dev-only overrides, never saved
+    const [dev_streak, setDevStreak] = useState<number | null>(null);
+    const [dev_color_id, setDevColorId] = useState<string | null>(null);
+    const [dev_level_up, setDevLevelUp] = useState<LevelUp | null>(null);
+
+    const shown_streak = is_dev_mode && dev_streak !== null ? dev_streak : streak.current_streak;
+    const color_id = is_dev_mode ? dev_color_id : null;
+    const progress = getTierProgress(shown_streak);
+    const current_index = progress.current.index;
+
+    const [selected_index, setSelectedIndex] = useState(current_index);
+    // When the tier itself changes (dev slider, a new day), jump the preview to it
+    const [tracked_index, setTrackedIndex] = useState(current_index);
+    if (tracked_index !== current_index)
+    {
+        setTrackedIndex(current_index);
+        setSelectedIndex(current_index);
+    }
 
     const selected_tier = FLAME_TIERS[selected_index];
-    const is_current = selected_index === progress.current.index;
-    const is_locked = selected_index > progress.current.index;
+    const is_current = selected_index === current_index;
+    const is_locked = selected_index > current_index;
 
     function selectTier(tier_index: number): void
     {
@@ -39,9 +68,15 @@ export function StreakScreen()
         setSelectedIndex(tier_index);
     }
 
+    function playDevLevelUp(): void
+    {
+        const to_index = Math.max(1, current_index);
+        setDevLevelUp({ from_index: to_index - 1, to_index });
+    }
+
     const selected_name = t(tierNameKey(selected_index));
 
-    let ribbon_text = t('journey_streak', { n: streak.current_streak });
+    let ribbon_text = t('journey_streak', { n: shown_streak });
     if (is_locked)
     {
         ribbon_text = t('journey_unlock_at', { n: selected_tier.min_days });
@@ -73,7 +108,8 @@ export function StreakScreen()
             </div>
 
             <div className={is_locked ? `${styles.scene} ${styles.locked}` : styles.scene}>
-                <LowPolyFlame tier_index={selected_index} />
+                {/* Equipped colors only paint tiers already reached; previews show the tier's own colors */}
+                <LowPolyFlame tier_index={selected_index} color_id={is_locked ? null : color_id} />
             </div>
 
             <div className={styles.words}>
@@ -99,13 +135,42 @@ export function StreakScreen()
                 </div>
             )}
 
-            <div className={styles.strip_area}>
-                <TierStrip
-                    reached_index={progress.current.index}
-                    selected_index={selected_index}
-                    onSelect={selectTier}
+            <TierStrip
+                reached_index={current_index}
+                selected_index={selected_index}
+                onSelect={selectTier}
+            />
+
+            <div className={styles.sections}>
+                {today.is_sport_day && <SportCheckIn today={today} />}
+
+                <StreakStats
+                    current_streak={shown_streak}
+                    best_streak={Math.max(streak.best_streak, shown_streak)}
+                    freezes_owned={streak.freezes_owned}
                 />
+
+                <StreakCalendar
+                    today={today.today}
+                    first_day_key={first_day_key}
+                    records={records}
+                    day_results={streak.day_results}
+                />
+
+                {is_dev_mode && (
+                    <DevJourneyPanel
+                        streak={shown_streak}
+                        is_faked={dev_streak !== null}
+                        tier_index={current_index}
+                        color_id={dev_color_id}
+                        onStreakChange={setDevStreak}
+                        onColorChange={setDevColorId}
+                        onPlayLevelUp={playDevLevelUp}
+                    />
+                )}
             </div>
+
+            <LevelUpOverlay level_up={dev_level_up} color_id={color_id} onClose={() => setDevLevelUp(null)} />
         </Screen>
     );
 }

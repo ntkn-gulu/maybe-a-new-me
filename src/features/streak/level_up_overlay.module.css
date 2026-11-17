@@ -1,0 +1,111 @@
+/* Above the tab bar and the focus session layer */
+.layer
+{
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    overflow: hidden;
+    background: var(--color-bg);
+}
+
+/* Big sunburst: thin conic wedges fading out toward the edges */
+.rays
+{
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    width: 170vmax;
+    height: 170vmax;
+    margin: -85vmax 0 0 -85vmax;
+    border-radius: 50%;
+    background: repeating-conic-gradient(var(--ray-color) 0deg 7deg, transparent 7deg 22.5deg);
+    -webkit-mask-image: radial-gradient(circle, #000000 0%, transparent 30%);
+    mask-image: radial-gradient(circle, #000000 0%, transparent 30%);
+    animation: spin 26s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes spin
+{
+    to
+    {
+        rotate: 360deg;
+    }
+}
+
+.content
+{
+    position: relative;
+    height: 100%;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: calc(28px + var(--safe-top)) var(--gutter) calc(24px + var(--safe-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Fixed height so the flame does not jump when the title appears */
+.heading
+{
+    height: 84px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.heading_inner
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.tier_name
+{
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+}
+
+.flame_area
+{
+    --flame-size: min(250px, 30dvh);
+
+    position: relative;
+    flex: 1;
+    display: grid;
+    place-items: center;
+}
+
+.flash
+{
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0.85) 35%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Reserved height so the button never moves while the words type */
+.details
+{
+    min-height: 116px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.actions
+{
+    width: 100%;
+    margin-top: 12px;
+}

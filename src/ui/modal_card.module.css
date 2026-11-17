@@ -1,0 +1,23 @@
+.backdrop
+{
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: calc(48px + var(--safe-top)) var(--gutter) var(--gutter);
+    background: rgba(30, 24, 16, 0.38);
+    overflow-y: auto;
+}
+
+/* Thick paper card, same extrusion as the other tiles */
+.card
+{
+    width: 100%;
+    max-width: 420px;
+    padding: 22px 20px 24px;
+    border-radius: var(--radius-lg);
+    background: var(--color-bg);
+    box-shadow: 0 8px 0 var(--tile-side), 0 24px 48px rgba(30, 24, 16, 0.28);
+}

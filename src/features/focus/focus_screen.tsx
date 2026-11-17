@@ -109,7 +109,7 @@ export function FocusScreen()
         window.setTimeout(() => setDevToast(null), DEV_TOAST_MS);
     }
 
-    const kicker = today.done >= today.goal
+    const kicker = today.is_kept
         ? t('focus_kicker_done', { done: today.done })
         : t('focus_kicker', { n: today.done + 1, goal: today.goal });
 

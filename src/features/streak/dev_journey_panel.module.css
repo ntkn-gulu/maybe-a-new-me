@@ -1,0 +1,69 @@
+/* Dashed "tape" border so it never looks like a real part of the app */
+.panel
+{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border: 2px dashed var(--color-yellow);
+    border-radius: var(--radius-lg);
+    text-align: left;
+}
+
+.chip
+{
+    align-self: flex-start;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--color-yellow);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.label
+{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.slider
+{
+    width: 100%;
+}
+
+.swatches
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.swatch
+{
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    box-shadow: 0 3px 0 rgba(60, 45, 25, 0.25);
+    cursor: pointer;
+}
+
+.swatch_selected
+{
+    outline: 2.5px solid var(--color-ink);
+    outline-offset: 3px;
+}
+
+.actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+}

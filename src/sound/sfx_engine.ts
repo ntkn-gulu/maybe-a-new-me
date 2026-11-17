@@ -2,7 +2,7 @@
 // No audio files: every sound is generated from oscillators and noise,
 // so there is nothing to download and no licensing to worry about.
 
-export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle' | 'crack';
+export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle' | 'crack' | 'rise' | 'burst';
 
 interface AudioSessionLike
 {
@@ -269,6 +269,31 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
         playNoise({ duration: 0.09, peak: 0.55, filter_hz: 2400, q: 0.9 });
         playTone({ start_hz: 140, end_hz: 55, duration: 0.35, peak: 0.45, wave: 'sine' });
         playTone({ start_hz: 620, end_hz: 180, duration: 0.4, peak: 0.12, wave: 'sawtooth', delay: 0.05 });
+    },
+    // Level-up charge: pentatonic notes climbing faster and louder (~1 s)
+    rise: () =>
+    {
+        const NOTES_HZ = [262, 294, 330, 392, 440, 523, 587, 659, 784, 880, 1046];
+        let delay = 0;
+        NOTES_HZ.forEach((hz, index) =>
+        {
+            const progress = index / (NOTES_HZ.length - 1);
+            playTone({ start_hz: hz, end_hz: hz * 1.01, duration: 0.16, peak: 0.06 + progress * 0.14, wave: 'triangle', delay });
+            delay += 0.13 - progress * 0.07;          // gaps shrink: the climb speeds up
+        });
+        playNoise({ duration: 1.1, peak: 0.05, filter_hz: 1400, q: 0.6 });
+    },
+    // Level-up release: deep boom, bright crack and a major chord ringing out
+    burst: () =>
+    {
+        playNoise({ duration: 0.5, peak: 0.5, filter_hz: 180, q: 0.7 });
+        playNoise({ duration: 0.12, peak: 0.35, filter_hz: 3600, q: 1 });
+        playTone({ start_hz: 110, end_hz: 45, duration: 0.6, peak: 0.45, wave: 'sine' });
+        const CHORD_HZ = [523, 659, 784, 1046];
+        CHORD_HZ.forEach((hz, index) =>
+        {
+            playTone({ start_hz: hz, end_hz: hz, duration: 1.4, peak: 0.1, wave: 'triangle', delay: 0.05 + index * 0.025 });
+        });
     },
     // Soft bell: fundamental + inharmonic partials, long decay
     chime: () =>
