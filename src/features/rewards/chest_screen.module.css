@@ -319,3 +319,18 @@
         background-position: 0% 0;
     }
 }
+
+/* Sketch theme: the hand-drawn gems (SketchRarityGem) carry the effect; the 3D
+   card's moving gradients would only repaint under the paper, so they stop */
+:global(:root[data-theme="sketch"]) .legendary
+{
+    border: 0;
+    animation: none;
+}
+
+:global(:root[data-theme="sketch"]) .legendary .card_label
+{
+    background: none;
+    color: #d98a00;
+    animation: none;
+}

@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { ChestIcon, FlameIcon, GearIcon, TimerIcon } from './icons';
+import { SketchChestIcon, SketchFlameIcon, SketchGearIcon, SketchTimerIcon } from './sketch_icons';
+import { useArtStyle } from '../stores/settings_store';
 import { SPRING_PRESS, SPRING_SLIDE } from './motion_presets';
 import { getPressableProps } from './pressable';
 import { HapticOverlay } from './haptic_overlay';
@@ -17,13 +19,14 @@ interface TabDefinition
     id: TabId;
     label_key: StringKey;
     icon: ReactNode;
+    sketch_icon: ReactNode;       // doodled version for the sketch theme
 }
 
 export const TABS: TabDefinition[] = [
-    { id: 'streak', label_key: 'tab_journey', icon: <FlameIcon /> },
-    { id: 'focus', label_key: 'tab_focus', icon: <TimerIcon /> },
-    { id: 'rewards', label_key: 'tab_rewards', icon: <ChestIcon /> },
-    { id: 'settings', label_key: 'tab_settings', icon: <GearIcon /> },
+    { id: 'streak', label_key: 'tab_journey', icon: <FlameIcon />, sketch_icon: <SketchFlameIcon /> },
+    { id: 'focus', label_key: 'tab_focus', icon: <TimerIcon />, sketch_icon: <SketchTimerIcon /> },
+    { id: 'rewards', label_key: 'tab_rewards', icon: <ChestIcon />, sketch_icon: <SketchChestIcon /> },
+    { id: 'settings', label_key: 'tab_settings', icon: <GearIcon />, sketch_icon: <SketchGearIcon /> },
 ];
 
 interface TabBarProps
@@ -35,6 +38,7 @@ interface TabBarProps
 export function TabBar(props: TabBarProps)
 {
     const t = useT();
+    const is_sketch = useArtStyle() === 'sketch';
 
     function selectTab(tab: TabId): void
     {
@@ -65,7 +69,7 @@ export function TabBar(props: TabBarProps)
                             // Shared layoutId makes the pill slide between tabs
                             <motion.span layoutId="tab-pill" className={`${styles.pill} sk-frame sk-flat sk-abs`} transition={SPRING_SLIDE} />
                         )}
-                        <span className={styles.icon}>{tab.icon}</span>
+                        <span className={styles.icon}>{is_sketch ? tab.sketch_icon : tab.icon}</span>
                         <span className={styles.label}>{t(tab.label_key)}</span>
                         <HapticOverlay />
                     </motion.div>

@@ -3,7 +3,8 @@ import { motion } from 'motion/react';
 import { OPACITY_FADE, SPRING_POP } from './motion_presets';
 import styles from './ribbon.module.css';
 
-// Banner ribbon with folded tails ("CẤP 1 / 8", "HOÀN THÀNH").
+// Banner ribbon with folded tails ("CẤP 1 / 8", "HOÀN THÀNH");
+// a strip of washi tape in the sketch theme.
 
 export type RibbonColor = 'blue' | 'ink' | 'flame';
 
@@ -25,7 +26,7 @@ export function Ribbon(props: RibbonProps)
         >
             <span className={`${styles.tail} ${styles.tail_left} sk-hide`} />
             <span className={`${styles.tail} ${styles.tail_right} sk-hide`} />
-            <span className={`${styles.band} sk-frame sk-flat`}>{props.children}</span>
+            <span className={`${styles.band} sk-tape`}>{props.children}</span>
         </motion.div>
     );
 }

@@ -147,3 +147,10 @@
     opacity: 0.4;
     cursor: not-allowed;
 }
+
+/* Sketch theme: ink lettering on the marker-colored accent button */
+:global(:root[data-theme="sketch"]) .accent .face
+{
+    color: var(--color-ink);
+    text-shadow: none;
+}

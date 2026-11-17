@@ -1,0 +1,32 @@
+/* Both marks cover their parent (which is position: relative) */
+.scribble,
+.circle
+{
+    position: absolute;
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Scribbles a box out in the accent pen */
+.scribble
+{
+    inset: 3px;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    stroke: var(--color-accent);
+    stroke-width: 2.6;
+}
+
+/* Marker loop, a little bigger than the thing it circles */
+.circle
+{
+    inset: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    stroke: var(--color-accent);
+    stroke-width: 2.6;
+    opacity: 0.9;
+}

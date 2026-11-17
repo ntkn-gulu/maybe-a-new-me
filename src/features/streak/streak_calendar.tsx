@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { TactileButton } from '../../ui/tactile_button';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
+import { CircleMark } from '../../ui/sketch_marks';
 import { SPRING_SLIDE, OPACITY_FADE } from '../../ui/motion_presets';
 import { playSfx } from '../../sound/sfx_engine';
 import { addMonths, buildMonthGrid, getMonthKey, getMonthParts, getWeekdayOrder, type MonthKey } from '../../core/calendar_month';
@@ -188,6 +189,7 @@ function DayCell(props: DayCellProps)
             aria-current={props.is_today ? 'date' : undefined}
         >
             {props.result === 'frozen' ? '❄' : day_number}
+            {props.result === 'kept' && <CircleMark variant={day_number} />}
             <HapticOverlay is_disabled={!is_tappable} />
         </div>
     );

@@ -44,10 +44,11 @@ const FACES: ChestFace[] = [
     { points: [[24, 56], [128, 56], [176, 32], [72, 32]], color: CHEST_COLORS.lid_top, is_shaded: false },
 ];
 
-// The dark band over the front and the lid, and the lock
+// The dark band down the front, then straight back over the lid top
+// (along the lid's depth, +48 / -24), and the lock
 const BAND: Point[][] = [
     [[66, 56], [86, 56], [86, 160], [66, 160]],
-    [[72, 32], [92, 32], [86, 56], [66, 56]],
+    [[66, 56], [86, 56], [134, 32], [114, 32]],
 ];
 const LOCK: Point[] = [[62, 78], [90, 78], [90, 103], [62, 103]];
 

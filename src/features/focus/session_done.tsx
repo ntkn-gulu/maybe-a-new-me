@@ -5,6 +5,7 @@ import { TypewriterText } from '../../ui/typewriter_text';
 import { useT } from '../../i18n/use_t';
 import { useTodayProgress } from '../../stores/progress_store';
 import { useFocusStore } from '../../stores/focus_store';
+import { ScribbleMark } from '../../ui/sketch_marks';
 import styles from './focus_session.module.css';
 
 // Celebration after a saved session: today's pips fill up one by one and,
@@ -39,7 +40,9 @@ export function SessionDone()
                             initial={is_new ? { scale: 0.2, rotate: -30 } : false}
                             animate={{ scale: 1, rotate: 0 }}
                             transition={{ type: 'spring', stiffness: 420, damping: 14, delay: 0.35 }}
-                        />
+                        >
+                            {is_filled && <ScribbleMark variant={index} delay={is_new ? 0.45 : 0} />}
+                        </motion.span>
                     );
                 })}
             </div>

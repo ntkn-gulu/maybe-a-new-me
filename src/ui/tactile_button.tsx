@@ -99,7 +99,7 @@ export function TactileButton(props: TactileButtonProps)
         >
             <span className={`${styles.base} sk-hatch-block`} style={{ top: depth }} />
             <motion.span
-                className={`${styles.face} sk-frame sk-flat`}
+                className={variant === 'accent' ? `${styles.face} sk-frame sk-flat sk-marker` : `${styles.face} sk-frame sk-flat`}
                 animate={{ y: sink }}
                 transition={SPRING_PRESS}
             >

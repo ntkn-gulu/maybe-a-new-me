@@ -1,20 +1,24 @@
 /* Sketch theme ("Phác thảo"): the whole app drawn in a sketchbook.
    On when <html data-theme="sketch"> (settings_store). Components opt in with
    these global classes, which do nothing in the other themes:
-   - sk-frame        hand-drawn ink frame, paper (or --sk-fill) inside, hatched shadow
+   - sk-frame        hand-drawn ink frame, paper (or --sk-fill) inside, hatched shadow;
+                     small elements set a smaller --sk-radius so they stay boxes
    - sk-flat         an sk-frame without the hatched shadow
    - sk-pill         an sk-frame shaped like a pill (switch tracks and thumbs)
    - sk-round        an sk-frame that is a circle
+   - sk-marker       an sk-frame whose fill is marker color slipping past the ink line
    - sk-abs/sk-fixed keep an absolutely/fixed positioned sk-frame in place
+   - sk-tape         a strip of washi tape stuck on at a slant (ribbons)
    - sk-hatch-block  a solid "thickness" band becomes a hatched shadow
    - sk-input        text field with a hand-drawn ink frame
    - sk-hide         hidden in the sketch theme; sk-only: shown only in it
    - sk-no-shadow    drops a soft drop shadow (paper on paper needs none)
 
-   Performance (iPhone Safari): everything textured is a small pre-drawn SVG
-   image, either 9-sliced (border-image) or tiled (background). No SVG filter
-   and no repeating/radial gradient pattern: Safari redraws gradients piece by
-   piece on every repaint, while an image tile is drawn once and reused. */
+   Frames are plain CSS borders, so they stay sharp at any size and cost
+   almost nothing: an uneven border-radius makes every corner a little
+   different (a hand-drawn box), and an offset box-shadow sliver is a
+   second, lighter pass of the pen. No SVG filter and no gradient pattern
+   (both are slow in iPhone Safari); the only textures are two tiny SVG tiles. */
 
 .sk-only
 {
@@ -40,15 +44,15 @@
     --font-ui: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
     --font-mono: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
 
+    /* Hand-drawn lines */
+    --sk-line: 2.5px solid var(--color-ink);
+    --sk-radius: 13px 17px 12px 16px / 16px 12px 17px 13px;
+    --sk-radius-alt: 16px 12px 17px 13px / 13px 17px 12px 16px;
+    --sk-echo: 1.5px -1.5px 0 -0.5px rgba(31, 28, 24, 0.45);
+
     /* Pen hatching tile (diagonal lines) and paper grain tile (two specks) */
     --sk-hatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M-1 1 L1 -1 M0 6 L6 0 M5 7 L7 5' stroke='%231f1c18' stroke-width='1.1'/%3E%3C/svg%3E") 0 0 / 6px 6px;
     --sk-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='2' cy='3' r='0.7' fill='%233c2d19' fill-opacity='0.12'/%3E%3Ccircle cx='7' cy='8' r='0.6' fill='%233c2d19' fill-opacity='0.1'/%3E%3C/svg%3E") 0 0 / 10px 10px;
-
-    /* Pre-drawn wobbly ink outlines (#1f1c18). 9-slice frames: corners stay
-       crisp, edges stretch to any size. */
-    --sk-frame-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M14 5 C38 3.6 82 6.4 106 4.6 C112 4.4 115.4 8 115.2 14 C116.4 40 114 82 115.6 106 C115.8 112 112 115.6 106 115.2 C80 116.6 40 114.2 14 115.8 C8 116 4.4 112 4.8 106 C3.6 80 6 40 4.4 14 C4.4 8 8 5 14 5 Z' fill='none' stroke='%231f1c18' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E");
-    --sk-pill-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60' viewBox='0 0 120 60'%3E%3Cpath d='M30 4.5 C55 3.4 70 5.6 90 4.4 C106 4 115.6 16 115.4 30 C115.6 45 105 55.8 90 55.4 C70 56.4 52 54.6 30 55.6 C15 56 4.4 44 4.6 30 C4.6 16 15 4.8 30 4.5 Z' fill='none' stroke='%231f1c18' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E");
-    --sk-circle-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 4.5 C76 3.6 96.4 24 95.5 50 C96.2 76 75 96.6 49 95.5 C23.6 96.4 3.6 75 4.6 49 C4 24 25 4.2 50 4.5 Z' fill='none' stroke='%231f1c18' stroke-width='5'/%3E%3C/svg%3E");
 }
 
 /* Patrick Hand has one weight: never let the browser fake a bold */
@@ -99,32 +103,28 @@
     position: fixed;
 }
 
-/* Ink outline (border-image) + fill (background inside the line) */
+/* Ink outline + fill inside the line + a lighter second pen pass */
 :root[data-theme="sketch"] .sk-frame::before
 {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
-    border: 3px solid transparent;
-    border-image: var(--sk-frame-image) 26 / 16px stretch;
-    border-radius: 12px;
-    background: var(--sk-fill, var(--tile-face)) padding-box;
+    border: var(--sk-line);
+    border-radius: var(--sk-radius);
+    background: var(--sk-fill, var(--tile-face));
+    box-shadow: var(--sk-echo);
     pointer-events: none;
 }
 
 :root[data-theme="sketch"] .sk-pill::before
 {
-    border-image: var(--sk-pill-image) 30 / 17px stretch;
     border-radius: 999px;
 }
 
 :root[data-theme="sketch"] .sk-round::before
 {
-    border: 0;
-    border-image: none;
-    border-radius: 50%;
-    background: var(--sk-circle-image) center / 100% 100% no-repeat, var(--sk-fill, var(--tile-face));
+    border-radius: 48% 52% 50% 50% / 52% 48% 52% 48%;
 }
 
 /* Hatched shadow, offset down-right like pen shading under an object */
@@ -135,10 +135,15 @@
     inset: 0;
     z-index: -2;
     transform: translate(4px, 5px);
-    border-radius: 12px;
+    border-radius: var(--sk-radius);
     background: var(--sk-hatch);
     opacity: 0.6;
     pointer-events: none;
+}
+
+:root[data-theme="sketch"] .sk-pill::after
+{
+    border-radius: 999px;
 }
 
 :root[data-theme="sketch"] .sk-round::after
@@ -151,18 +156,55 @@
     content: none;
 }
 
+/* Marker: the color is a separate layer that slips down-right past the ink
+   line (::before), the ink outline is drawn on top of it (::after) */
+:root[data-theme="sketch"] .sk-frame.sk-marker::before
+{
+    inset: 4px -6px -6px 4px;
+    border: 0;
+    border-radius: var(--sk-radius-alt);
+    box-shadow: none;
+    transform: rotate(-0.6deg);
+}
+
+:root[data-theme="sketch"] .sk-frame.sk-marker::after
+{
+    content: "";
+    z-index: -1;
+    transform: none;
+    border: var(--sk-line);
+    background: transparent;
+    box-shadow: var(--sk-echo);
+    opacity: 1;
+}
+
+/* ---------- Other pieces ---------- */
+
+/* Washi tape: a slightly see-through strip with torn ends, stuck on at a slant */
+:root[data-theme="sketch"] .sk-tape
+{
+    background: var(--sk-fill) !important;
+    box-shadow: none !important;
+    opacity: 0.92;
+    transform: rotate(-2deg);
+    clip-path: polygon(
+        0 4%, 100% 0, calc(100% - 4px) 22%, 100% 44%, calc(100% - 3px) 66%, 100% 86%, calc(100% - 2px) 100%,
+        2px 96%, 0 78%, 4px 58%, 0 38%, 3px 18%
+    );
+}
+
 :root[data-theme="sketch"] .sk-hatch-block
 {
     background: var(--sk-hatch) !important;
     box-shadow: none !important;
     opacity: 0.6;
-    border-radius: 12px;
+    border-radius: var(--sk-radius);
 }
 
 :root[data-theme="sketch"] .sk-input
 {
-    border: 3px solid transparent !important;
-    border-image: var(--sk-frame-image) 26 / 16px stretch !important;
-    background: var(--tile-face) padding-box !important;
-    box-shadow: none !important;
+    border: var(--sk-line) !important;
+    border-radius: var(--sk-radius) !important;
+    background: var(--tile-face) !important;
+    box-shadow: var(--sk-echo) !important;
 }

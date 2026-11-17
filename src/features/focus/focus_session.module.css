@@ -293,6 +293,7 @@
 .done_pip
 {
     --sk-fill: var(--tile-face);                /* sketch theme */
+    --sk-radius: 7px 9px 6px 8px / 8px 6px 9px 7px;
     width: 34px;
     height: 34px;
     border-radius: 10px;
@@ -355,4 +356,10 @@
 {
     width: 100%;
     margin-top: 20px;
+}
+
+/* Sketch theme: a done pip stays paper and gets scribbled out (ScribbleMark) */
+:global(:root[data-theme="sketch"]) .done_pip_filled
+{
+    --sk-fill: var(--tile-face);
 }

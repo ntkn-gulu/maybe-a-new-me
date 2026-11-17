@@ -57,7 +57,7 @@ export function SessionBroken(props: SessionBrokenProps)
 
             {props.reason && (
                 <motion.div
-                    className={styles.reason_card}
+                    className={`${styles.reason_card} sk-frame`}
                     initial={{ y: 16, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ y: { type: 'spring', stiffness: 260, damping: 20, delay: 0.6 }, opacity: { duration: 0.2, delay: 0.6 } }}

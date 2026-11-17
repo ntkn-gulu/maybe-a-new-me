@@ -12,6 +12,7 @@ import { detectDevice } from '../../stores/clock';
 import type { FocusLength } from '../../core/types';
 import { SketchTimerDial } from './sketch_timer_dial';
 import { ExtrudedTimerDial } from './extruded_timer_dial';
+import { ScribbleMark } from '../../ui/sketch_marks';
 import styles from './focus_screen.module.css';
 
 // Focus tab. A kitchen-timer dial (ExtrudedTimerDial in the 3D theme, SketchTimerDial in the sketch theme): the light wedge
@@ -120,7 +121,9 @@ export function FocusScreen()
 
             <div className={styles.pips} aria-label={t('focus_pips_label', { done: today.done, goal: today.target })}>
                 {Array.from({ length: Math.max(today.target, today.done) }, (_, index) => (
-                    <span key={index} className={index < today.done ? `${styles.pip} ${styles.pip_done} sk-frame sk-flat` : `${styles.pip} sk-frame sk-flat`} />
+                    <span key={index} className={index < today.done ? `${styles.pip} ${styles.pip_done} sk-frame sk-flat` : `${styles.pip} sk-frame sk-flat`}>
+                        {index < today.done && <ScribbleMark variant={index} />}
+                    </span>
                 ))}
             </div>
 

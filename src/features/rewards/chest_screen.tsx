@@ -9,6 +9,7 @@ import { useT } from '../../i18n/use_t';
 import type { StringKey } from '../../i18n/strings';
 import { SketchChestArt } from './sketch_chest_art';
 import { ExtrudedChestArt } from './extruded_chest_art';
+import { SketchRarityGem, type RarityKey } from './sketch_rarity_gem';
 import { useArtStyle } from '../../stores/settings_store';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
@@ -18,8 +19,6 @@ import styles from './chest_screen.module.css';
 // and a teaser of what can drop. Real chests + gacha arrive in phase 4.
 // Higher rarities get louder card effects: epic shimmers, legendary has a
 // rotating gold border, glow, twinkling sparkles and shiny text.
-
-type RarityKey = 'common' | 'rare' | 'epic' | 'legendary';
 
 interface RarityTeaser
 {
@@ -110,7 +109,7 @@ export function ChestScreen()
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.15 + index * 0.06 }}
                     >
-                        <span className={styles.gem} />
+                        {art_style === 'sketch' ? <SketchRarityGem rarity={rarity.key} /> : <span className={styles.gem} />}
                         <span className={styles.card_label}>{t(rarity.label_key)}</span>
                         <span className={styles.card_example}>{t(rarity.example_key)}</span>
                         <span className={styles.card_rate}>{rarity.rate}</span>
