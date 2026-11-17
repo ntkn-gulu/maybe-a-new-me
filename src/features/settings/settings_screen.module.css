@@ -84,3 +84,9 @@
     margin: auto 0 0;
     text-align: center;
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .row_caption
+{
+    font-size: 14px;
+}

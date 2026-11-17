@@ -31,3 +31,9 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .label
+{
+    font-size: 14.5px;
+}

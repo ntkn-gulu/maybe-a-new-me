@@ -132,3 +132,9 @@
     gap: 12px;
     margin-top: 18px;
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .hint
+{
+    font-size: 14px;
+}

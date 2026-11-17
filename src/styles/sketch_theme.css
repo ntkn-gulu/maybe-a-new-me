@@ -6,7 +6,8 @@
    - sk-flat         an sk-frame without the hatched shadow
    - sk-pill         an sk-frame shaped like a pill (switch tracks and thumbs)
    - sk-round        an sk-frame that is a circle
-   - sk-marker       an sk-frame whose fill is marker color slipping past the ink line
+   - sk-marker       an sk-frame colored in with marker strokes (MarkerFill, in --sk-fill)
+                     that slip past the ink line; the outline is drawn on top
    - sk-abs/sk-fixed keep an absolutely/fixed positioned sk-frame in place
    - sk-tape         a strip of washi tape stuck on at a slant (ribbons)
    - sk-hatch-block  a solid "thickness" band becomes a hatched shadow
@@ -53,6 +54,25 @@
     /* Pen hatching tile (diagonal lines) and paper grain tile (two specks) */
     --sk-hatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M-1 1 L1 -1 M0 6 L6 0 M5 7 L7 5' stroke='%231f1c18' stroke-width='1.1'/%3E%3C/svg%3E") 0 0 / 6px 6px;
     --sk-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='2' cy='3' r='0.7' fill='%233c2d19' fill-opacity='0.12'/%3E%3Ccircle cx='7' cy='8' r='0.6' fill='%233c2d19' fill-opacity='0.1'/%3E%3C/svg%3E") 0 0 / 10px 10px;
+}
+
+/* Patrick Hand is narrower and lighter than the 3D fonts, so small text
+   looked cramped: show it about 13% larger (x-height = 0.53 of the font size
+   instead of its own 0.47; the width ends up close to the 3D layout) and
+   with a little air between letters */
+:root[data-theme="sketch"]
+{
+    font-size-adjust: 0.53;
+}
+
+:root[data-theme="sketch"] body
+{
+    letter-spacing: 0.02em;
+}
+
+:root[data-theme="sketch"] .mono_label
+{
+    font-size: 14px;
 }
 
 /* Patrick Hand has one weight: never let the browser fake a bold */
@@ -156,15 +176,11 @@
     content: none;
 }
 
-/* Marker: the color is a separate layer that slips down-right past the ink
-   line (::before), the ink outline is drawn on top of it (::after) */
+/* Marker: no paper fill; the element holds a MarkerFill (hand-drawn marker
+   passes, sketch_marks.tsx) and the ink outline is drawn on top of it (::after) */
 :root[data-theme="sketch"] .sk-frame.sk-marker::before
 {
-    inset: 4px -6px -6px 4px;
-    border: 0;
-    border-radius: var(--sk-radius-alt);
-    box-shadow: none;
-    transform: rotate(-0.6deg);
+    content: none;
 }
 
 :root[data-theme="sketch"] .sk-frame.sk-marker::after

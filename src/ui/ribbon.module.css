@@ -60,3 +60,9 @@
     --ribbon-face: var(--color-accent);
     --ribbon-side: var(--color-accent-side);
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .band
+{
+    font-size: 14.5px;
+}

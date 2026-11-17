@@ -30,3 +30,22 @@
     stroke-width: 2.6;
     opacity: 0.9;
 }
+
+/* Marker passes under the ink outline. The box is inset on the left and
+   right by about the round cap's radius, so stroke ends land near the line
+   and slip a little past it on the right and bottom */
+.marker
+{
+    position: absolute;
+    inset: 1px 4px -4px 7px;
+    z-index: -1;
+    width: calc(100% - 11px);
+    height: calc(100% + 3px);
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--sk-fill);
+    stroke-width: var(--marker-width, 19px);
+    stroke-linecap: round;
+    stroke-opacity: 0.78;
+}

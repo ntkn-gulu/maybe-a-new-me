@@ -59,3 +59,9 @@
     background: linear-gradient(160deg, #e6fbff 0%, #8fdcf2 100%);
     box-shadow: 0 3px 0 #4fb3d9, inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .caption
+{
+    font-size: 14px;
+}

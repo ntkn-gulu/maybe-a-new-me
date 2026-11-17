@@ -363,3 +363,34 @@
 {
     --sk-fill: var(--tile-face);
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .sound_banner
+{
+    font-size: 14px;
+}
+
+:global(:root[data-theme="sketch"]) .running_label
+{
+    font-size: 14px;
+}
+
+:global(:root[data-theme="sketch"]) .dev_chip
+{
+    font-size: 13px;
+}
+
+:global(:root[data-theme="sketch"]) .running_info
+{
+    font-size: 14.5px;
+}
+
+:global(:root[data-theme="sketch"]) .running_hint
+{
+    font-size: 14px;
+}
+
+:global(:root[data-theme="sketch"]) .note_hint
+{
+    font-size: 14px;
+}

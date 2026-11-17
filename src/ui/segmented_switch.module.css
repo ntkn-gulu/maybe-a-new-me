@@ -57,3 +57,9 @@
     /* Letter-spacing adds space after the last letter too; pull it back so text is truly centered */
     margin-right: -0.1em;
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .label
+{
+    font-size: 14.5px;
+}

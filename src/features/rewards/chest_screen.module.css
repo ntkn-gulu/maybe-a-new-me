@@ -334,3 +334,9 @@
     color: #d98a00;
     animation: none;
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .card_rate
+{
+    font-size: 14.5px;
+}

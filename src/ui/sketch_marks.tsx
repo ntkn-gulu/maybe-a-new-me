@@ -3,6 +3,7 @@ import { createRandom, ellipsePoints, sketchOutline, type Point } from './sketch
 import styles from './sketch_marks.module.css';
 
 // Small hand-drawn marks for the sketch theme, shown only there (sk-only):
+// - MarkerFill:   marker coloring inside an sk-marker frame (accent buttons)
 // - ScribbleMark: a quick zigzag that scribbles out a box (a finished goal pip)
 // - CircleMark:   a marker loop around something (a kept day in the calendar)
 // Plain vector paths computed once (a few variants, picked by `variant`), drawn
@@ -36,15 +37,63 @@ function buildCircle(seed: number): string
 const SCRIBBLES = Array.from({ length: VARIANT_COUNT }, (_, index) => buildScribble(31 + index));
 const CIRCLES = Array.from({ length: VARIANT_COUNT }, (_, index) => buildCircle(41 + index));
 
+// ---------- Marker coloring ----------
+
+// Back-and-forth marker strokes filling a 0..100 box (stretched over any
+// button; the stroke width stays in px). Each pass is a little tilted and
+// bent, starts and stops at uneven places, and overlaps its neighbors,
+// where the semi-transparent marker gets darker, like real coloring.
+function buildMarkerRows(rows: number, seed: number): string[]
+{
+    const random = createRandom(seed);
+    const band = 100 / rows;
+    return Array.from({ length: rows }, (_, row) =>
+    {
+        const y = band * (row + 0.5) + (random() - 0.5) * band * 0.3;
+        const start_x = random() * 3;
+        const end_x = 97 + random() * 4;
+        const start_y = y + (random() - 0.5) * band * 0.5;
+        const end_y = y + (random() - 0.5) * band * 0.5;
+        const bend_y = y + (random() - 0.5) * band * 0.45;
+        const from_left = row % 2 === 0;
+        const [x1, y1, x2, y2] = from_left ? [start_x, start_y, end_x, end_y] : [end_x, end_y, start_x, start_y];
+        return `M${x1.toFixed(1)} ${y1.toFixed(1)} Q50 ${bend_y.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+    });
+}
+
+const MARKER_ROW_COUNTS = [3, 4, 5] as const;
+export type MarkerRows = typeof MARKER_ROW_COUNTS[number];
+const MARKER_FILLS: Record<number, string[][]> = Object.fromEntries(MARKER_ROW_COUNTS.map((rows) => [
+    rows,
+    Array.from({ length: VARIANT_COUNT }, (_, index) => buildMarkerRows(rows, 51 + rows * 10 + index)),
+]));
+
+interface MarkerFillProps
+{
+    rows: MarkerRows;             // passes of the marker; taller boxes need more
+    variant?: number;
+}
+
+// Marker coloring behind an sk-marker frame's ink outline, in --sk-fill
+export function MarkerFill(props: MarkerFillProps)
+{
+    const passes = pickVariant(MARKER_FILLS[props.rows], props.variant);
+    return (
+        <svg className={`${styles.marker} sk-only`} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            {passes.map((d) => <path key={d} d={d} vectorEffect="non-scaling-stroke" />)}
+        </svg>
+    );
+}
+
 interface MarkProps
 {
     variant?: number;             // any number; picks one of the precomputed drawings
     delay?: number;               // seconds before the pen starts
 }
 
-function pickVariant(paths: string[], variant: number | undefined): string
+function pickVariant<T>(items: T[], variant: number | undefined): T
 {
-    return paths[Math.abs(variant ?? 0) % paths.length];
+    return items[Math.abs(variant ?? 0) % items.length];
 }
 
 export function ScribbleMark(props: MarkProps)

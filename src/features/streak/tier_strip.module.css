@@ -46,3 +46,9 @@
     border-radius: 2px;
     background: var(--color-ink);
 }
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .days
+{
+    font-size: 13px;
+}

@@ -213,3 +213,24 @@
     border: 2px solid var(--color-accent);
     border-radius: 50%;
 }
+
+/* Sketch theme: handwriting needs bigger numbers and labels to read in the grid */
+:global(:root[data-theme="sketch"]) .cell
+{
+    font-size: 16px;
+}
+
+:global(:root[data-theme="sketch"]) .weekday
+{
+    font-size: 13px;
+}
+
+:global(:root[data-theme="sketch"]) .detail
+{
+    font-size: 14px;
+}
+
+:global(:root[data-theme="sketch"]) .legend_item
+{
+    font-size: 12px;
+}
