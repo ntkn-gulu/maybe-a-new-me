@@ -26,7 +26,7 @@ export function SessionNote()
             <h2 className={styles.paper_title}>{t('note_title')}</h2>
 
             <textarea
-                className={styles.note_input}
+                className={`${styles.note_input} sk-input`}
                 value={note}
                 maxLength={140}
                 rows={3}

@@ -82,7 +82,7 @@ export function StreakCalendar(props: StreakCalendarProps)
     }
 
     return (
-        <section className={styles.card}>
+        <section className={`${styles.card} sk-frame`}>
             <div className={styles.header}>
                 <TactileButton size="sm" is_disabled={!can_go_back} onClick={() => pageMonth(-1)} aria_label={t('calendar_prev')}>‹</TactileButton>
                 <div className={styles.header_text}>
@@ -170,7 +170,7 @@ function DayCell(props: DayCellProps)
     const class_names = [styles.cell];
     if (props.result)
     {
-        class_names.push(styles[props.result]);
+        class_names.push(styles[props.result], 'sk-frame', 'sk-flat');
     }
     else
     {

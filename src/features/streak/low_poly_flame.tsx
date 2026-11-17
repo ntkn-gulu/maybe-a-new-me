@@ -1,7 +1,8 @@
 import { motion } from 'motion/react';
-import { MYSTERY_COLORS, MYSTERY_EFFECTS, getFlameColors, getFlameEffects } from './flame_palettes';
+import { getFlameColors, getFlameEffects, type FlameColors } from './flame_palettes';
 import styles from './low_poly_flame.module.css';
 
+// The 3D theme's flame (paper + ink themes use PaperFlame instead).
 // A faceted "low-poly" flame drawn with SVG triangles.
 // Light comes from the upper left, so each facet uses one of 4 shades.
 // On mount (or when the tier / color changes) the facets fly in and assemble;
@@ -73,17 +74,35 @@ const FACETS: Facet[] = [
 ];
 
 // Floating shards around the flame: [x%, y%, size px, rotation deg].
-// Higher tiers show more of them (TIER_EFFECTS.shard_count).
+// Higher tiers show more of them (LOW_POLY_COUNTS).
 const SHARDS: [number, number, number, number][] = [
     [12, 30, 14, 20], [84, 22, 10, -30], [20, 68, 9, 60], [88, 60, 13, 10],
     [6, 50, 7, -45], [74, 8, 8, 75], [30, 12, 6, -15], [94, 82, 8, 40],
 ];
 
-// Rising sparks: [x% start, sideways drift px, size px] (TIER_EFFECTS.ember_count)
+// Rising sparks: [x% start, sideways drift px, size px] (LOW_POLY_COUNTS)
 const EMBERS: [number, number, number][] = [
     [46, -18, 5], [56, 14, 4], [40, 10, 3], [62, -10, 5],
     [50, 22, 3], [36, -6, 4], [58, -24, 3], [44, 26, 4],
 ];
+
+// Floating shards and rising embers per tier (glow and stars come from TIER_EFFECTS)
+const LOW_POLY_COUNTS: readonly { shards: number; embers: number }[] = [
+    { shards: 2, embers: 0 }, { shards: 4, embers: 0 }, { shards: 5, embers: 3 },
+    { shards: 6, embers: 4 }, { shards: 7, embers: 5 }, { shards: 8, embers: 6 },
+    { shards: 8, embers: 6 }, { shards: 8, embers: 7 }, { shards: 8, embers: 8 },
+];
+
+// Locked tiers: a charcoal silhouette with calm effects, so nothing leaks
+const MYSTERY_COLORS: FlameColors = {
+    shades: ['#2b2723', '#3a3530', '#4a443d', '#5c554c'],
+    core: ['#6b645a', '#837a6e'],
+    glow: 'rgba(60, 45, 25, 0.16)',
+    shard_colors: ['#a49d92', '#7a7268'],
+    is_hue_cycling: false,
+};
+const MYSTERY_COUNTS = { shards: 3, embers: 0 };
+const MYSTERY_GLOW_PULSE = 0.04;
 
 const GALAXY_STARS: Point[] = [[86, 150], [118, 104], [96, 210], [132, 196], [70, 190], [110, 160]];
 
@@ -119,7 +138,10 @@ export function LowPolyFlame(props: LowPolyFlameProps)
 {
     const is_mystery = props.is_mystery ?? false;
     const colors = is_mystery ? MYSTERY_COLORS : getFlameColors(props.tier_index, props.color_id ?? null);
-    const effects = is_mystery ? MYSTERY_EFFECTS : getFlameEffects(props.tier_index);
+    const tier_effects = getFlameEffects(props.tier_index);
+    const counts = is_mystery ? MYSTERY_COUNTS : (LOW_POLY_COUNTS[props.tier_index] ?? LOW_POLY_COUNTS[0]);
+    const glow_pulse = is_mystery ? MYSTERY_GLOW_PULSE : tier_effects.glow_pulse;
+    const has_stars = !is_mystery && tier_effects.has_stars;
     const is_bursting = props.is_bursting ?? false;
 
     function fillFor(shade: Facet['shade']): string
@@ -142,11 +164,11 @@ export function LowPolyFlame(props: LowPolyFlameProps)
             <motion.div
                 className={styles.glow}
                 style={{ background: `radial-gradient(circle, ${colors.glow} 0%, transparent 65%)` }}
-                animate={{ scale: [1, 1 + effects.glow_pulse, 1], opacity: [0.85, 1, 0.85] }}
+                animate={{ scale: [1, 1 + glow_pulse, 1], opacity: [0.85, 1, 0.85] }}
                 transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
             />
 
-            {SHARDS.slice(0, effects.shard_count).map(([left, top, size, rotation], index) => (
+            {SHARDS.slice(0, counts.shards).map(([left, top, size, rotation], index) => (
                 <motion.span
                     key={index}
                     className={styles.shard}
@@ -207,7 +229,7 @@ export function LowPolyFlame(props: LowPolyFlameProps)
                         );
                     })}
 
-                    {effects.has_stars && !is_bursting && GALAXY_STARS.map(([x, y], index) => (
+                    {has_stars && !is_bursting && GALAXY_STARS.map(([x, y], index) => (
                         <motion.circle
                             key={`star-${index}`}
                             cx={x}
@@ -234,7 +256,7 @@ export function LowPolyFlame(props: LowPolyFlameProps)
                 </motion.span>
             )}
 
-            {!is_bursting && EMBERS.slice(0, effects.ember_count).map(([left, drift, size], index) => (
+            {!is_bursting && EMBERS.slice(0, counts.embers).map(([left, drift, size], index) => (
                 <motion.span
                     key={`ember-${index}`}
                     className={styles.ember}
@@ -250,7 +272,7 @@ export function LowPolyFlame(props: LowPolyFlameProps)
                         duration: EMBER_DURATION,
                         repeat: Infinity,
                         ease: 'easeOut',
-                        delay: index * (EMBER_DURATION / effects.ember_count),
+                        delay: index * (EMBER_DURATION / counts.embers),
                     }}
                 />
             ))}

@@ -3,19 +3,11 @@
     width: min(62vw, 230px, 30dvh);
     height: auto;
     overflow: visible;
-    filter: drop-shadow(0 14px 22px rgba(60, 45, 25, 0.16));
 }
 
 .shadow
 {
     fill: rgba(60, 45, 25, 0.16);
-}
-
-.tick
-{
-    stroke: var(--color-ink);
-    stroke-width: 3;
-    stroke-linecap: round;
 }
 
 .needle

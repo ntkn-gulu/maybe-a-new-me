@@ -97,9 +97,9 @@ export function TactileButton(props: TactileButtonProps)
             onPointerLeave={handlePointerUp}
             onPointerCancel={handlePointerUp}
         >
-            <span className={styles.base} style={{ top: depth }} />
+            <span className={`${styles.base} sk-hatch-block`} style={{ top: depth }} />
             <motion.span
-                className={styles.face}
+                className={`${styles.face} sk-frame sk-flat`}
                 animate={{ y: sink }}
                 transition={SPRING_PRESS}
             >

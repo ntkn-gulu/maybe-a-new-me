@@ -23,13 +23,13 @@ export function StreakStats(props: StreakStatsProps)
 
     return (
         <div className={styles.row}>
-            <div className={styles.tile}>
+            <div className={`${styles.tile} sk-frame`}>
                 <span className="mono_label">{t('journey_best')}</span>
                 <span className={styles.big}>{props.best_streak}</span>
                 <span className={styles.caption}>{t('journey_days', { n: props.best_streak })}</span>
             </div>
 
-            <div className={styles.tile}>
+            <div className={`${styles.tile} sk-frame`}>
                 <span className="mono_label">{t('journey_freezes')}</span>
                 <div className={styles.cubes} aria-label={`${props.freezes_owned} / ${cap}`}>
                     {Array.from({ length: cap }, (_, index) => (

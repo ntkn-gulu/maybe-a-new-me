@@ -1,6 +1,6 @@
 // How each flame looks. Two separate parts:
 // - colors: from the tier by default, or from an equipped flame color item
-// - effects: always from the tier (more shards, rising embers, stars...)
+// - effects: always from the tier (more paper layers, more sparks, stars...)
 // so an equipped color changes the paint but never hides the tier you earned.
 
 export interface FlameColors
@@ -8,14 +8,14 @@ export interface FlameColors
     shades: [string, string, string, string];      // facet tones, darkest (shadow side) to lightest (lit face)
     core: [string, string];                        // inner hot core, dark then light
     glow: string;                                  // halo behind the flame
-    shard_colors: string[];                        // floating shards and embers
+    shard_colors: string[];                        // sparks and other small bits
     is_hue_cycling: boolean;                       // hue keeps rotating (rainbow)
 }
 
 export interface FlameEffects
 {
-    shard_count: number;                           // floating triangles around the flame (max 8)
-    ember_count: number;                           // sparks rising from the flame
+    layer_count: number;                           // cut paper layers, outer to core (3..6)
+    spark_count: number;                           // little flame tips drifting up (max 6)
     glow_pulse: number;                            // how much the halo breathes (scale amplitude)
     has_stars: boolean;                            // twinkling stars inside the flame
 }
@@ -98,15 +98,15 @@ export const TIER_COLORS: readonly FlameColors[] = [
 
 // Grows with the tier, so a higher flame always feels more alive
 export const TIER_EFFECTS: readonly FlameEffects[] = [
-    { shard_count: 2, ember_count: 0, glow_pulse: 0.04, has_stars: false },     // 0 a quiet spark
-    { shard_count: 4, ember_count: 0, glow_pulse: 0.06, has_stars: false },     // 1
-    { shard_count: 5, ember_count: 3, glow_pulse: 0.08, has_stars: false },     // 2 sparks start to fly
-    { shard_count: 6, ember_count: 4, glow_pulse: 0.08, has_stars: false },     // 3
-    { shard_count: 7, ember_count: 5, glow_pulse: 0.1, has_stars: false },      // 4
-    { shard_count: 8, ember_count: 6, glow_pulse: 0.14, has_stars: false },     // 5 neon: the halo breathes harder
-    { shard_count: 8, ember_count: 6, glow_pulse: 0.12, has_stars: false },     // 6
-    { shard_count: 8, ember_count: 7, glow_pulse: 0.12, has_stars: false },     // 7
-    { shard_count: 8, ember_count: 8, glow_pulse: 0.14, has_stars: true },      // 8 galaxy
+    { layer_count: 3, spark_count: 1, glow_pulse: 0.04, has_stars: false },     // 0 a quiet spark
+    { layer_count: 3, spark_count: 2, glow_pulse: 0.06, has_stars: false },     // 1
+    { layer_count: 4, spark_count: 3, glow_pulse: 0.08, has_stars: false },     // 2 sparks start to fly
+    { layer_count: 4, spark_count: 3, glow_pulse: 0.08, has_stars: false },     // 3
+    { layer_count: 5, spark_count: 4, glow_pulse: 0.1, has_stars: false },      // 4
+    { layer_count: 5, spark_count: 5, glow_pulse: 0.14, has_stars: false },     // 5 neon: the halo breathes harder
+    { layer_count: 6, spark_count: 5, glow_pulse: 0.12, has_stars: false },     // 6
+    { layer_count: 6, spark_count: 6, glow_pulse: 0.12, has_stars: false },     // 7
+    { layer_count: 6, spark_count: 6, glow_pulse: 0.14, has_stars: true },      // 8 galaxy
 ];
 
 // Flame color items from chests (ids match REWARD_CATALOG in core)
@@ -148,17 +148,17 @@ const RARE_FLAME_COLORS: Record<string, FlameColors> = {
     },
 };
 
-// Locked tiers are shown as a charcoal silhouette so their color stays a surprise
+// Locked tiers are blank, uncolored paper so their color stays a surprise
 export const MYSTERY_COLORS: FlameColors = {
-    shades: ['#2b2723', '#3a3530', '#4a443d', '#5c554c'],
-    core: ['#6b645a', '#837a6e'],
-    glow: 'rgba(60, 45, 25, 0.16)',
-    shard_colors: ['#a49d92', '#7a7268'],
+    shades: ['#e2dacd', '#ece5da', '#f5f0e8', '#fbf8f3'],
+    core: ['#ffffff', '#ffffff'],
+    glow: 'rgba(60, 45, 25, 0.1)',
+    shard_colors: ['#d9cfbf'],
     is_hue_cycling: false,
 };
 
-// Calm effects for the silhouette, so a locked tier's extra sparkle does not leak either
-export const MYSTERY_EFFECTS: FlameEffects = { shard_count: 3, ember_count: 0, glow_pulse: 0.04, has_stars: false };
+// Calm effects for the blank flame, so a locked tier's extra sparkle does not leak either
+export const MYSTERY_EFFECTS: FlameEffects = { layer_count: 3, spark_count: 0, glow_pulse: 0.03, has_stars: false };
 
 const FOLLOW_TIER_ID = 'flame_follow_tier';
 const TIER_COLOR_PREFIX = 'flame_tier_';

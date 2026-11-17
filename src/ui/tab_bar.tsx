@@ -48,7 +48,7 @@ export function TabBar(props: TabBarProps)
     }
 
     return (
-        <nav className={styles.bar}>
+        <nav className={`${styles.bar} sk-frame sk-fixed`}>
             {TABS.map((tab) =>
             {
                 const is_active = tab.id === props.active_tab;
@@ -63,7 +63,7 @@ export function TabBar(props: TabBarProps)
                     >
                         {is_active && (
                             // Shared layoutId makes the pill slide between tabs
-                            <motion.span layoutId="tab-pill" className={styles.pill} transition={SPRING_SLIDE} />
+                            <motion.span layoutId="tab-pill" className={`${styles.pill} sk-frame sk-flat sk-abs`} transition={SPRING_SLIDE} />
                         )}
                         <span className={styles.icon}>{tab.icon}</span>
                         <span className={styles.label}>{t(tab.label_key)}</span>

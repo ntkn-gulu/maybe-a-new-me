@@ -44,6 +44,7 @@
 /* Ink pill behind the active tab, slides between tabs */
 .pill
 {
+    --sk-fill: var(--btn-ink-face);             /* sketch theme */
     position: absolute;
     inset: 0;
     border-radius: var(--radius-md);

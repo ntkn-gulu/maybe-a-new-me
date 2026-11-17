@@ -3,7 +3,7 @@ import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { ToggleSwitch } from '../../ui/toggle_switch';
 import { SegmentedSwitch, type SegmentOption } from '../../ui/segmented_switch';
-import { useSettingsStore } from '../../stores/settings_store';
+import { useSettingsStore, type AppTheme } from '../../stores/settings_store';
 import { MAX_DAILY_GOAL, MIN_DAILY_GOAL, useGoalSetting, useProgressStore } from '../../stores/progress_store';
 import { getTodayKey } from '../../stores/clock';
 import { playSfx, type SfxName } from '../../sound/sfx_engine';
@@ -12,7 +12,7 @@ import type { Language, StringKey } from '../../i18n/strings';
 import type { DateFormat } from '../../i18n/date_format';
 import styles from './settings_screen.module.css';
 
-// Settings tab: daily goal, language, date format, sound + haptic preferences.
+// Settings tab: daily goal, theme, language, date format, sound + haptic preferences.
 // The sound tester only shows in dev mode. Sport days, backup and credits arrive in later phases.
 
 const PREVIEW_SOUNDS: { name: SfxName; label_key: StringKey }[] = [
@@ -74,6 +74,13 @@ export function SettingsScreen()
     const date_format = useSettingsStore((state) => state.date_format);
     const setDateFormat = useSettingsStore((state) => state.setDateFormat);
     const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
+    const theme = useSettingsStore((state) => state.theme);
+    const setTheme = useSettingsStore((state) => state.setTheme);
+    const theme_options: SegmentOption<AppTheme>[] = [
+        { value: 'classic_3d', label: t('theme_3d') },
+        { value: 'paper_ink', label: t('theme_paper_ink') },
+        { value: 'sketch', label: t('theme_sketch') },
+    ];
     const goal = useGoalSetting();
     const setDailyGoal = useProgressStore((state) => state.setDailyGoal);
 
@@ -86,7 +93,7 @@ export function SettingsScreen()
     return (
         <Screen kicker={t('settings_kicker')} title={t('settings_title')}>
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_goal')}</h2>
-            <div className={styles.group}>
+            <div className={`${styles.group} sk-frame`}>
                 <SettingRow
                     label={t('settings_goal')}
                     caption={goal.tomorrow_goal !== goal.today_goal
@@ -103,7 +110,19 @@ export function SettingsScreen()
             </div>
 
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_general')}</h2>
-            <div className={styles.group}>
+            <div className={`${styles.group} sk-frame`}>
+                <SettingRow
+                    label={t('settings_theme')}
+                    caption={t('settings_theme_caption')}
+                    control={
+                        <SegmentedSwitch
+                            options={theme_options}
+                            value={theme}
+                            onChange={setTheme}
+                            aria_label={t('settings_theme')}
+                        />
+                    }
+                />
                 <SettingRow
                     label={t('settings_language')}
                     caption="Tiếng Việt · English"
@@ -131,7 +150,7 @@ export function SettingsScreen()
             </div>
 
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_sound')}</h2>
-            <div className={styles.group}>
+            <div className={`${styles.group} sk-frame`}>
                 <SettingRow
                     label={t('settings_sound')}
                     control={<ToggleSwitch is_on={is_sound_enabled} onChange={setSoundEnabled} aria_label={t('settings_sound')} />}

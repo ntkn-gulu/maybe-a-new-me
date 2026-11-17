@@ -32,7 +32,7 @@ export function ModalCard(props: ModalCardProps)
                     onClick={props.onClose}
                 >
                     <motion.div
-                        className={styles.card}
+                        className={`${styles.card} sk-frame`}
                         role="dialog"
                         aria-modal="true"
                         aria-label={props.aria_label}

@@ -1,0 +1,67 @@
+.stage
+{
+    /* Default size; parents can override --flame-size (e.g. based on screen height) */
+    width: var(--flame-size, 220px);
+    height: calc(var(--flame-size, 220px) * 1.3);
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
+.glow
+{
+    position: absolute;
+    inset: 4% -10% 8%;
+    border-radius: 50%;
+    filter: blur(6px);
+}
+
+/* Flat oval "floor" the flame stands on */
+.ground
+{
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    bottom: 2%;
+    height: 9%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(60, 45, 25, 0.22), transparent);
+}
+
+.flame
+{
+    position: relative;
+    width: 82%;
+    height: auto;
+    overflow: visible;
+}
+
+.rainbow
+{
+    animation: hue_cycle 6s linear infinite;
+}
+
+@keyframes hue_cycle
+{
+    to
+    {
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* Big inked question mark over a locked (blank paper) flame */
+.mystery_mark
+{
+    position: absolute;
+    top: 56%;
+    left: 50%;
+    width: 0.6em;
+    margin: -0.5em 0 0 -0.3em;
+    font-family: var(--font-display);
+    font-size: calc(var(--flame-size, 220px) * 0.34);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    color: #1f1c18;
+    pointer-events: none;
+}

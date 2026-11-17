@@ -74,9 +74,9 @@ export function SportCheckIn(props: SportCheckInProps)
     }
 
     return (
-        <section className={styles.card}>
+        <section className={`${styles.card} sk-frame`}>
             <div className={styles.header}>
-                <span className={styles.badge}>{check_in ? ACTIVITY_ICONS[check_in.activity] : '🏸'}</span>
+                <span className={`${styles.badge} sk-frame sk-flat sk-round`}>{check_in ? ACTIVITY_ICONS[check_in.activity] : '🏸'}</span>
                 <div className={styles.header_text}>
                     <span className="mono_label">{t('sport_kicker')}</span>
                     <span className={styles.title}>
@@ -125,7 +125,7 @@ export function SportCheckIn(props: SportCheckInProps)
                 </div>
 
                 <input
-                    className={styles.note_input}
+                    className={`${styles.note_input} sk-input`}
                     value={note}
                     maxLength={NOTE_MAX_LENGTH}
                     placeholder={t('sport_note_placeholder')}

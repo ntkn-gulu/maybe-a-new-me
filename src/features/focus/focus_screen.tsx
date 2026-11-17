@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useSpring, useTransform } from 'motion/react';
+import { AnimatePresence, motion, useSpring } from 'motion/react';
 import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { playSfx } from '../../sound/sfx_engine';
@@ -7,13 +7,15 @@ import { OPACITY_FADE, SPRING_POP } from '../../ui/motion_presets';
 import { useT } from '../../i18n/use_t';
 import { useFocusStore, DEV_TIME_SCALE } from '../../stores/focus_store';
 import { useTodayProgress } from '../../stores/progress_store';
-import { useSettingsStore } from '../../stores/settings_store';
+import { useArtStyle, useSettingsStore } from '../../stores/settings_store';
 import { detectDevice } from '../../stores/clock';
 import type { FocusLength } from '../../core/types';
+import { TimerDial } from './timer_dial';
+import { ExtrudedTimerDial } from './extruded_timer_dial';
 import styles from './focus_screen.module.css';
 
-// Focus tab. A chunky kitchen-timer dial: the colored wedge shows how long
-// the session is, the needle sits at its end. Start opens the session layer.
+// Focus tab. A kitchen-timer dial (TimerDial, or ExtrudedTimerDial in the 3D theme): the light wedge
+// shows how long the session is, the needle sits at its end. Start opens the session layer.
 // Tapping the kicker 5 times toggles dev mode (sessions run 25x faster).
 
 const FOCUS_LENGTHS: FocusLength[] = [25, 50];
@@ -21,7 +23,6 @@ const DEV_MODE_TAPS = 5;
 const DEV_TAP_WINDOW_MS = 2000;
 const DEV_TOAST_MS = 1800;
 const DEGREES_PER_MINUTE = 6;          // 60 minutes = full circle
-const TICK_COUNT = 60;
 
 const RATCHET_CLICKS = 7;
 const RATCHET_INTERVAL_MS = 45;
@@ -29,28 +30,9 @@ const RATCHET_INTERVAL_MS = 45;
 // Spring that turns the dial like a real knob (slight overshoot)
 const DIAL_SPRING = { stiffness: 140, damping: 14 };
 
-// Wedge geometry in the disc's own SVG space (viewBox 0 0 100 100).
-// The radius is larger than the disc so the arc edge is hidden by the
-// disc's round clip: no thin anti-aliased rim can show.
-const WEDGE_CENTER = 50;
-const WEDGE_RADIUS = 60;
-const MAX_WEDGE_DEGREES = 359.9;       // a full 360 arc would collapse to nothing
-
 function formatMinutes(minutes: number): string
 {
     return `${String(minutes).padStart(2, '0')}:00`;
-}
-
-// SVG pie slice from 12 o'clock, clockwise, to `degrees`
-function wedgePath(degrees: number): string
-{
-    const clamped = Math.min(Math.max(degrees, 0), MAX_WEDGE_DEGREES);
-    const radians = (clamped * Math.PI) / 180;
-    const end_x = WEDGE_CENTER + WEDGE_RADIUS * Math.sin(radians);
-    const end_y = WEDGE_CENTER - WEDGE_RADIUS * Math.cos(radians);
-    const large_arc = clamped > 180 ? 1 : 0;
-    return `M ${WEDGE_CENTER} ${WEDGE_CENTER} L ${WEDGE_CENTER} ${WEDGE_CENTER - WEDGE_RADIUS} `
-        + `A ${WEDGE_RADIUS} ${WEDGE_RADIUS} 0 ${large_arc} 1 ${end_x} ${end_y} Z`;
 }
 
 export function FocusScreen()
@@ -62,11 +44,11 @@ export function FocusScreen()
     const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
     const toggleDevMode = useSettingsStore((state) => state.toggleDevMode);
     const today = useTodayProgress();
+    const art_style = useArtStyle();
     const [dev_toast, setDevToast] = useState<string | null>(null);
     const kicker_taps = useRef<number[]>([]);
 
     const sweep_degrees = useSpring(focus_length * DEGREES_PER_MINUTE, DIAL_SPRING);
-    const wedge_d = useTransform(sweep_degrees, wedgePath);
 
     useEffect(() =>
     {
@@ -115,30 +97,9 @@ export function FocusScreen()
 
     return (
         <Screen kicker={kicker} title={t('focus_title')} onKickerTap={handleKickerTap}>
-            <div className={styles.dial}>
-                <div className={styles.dial_ring}>
-                    {Array.from({ length: TICK_COUNT }, (_, index) => (
-                        <span
-                            key={index}
-                            className={index % 5 === 0 ? `${styles.tick} ${styles.tick_major}` : styles.tick}
-                            style={{ transform: `rotate(${index * DEGREES_PER_MINUTE}deg)` }}
-                        />
-                    ))}
-                </div>
-                <div className={styles.dial_disc}>
-                    <svg className={styles.wedge} viewBox="0 0 100 100" aria-hidden="true">
-                        <motion.path d={wedge_d} className={styles.wedge_path} />
-                    </svg>
-                </div>
-                {/* Needle layer sits outside the clipped disc. Its drop shadow is on this
-                    non-rotating wrapper, so the light direction stays fixed while it turns. */}
-                <div className={styles.needle_layer}>
-                    <motion.div className={styles.needle} style={{ rotate: sweep_degrees }}>
-                        <span className={styles.needle_bar} />
-                    </motion.div>
-                    <span className={styles.hub} />
-                </div>
-            </div>
+            {art_style === 'extruded'
+                ? <ExtrudedTimerDial sweep_degrees={sweep_degrees} />
+                : <TimerDial sweep_degrees={sweep_degrees} />}
 
             <div className={styles.time_row}>
                 <AnimatePresence mode="popLayout" initial={false}>
@@ -159,7 +120,7 @@ export function FocusScreen()
 
             <div className={styles.pips} aria-label={t('focus_pips_label', { done: today.done, goal: today.target })}>
                 {Array.from({ length: Math.max(today.target, today.done) }, (_, index) => (
-                    <span key={index} className={index < today.done ? `${styles.pip} ${styles.pip_done}` : styles.pip} />
+                    <span key={index} className={index < today.done ? `${styles.pip} ${styles.pip_done} sk-frame sk-flat` : `${styles.pip} sk-frame sk-flat`} />
                 ))}
             </div>
 

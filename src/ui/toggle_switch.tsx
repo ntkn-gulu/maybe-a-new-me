@@ -32,10 +32,10 @@ export function ToggleSwitch(props: ToggleSwitchProps)
             {...getPressableProps(flip, false, 'switch')}
             aria-checked={props.is_on}
             aria-label={props.aria_label}
-            className={props.is_on ? `${styles.track} ${styles.on}` : styles.track}
+            className={props.is_on ? `${styles.track} ${styles.on} sk-frame sk-flat` : `${styles.track} sk-frame sk-flat`}
         >
             <motion.span
-                className={styles.knob}
+                className={`${styles.knob} sk-frame sk-flat sk-round sk-abs`}
                 animate={{ x: props.is_on ? KNOB_TRAVEL : 0 }}
                 transition={SPRING_PRESS}
             />

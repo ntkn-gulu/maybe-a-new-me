@@ -6,8 +6,9 @@ import type { StringKey } from '../../i18n/strings';
 import type { BreakReason } from '../../core/session_rules';
 import { detectDevice } from '../../stores/clock';
 import { useFocusStore } from '../../stores/focus_store';
-import { useSettingsStore } from '../../stores/settings_store';
+import { useArtStyle, useSettingsStore } from '../../stores/settings_store';
 import { ShatteredDial } from './shattered_dial';
+import { ExtrudedShatteredDial } from './extruded_shattered_dial';
 import styles from './focus_session.module.css';
 
 // A broken session: the dial shatters, the reason sits on a card,
@@ -40,6 +41,7 @@ export function SessionBroken(props: SessionBrokenProps)
     const dismiss = useFocusStore((state) => state.dismiss);
     const start = useFocusStore((state) => state.start);
     const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
+    const art_style = useArtStyle();
 
     function retry(): void
     {
@@ -51,7 +53,7 @@ export function SessionBroken(props: SessionBrokenProps)
             <span className="mono_label">{t('broken_kicker')}</span>
             <h2 className={styles.paper_title}>{t('broken_title')}</h2>
 
-            <ShatteredDial />
+            {art_style === 'extruded' ? <ExtrudedShatteredDial /> : <ShatteredDial />}
 
             {props.reason && (
                 <motion.div

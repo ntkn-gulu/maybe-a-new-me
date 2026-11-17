@@ -12,7 +12,7 @@ import { triggerHaptic } from '../../sound/haptic_hack';
 import { FLAME_TIERS, type LevelUp } from '../../core/flame_tiers';
 import { useT } from '../../i18n/use_t';
 import { tierNameKey, tierWordsKey } from '../../i18n/strings';
-import { LowPolyFlame } from './low_poly_flame';
+import { Flame } from './flame';
 import { getFlameColors } from './flame_palettes';
 import styles from './level_up_overlay.module.css';
 
@@ -203,9 +203,9 @@ function LevelUpStage(props: LevelUpStageProps)
                     <motion.div animate={swell_animate} transition={swell_transition}>
                         <div ref={jolt_scope}>
                             {is_revealed
-                                ? <LowPolyFlame key="new" tier_index={props.level_up.to_index} color_id={props.color_id} />
+                                ? <Flame key="new" tier_index={props.level_up.to_index} color_id={props.color_id} />
                                 : (
-                                    <LowPolyFlame
+                                    <Flame
                                         key="old"
                                         tier_index={props.level_up.from_index}
                                         color_id={props.color_id}

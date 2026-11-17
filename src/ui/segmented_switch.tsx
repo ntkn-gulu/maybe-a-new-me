@@ -41,7 +41,7 @@ export function SegmentedSwitch<Value extends string>(props: SegmentedSwitchProp
     }
 
     return (
-        <div className={styles.track} role="radiogroup" aria-label={props.aria_label}>
+        <div className={`${styles.track} sk-frame sk-flat`} role="radiogroup" aria-label={props.aria_label}>
             {props.options.map((option) =>
             {
                 const is_active = option.value === props.value;
@@ -53,7 +53,7 @@ export function SegmentedSwitch<Value extends string>(props: SegmentedSwitchProp
                         className={is_active ? `${styles.option} ${styles.active}` : styles.option}
                     >
                         {is_active && (
-                            <motion.span layoutId={thumb_id} className={styles.thumb} transition={SPRING_SLIDE} />
+                            <motion.span layoutId={thumb_id} className={`${styles.thumb} sk-frame sk-flat sk-abs`} transition={SPRING_SLIDE} />
                         )}
                         <span className={styles.label}>{option.label}</span>
                         <HapticOverlay />

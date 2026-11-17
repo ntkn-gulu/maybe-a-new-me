@@ -292,6 +292,7 @@
 
 .done_pip
 {
+    --sk-fill: var(--tile-face);                /* sketch theme */
     width: 34px;
     height: 34px;
     border-radius: 10px;
@@ -301,6 +302,7 @@
 
 .done_pip_filled
 {
+    --sk-fill: var(--color-accent);
     background: var(--color-accent);
     box-shadow: 0 5px 0 var(--color-accent-side), 0 0 18px var(--color-accent-glow);
 }

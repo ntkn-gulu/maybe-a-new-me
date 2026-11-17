@@ -35,7 +35,7 @@ export function SessionDone()
                     return (
                         <motion.span
                             key={index}
-                            className={is_filled ? `${styles.done_pip} ${styles.done_pip_filled}` : styles.done_pip}
+                            className={is_filled ? `${styles.done_pip} ${styles.done_pip_filled} sk-frame sk-flat` : `${styles.done_pip} sk-frame sk-flat`}
                             initial={is_new ? { scale: 0.2, rotate: -30 } : false}
                             animate={{ scale: 1, rotate: 0 }}
                             transition={{ type: 'spring', stiffness: 420, damping: 14, delay: 0.35 }}

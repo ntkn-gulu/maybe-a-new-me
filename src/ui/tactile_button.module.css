@@ -50,6 +50,7 @@
 
 .neutral .face
 {
+    --sk-fill: var(--btn-neutral-face);         /* fill in the sketch theme */
     background: var(--btn-neutral-face);
     color: var(--color-ink);
     box-shadow: inset 0 0 0 1.5px var(--tile-stroke), inset 0 2px 0 var(--btn-highlight);
@@ -63,6 +64,7 @@
 
 .accent .face
 {
+    --sk-fill: var(--color-accent);
     background: var(--color-accent);
     color: #ffffff;
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28);
@@ -76,6 +78,7 @@
 
 .ink .face
 {
+    --sk-fill: var(--btn-ink-face);
     background: var(--btn-ink-face);
     color: #ffffff;
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12);
@@ -84,6 +87,7 @@
 /* Latched (selected) state: ink face, reads as "pushed in" */
 .neutral.selected .face
 {
+    --sk-fill: var(--btn-ink-face);
     background: var(--btn-ink-face);
     color: #ffffff;
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12);

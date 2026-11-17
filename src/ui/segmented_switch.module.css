@@ -2,6 +2,8 @@
    drop below the thumb), so the thumb reads as vertically centered. */
 .track
 {
+    --sk-fill: var(--color-bg-deep);            /* sketch theme */
+    --sk-radius: 999px;
     display: inline-flex;
     flex-shrink: 0;
     gap: 2px;
@@ -34,6 +36,8 @@
 
 .thumb
 {
+    --sk-fill: var(--btn-ink-face);
+    --sk-radius: 999px;
     position: absolute;
     inset: 0;
     border-radius: var(--radius-pill);

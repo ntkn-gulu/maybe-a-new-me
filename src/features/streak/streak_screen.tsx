@@ -9,7 +9,7 @@ import { useDayRecords, useProgressStore, useStreak, useTodayProgress } from '..
 import { useSettingsStore } from '../../stores/settings_store';
 import { useT } from '../../i18n/use_t';
 import { tierNameKey, tierWordsKey } from '../../i18n/strings';
-import { LowPolyFlame } from './low_poly_flame';
+import { Flame } from './flame';
 import { TierStrip } from './tier_strip';
 import { StreakStats } from './streak_stats';
 import { SportCheckIn } from './sport_check_in';
@@ -113,7 +113,7 @@ export function StreakScreen()
             </div>
 
             <div className={styles.scene}>
-                <LowPolyFlame tier_index={selected_index} color_id={color_id} is_mystery={is_locked} />
+                <Flame tier_index={selected_index} color_id={color_id} is_mystery={is_locked} />
             </div>
 
             <div className={styles.words}>

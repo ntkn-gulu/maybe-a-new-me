@@ -1,122 +1,3 @@
-/* Extruded dial: cream ring with thickness, colored disc on top */
-.dial
-{
-    position: relative;
-    /* Also capped by screen height, so short/notched screens still fit the start button */
-    width: min(72vw, 260px, 30dvh);
-    aspect-ratio: 1;
-    margin: 4px auto 0;
-    border-radius: 50%;
-    background: var(--tile-face);
-    box-shadow:
-        0 12px 0 var(--tile-side),
-        0 26px 40px rgba(60, 45, 25, 0.18),
-        inset 0 2px 0 #ffffff;
-}
-
-.dial_ring
-{
-    position: absolute;
-    inset: 0;
-}
-
-/* Each tick is a thin bar rotated around the dial center */
-.tick
-{
-    position: absolute;
-    left: 50%;
-    top: 4%;
-    width: 2px;
-    height: 46%;
-    margin-left: -1px;
-    transform-origin: 50% 100%;
-}
-
-.tick::before
-{
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 7px;
-    border-radius: 1px;
-    background: var(--color-ink-faint);
-}
-
-.tick_major::before
-{
-    height: 13px;
-    width: 3px;
-    margin-left: -0.5px;
-    background: var(--color-ink);
-}
-
-.dial_disc
-{
-    position: absolute;
-    inset: 15%;
-    border-radius: 50%;
-    background: var(--color-pink);
-    box-shadow:
-        0 8px 0 #c42a48,
-        0 12px 18px rgba(196, 42, 72, 0.3),
-        inset 0 3px 0 rgba(255, 255, 255, 0.25);
-    overflow: hidden;
-}
-
-.wedge
-{
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.wedge_path
-{
-    fill: rgba(255, 255, 255, 0.4);
-}
-
-/* Same box as the disc, but not clipped, so the needle shadow can spill out */
-.needle_layer
-{
-    position: absolute;
-    inset: 15%;
-    filter: drop-shadow(3px 4px 0 var(--color-blue-side));
-}
-
-.needle
-{
-    position: absolute;
-    inset: 0;
-}
-
-.needle_bar
-{
-    position: absolute;
-    left: 50%;
-    top: 10%;
-    width: 10px;
-    height: 42%;
-    margin-left: -5px;
-    border-radius: 5px;
-    background: var(--color-blue);
-}
-
-.hub
-{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 30px;
-    height: 30px;
-    margin: -15px 0 0 -15px;
-    border-radius: 50%;
-    background: var(--color-blue);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
-}
-
 .time_row
 {
     display: flex;
@@ -146,6 +27,7 @@
 
 .pip
 {
+    --sk-fill: var(--tile-face);                /* sketch theme */
     width: 22px;
     height: 22px;
     border-radius: 7px;
@@ -155,6 +37,7 @@
 
 .pip_done
 {
+    --sk-fill: var(--color-accent);
     background: var(--color-accent);
     box-shadow: 0 4px 0 var(--color-accent-side);
 }

@@ -1,8 +1,10 @@
 import { motion } from 'motion/react';
+import { INK_BOIL_FILTER, PAPER_LIFT_FILTER } from '../../ui/ink_filters';
 import styles from './shattered_dial.module.css';
 
-// The Focus dial breaking apart: the pink disc splits into thick shards
-// along jagged cracks, they burst out and drop a little, the needle snaps off.
+// The Focus dial (same paper + ink style as TimerDial) breaking apart: the
+// pink paper disc tears into shards along jagged cracks, each outlined in
+// boiling ink; they burst out and drop a little, the needle snaps off.
 // Geometry is computed once; shards share their crack edges exactly, so the
 // disc looks whole at the first frame.
 
@@ -12,7 +14,6 @@ const CENTER: Point = [120, 116];
 const DISC_RADIUS = 70;
 const RING_RADIUS = 100;
 const CRACK_ORIGIN: Point = [126, 108];           // cracks start slightly off-center
-const SHARD_THICKNESS = 7;                         // px of visible "side" under each shard
 
 // Crack angles in degrees, clockwise from 12 o'clock
 const CRACK_ANGLES = [0, 48, 101, 152, 205, 258, 312];
@@ -20,7 +21,7 @@ const CRACK_ANGLES = [0, 48, 101, 152, 205, 258, 312];
 const CRACK_BENDS: [number, number][] = [[34, 9], [30, -10], [38, 7], [32, -8], [36, 10], [30, -6], [35, 8]];
 
 const SHARD_FACES = ['#ff4d6d', '#ff6b85', '#e83e5e', '#ff7f96', '#f2456a', '#ff5d7a', '#e54a68'];
-const SHARD_SIDE = '#b8213f';
+const INK_COLOR = '#1f1c18';
 
 // How far each shard flies: [distance px, extra drop px, rotation deg]
 const SHARD_FLIGHT: [number, number, number][] = [[16, 6, -10], [20, 10, 14], [14, 18, -8], [18, 22, 12], [12, 20, -16], [22, 12, 9], [15, 4, -12]];
@@ -91,17 +92,20 @@ export function ShatteredDial()
         >
             <ellipse cx="120" cy="236" rx="78" ry="9" className={styles.shadow} />
 
-            {/* Cream ring with thickness and ticks (stays intact) */}
-            <circle cx={CENTER[0]} cy={CENTER[1] + 10} r={RING_RADIUS} fill="var(--tile-side)" />
-            <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill="var(--tile-face)" />
-            {TICKS.map((angle) =>
-            {
-                const [x1, y1] = polar(angle, RING_RADIUS - 6);
-                const [x2, y2] = polar(angle, RING_RADIUS - (angle % 90 === 0 ? 16 : 12));
-                return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} className={styles.tick} />;
-            })}
+            {/* Paper face with ink ticks (stays intact) */}
+            <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill="#fbf8f3" filter={PAPER_LIFT_FILTER} />
             {/* Empty socket where the disc was */}
             <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} fill="var(--color-bg-deep)" />
+            <g filter={INK_BOIL_FILTER} fill="none" stroke={INK_COLOR} strokeLinecap="round">
+                <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} strokeWidth={3} />
+                <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} strokeWidth={1.4} strokeDasharray="4 6" opacity={0.5} />
+                {TICKS.map((angle) =>
+                {
+                    const [x1, y1] = polar(angle, RING_RADIUS - 6);
+                    const [x2, y2] = polar(angle, RING_RADIUS - (angle % 90 === 0 ? 16 : 12));
+                    return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth={3} />;
+                })}
+            </g>
 
             {SHARDS.map((shard, index) =>
             {
@@ -114,8 +118,8 @@ export function ShatteredDial()
                         animate={{ x: shard.direction[0] * distance, y: shard.direction[1] * distance + drop, rotate: rotation }}
                         transition={{ type: 'spring', stiffness: 140, damping: 11, delay: 0.28 + index * 0.025 }}
                     >
-                        <polygon points={toPoints(shard.points.map(([x, y]) => [x, y + SHARD_THICKNESS]))} fill={SHARD_SIDE} />
-                        <polygon points={toPoints(shard.points)} fill={SHARD_FACES[index]} stroke={SHARD_FACES[index]} strokeWidth="0.6" strokeLinejoin="round" />
+                        <polygon points={toPoints(shard.points)} fill={SHARD_FACES[index]} filter={PAPER_LIFT_FILTER} />
+                        <polygon points={toPoints(shard.points)} fill="none" stroke={INK_COLOR} strokeWidth={2.2} strokeLinejoin="round" filter={INK_BOIL_FILTER} />
                     </motion.g>
                 );
             })}
@@ -131,6 +135,10 @@ export function ShatteredDial()
                 <circle cx={CENTER[0]} cy={CENTER[1]} r="56" fill="none" />
                 <rect x={CENTER[0] - 5} y={CENTER[1] - 54} width="10" height="50" rx="5" className={styles.needle} />
                 <circle cx={CENTER[0]} cy={CENTER[1]} r="13" className={styles.needle} />
+                <g filter={INK_BOIL_FILTER} fill="none" stroke={INK_COLOR} strokeWidth={2.2}>
+                    <rect x={CENTER[0] - 5} y={CENTER[1] - 54} width="10" height="50" rx="5" />
+                    <circle cx={CENTER[0]} cy={CENTER[1]} r="13" />
+                </g>
             </motion.g>
 
             {DEBRIS.map(([angle, distance, size], index) =>
@@ -142,6 +150,9 @@ export function ShatteredDial()
                         key={`debris-${index}`}
                         points={toPoints([[x, y - size], [x + size, y + size], [x - size, y + size]])}
                         fill={SHARD_FACES[index]}
+                        stroke={INK_COLOR}
+                        strokeWidth={1.4}
+                        strokeLinejoin="round"
                         initial={{ x: 0, y: 0, opacity: 0, rotate: 0 }}
                         animate={{ x: to_x - x, y: to_y - y + 20, opacity: [0, 1, 1, 0], rotate: 180 }}
                         transition={{ duration: 0.9, delay: 0.28, ease: 'easeOut' }}

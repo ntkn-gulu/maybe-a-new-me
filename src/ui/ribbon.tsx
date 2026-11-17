@@ -23,9 +23,9 @@ export function Ribbon(props: RibbonProps)
             animate={{ scaleX: 1, opacity: 1 }}
             transition={{ scaleX: SPRING_POP, opacity: OPACITY_FADE }}
         >
-            <span className={`${styles.tail} ${styles.tail_left}`} />
-            <span className={`${styles.tail} ${styles.tail_right}`} />
-            <span className={styles.band}>{props.children}</span>
+            <span className={`${styles.tail} ${styles.tail_left} sk-hide`} />
+            <span className={`${styles.tail} ${styles.tail_right} sk-hide`} />
+            <span className={`${styles.band} sk-frame sk-flat`}>{props.children}</span>
         </motion.div>
     );
 }

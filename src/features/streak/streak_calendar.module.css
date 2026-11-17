@@ -101,6 +101,7 @@
 /* Kept: a raised flame tile */
 .kept
 {
+    --sk-fill: var(--color-accent);             /* sketch theme */
     background: var(--color-accent);
     box-shadow: 0 3px 0 var(--color-accent-side);
     color: #ffffff;
@@ -109,6 +110,7 @@
 /* Frozen: an ice tile */
 .frozen
 {
+    --sk-fill: #bfeefc;
     background: linear-gradient(160deg, #e6fbff 0%, #8fdcf2 100%);
     box-shadow: 0 3px 0 #4fb3d9;
     color: #1d6f94;
@@ -118,6 +120,7 @@
 /* Missed: sunken, number crossed out */
 .missed
 {
+    --sk-fill: var(--color-bg-deep);
     background: var(--color-bg-deep);
     box-shadow: inset 0 2px 3px rgba(60, 45, 25, 0.14);
     color: var(--color-ink-faint);
@@ -127,6 +130,7 @@
 /* Today, not kept yet: dashed outline waiting to be filled */
 .pending
 {
+    --sk-fill: transparent;
     box-shadow: inset 0 0 0 2px var(--color-accent);
     color: var(--color-accent);
 }

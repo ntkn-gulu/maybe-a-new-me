@@ -8,6 +8,8 @@ import { triggerHaptic } from '../../sound/haptic_hack';
 import { useT } from '../../i18n/use_t';
 import type { StringKey } from '../../i18n/strings';
 import { ChestArt } from './chest_art';
+import { ExtrudedChestArt } from './extruded_chest_art';
+import { useArtStyle } from '../../stores/settings_store';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
 import styles from './chest_screen.module.css';
@@ -51,6 +53,7 @@ export function ChestScreen()
     const t = useT();
     const chest_controls = useAnimationControls();
     const [tap_count, setTapCount] = useState(0);
+    const art_style = useArtStyle();
 
     function rattleChest(): void
     {
@@ -78,7 +81,7 @@ export function ChestScreen()
                     aria-label={t('rewards_chest_label')}
                 >
                     <motion.div animate={chest_controls}>
-                        <ChestArt size={210} />
+                        {art_style === 'extruded' ? <ExtrudedChestArt size={210} /> : <ChestArt size={210} />}
                     </motion.div>
                     <HapticOverlay />
                 </motion.div>
@@ -102,7 +105,7 @@ export function ChestScreen()
                 {RARITY_TEASERS.map((rarity, index) => (
                     <motion.div
                         key={rarity.key}
-                        className={`${styles.card} ${styles[rarity.key]}`}
+                        className={`${styles.card} ${styles[rarity.key]} sk-frame sk-flat`}
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.15 + index * 0.06 }}
