@@ -24,14 +24,6 @@
     display: flex;
     justify-content: center;
     margin: 0;
-    transition: filter 0.3s;
-}
-
-/* Locked preview stays in full color (a teaser), just slightly softened */
-.locked
-{
-    filter: saturate(0.85);
-    opacity: 0.9;
 }
 
 .words

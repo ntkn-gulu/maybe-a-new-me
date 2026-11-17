@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { getFlameColors, getFlameEffects } from './flame_palettes';
+import { MYSTERY_COLORS, MYSTERY_EFFECTS, getFlameColors, getFlameEffects } from './flame_palettes';
 import styles from './low_poly_flame.module.css';
 
 // A faceted "low-poly" flame drawn with SVG triangles.
@@ -7,6 +7,7 @@ import styles from './low_poly_flame.module.css';
 // On mount (or when the tier / color changes) the facets fly in and assemble;
 // with `is_bursting` they blow apart instead (used by the level-up screen).
 // Colors can come from an equipped flame item; effects always follow the tier.
+// `is_mystery` hides the tier: a charcoal silhouette with a big "?".
 
 type Point = [number, number];
 
@@ -111,12 +112,14 @@ interface LowPolyFlameProps
     color_id?: string | null;    // equipped flame color item; omit to use the tier colors
     size?: number;               // rendered width in px; omit to size from the --flame-size CSS variable
     is_bursting?: boolean;       // facets blow apart and fade out
+    is_mystery?: boolean;        // locked tier: hide its colors and effects
 }
 
 export function LowPolyFlame(props: LowPolyFlameProps)
 {
-    const colors = getFlameColors(props.tier_index, props.color_id ?? null);
-    const effects = getFlameEffects(props.tier_index);
+    const is_mystery = props.is_mystery ?? false;
+    const colors = is_mystery ? MYSTERY_COLORS : getFlameColors(props.tier_index, props.color_id ?? null);
+    const effects = is_mystery ? MYSTERY_EFFECTS : getFlameEffects(props.tier_index);
     const is_bursting = props.is_bursting ?? false;
 
     function fillFor(shade: Facet['shade']): string
@@ -162,7 +165,7 @@ export function LowPolyFlame(props: LowPolyFlameProps)
 
             <div className={styles.ground} />
 
-            <svg key={`${props.tier_index}-${props.color_id ?? ''}`} className={flame_class} viewBox="0 0 200 260" aria-hidden="true">
+            <svg key={`${props.tier_index}-${props.color_id ?? ''}-${is_mystery}`} className={flame_class} viewBox="0 0 200 260" aria-hidden="true">
                 <motion.g
                     style={{ originX: 0.5, originY: 1, transformBox: 'fill-box' }}
                     animate={{ skewX: [0, -2.5, 1.5, -1, 0], scaleY: [1, 1.035, 0.985, 1.02, 1] }}
@@ -217,6 +220,19 @@ export function LowPolyFlame(props: LowPolyFlameProps)
                     ))}
                 </motion.g>
             </svg>
+
+            {is_mystery && (
+                <motion.span
+                    key={`mystery-${props.tier_index}`}
+                    className={styles.mystery_mark}
+                    aria-hidden="true"
+                    initial={{ scale: 0.3, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ scale: { type: 'spring', stiffness: 420, damping: 16, delay: 0.45 }, opacity: { duration: 0.2, delay: 0.45 } }}
+                >
+                    ?
+                </motion.span>
+            )}
 
             {!is_bursting && EMBERS.slice(0, effects.ember_count).map(([left, drift, size], index) => (
                 <motion.span

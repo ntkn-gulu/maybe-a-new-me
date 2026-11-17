@@ -70,3 +70,21 @@
     border-radius: 50%;
     pointer-events: none;
 }
+
+/* Big question mark over a locked (mystery) flame */
+.mystery_mark
+{
+    position: absolute;
+    top: 54%;
+    left: 50%;
+    margin: -0.5em 0 0 -0.3em;
+    width: 0.6em;
+    font-family: var(--font-display);
+    font-size: calc(var(--flame-size, 220px) * 0.34);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    color: #f2eee7;
+    text-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}

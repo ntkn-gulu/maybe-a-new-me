@@ -19,7 +19,8 @@ import { LevelUpOverlay } from './level_up_overlay';
 import styles from './streak_screen.module.css';
 
 // Journey tab. Top: the current flame, its words, progress to the next tier
-// and a strip of every tier that can be tapped to preview.
+// and a strip of every tier that can be tapped. Tiers not reached yet stay a
+// mystery (charcoal "?" flame, hidden name) so the next color is a surprise.
 // Below: sport-day check-in (sport days only), best streak + freezes, and the
 // month calendar. In dev mode a panel can fake the streak and replay level-ups.
 // The streak comes from real session history (progress_store + core/streak_engine).
@@ -75,7 +76,10 @@ export function StreakScreen()
         setDevLevelUp({ from_index: to_index - 1, to_index });
     }
 
-    const selected_name = t(tierNameKey(selected_index));
+    const selected_name = is_locked ? t('journey_locked_name') : t(tierNameKey(selected_index));
+    const selected_words = is_locked
+        ? t('journey_locked_words', { n: selected_tier.min_days - shown_streak })
+        : t(tierWordsKey(selected_index));
 
     let ribbon_text = t('journey_streak', { n: shown_streak });
     if (is_locked)
@@ -91,7 +95,7 @@ export function StreakScreen()
         <Screen kicker={t('journey_kicker', { level: selected_index, max: LAST_TIER_INDEX })} align="center">
             <AnimatePresence mode="wait" initial={false}>
                 <motion.h1
-                    key={selected_name}
+                    key={`${selected_index}-${selected_name}`}
                     className={styles.tier_name}
                     initial={{ y: 16, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -108,13 +112,12 @@ export function StreakScreen()
                 </Ribbon>
             </div>
 
-            <div className={is_locked ? `${styles.scene} ${styles.locked}` : styles.scene}>
-                {/* Equipped colors only paint tiers already reached; previews show the tier's own colors */}
-                <LowPolyFlame tier_index={selected_index} color_id={is_locked ? null : color_id} />
+            <div className={styles.scene}>
+                <LowPolyFlame tier_index={selected_index} color_id={color_id} is_mystery={is_locked} />
             </div>
 
             <div className={styles.words}>
-                <TypewriterText text={t(tierWordsKey(selected_index))} start_delay_ms={350} />
+                <TypewriterText text={selected_words} start_delay_ms={350} />
             </div>
 
             {is_current && progress.next && (
@@ -132,7 +135,7 @@ export function StreakScreen()
                             transition={{ type: 'spring', stiffness: 120, damping: 20, delay: 0.4 }}
                         />
                     </div>
-                    <span className="mono_label">{t('journey_next', { name: t(tierNameKey(progress.next.index)) })}</span>
+                    <span className="mono_label">{t('journey_next', { level: progress.next.index })}</span>
                 </div>
             )}
 

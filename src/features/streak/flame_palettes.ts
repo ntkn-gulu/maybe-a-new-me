@@ -148,6 +148,18 @@ const RARE_FLAME_COLORS: Record<string, FlameColors> = {
     },
 };
 
+// Locked tiers are shown as a charcoal silhouette so their color stays a surprise
+export const MYSTERY_COLORS: FlameColors = {
+    shades: ['#2b2723', '#3a3530', '#4a443d', '#5c554c'],
+    core: ['#6b645a', '#837a6e'],
+    glow: 'rgba(60, 45, 25, 0.16)',
+    shard_colors: ['#a49d92', '#7a7268'],
+    is_hue_cycling: false,
+};
+
+// Calm effects for the silhouette, so a locked tier's extra sparkle does not leak either
+export const MYSTERY_EFFECTS: FlameEffects = { shard_count: 3, ember_count: 0, glow_pulse: 0.04, has_stars: false };
+
 const FOLLOW_TIER_ID = 'flame_follow_tier';
 const TIER_COLOR_PREFIX = 'flame_tier_';
 

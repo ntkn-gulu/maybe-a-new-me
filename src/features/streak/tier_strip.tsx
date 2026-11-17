@@ -9,7 +9,7 @@ import { tierNameKey } from '../../i18n/strings';
 import styles from './tier_strip.module.css';
 
 // Row of all tiers as small flame badges. Reached tiers are colored,
-// locked ones are outlines. Tapping one previews it.
+// locked ones are outlines (their names stay hidden too). Tapping one shows it above.
 
 // Simplified flame outline (same shape as the big flame, viewBox 0 0 200 260)
 const MINI_FLAME_POINTS = '104,8 130,62 157,118 167,170 150,222 100,250 50,222 33,170 47,122 70,86 60,40 84,94';
@@ -39,7 +39,9 @@ export function TierStrip(props: TierStripProps)
                         className={styles.badge}
                         whileTap={{ scale: 0.8 }}
                         transition={SPRING_PRESS}
-                        aria-label={t('journey_tier_label', { name: t(tierNameKey(tier.index)), n: tier.min_days })}
+                        aria-label={is_reached
+                            ? t('journey_tier_label', { name: t(tierNameKey(tier.index)), n: tier.min_days })
+                            : t('journey_locked_label', { level: tier.index, n: tier.min_days })}
                     >
                         <svg viewBox="0 0 200 260" className={styles.icon}>
                             <polygon

@@ -23,8 +23,11 @@ const VI = {
     journey_streak: '{n} ngày liên tiếp',
     journey_passed: 'Đã đi qua',
     journey_unlock_at: 'Mở khóa ở {n} ngày',
-    journey_next: 'Tới {name}',
+    journey_next: 'Tới cấp {level}',
     journey_tier_label: '{name}, {n} ngày',
+    journey_locked_label: 'Cấp {level} chưa mở, {n} ngày',
+    journey_locked_name: '???',
+    journey_locked_words: 'Giữ lửa thêm {n} ngày\nđể thắp ngọn lửa này.',
 
     // Rewards
     rewards_kicker: 'Kho báu',
@@ -247,8 +250,11 @@ const EN: Record<StringKey, string> = {
     journey_streak: '{n} day streak',
     journey_passed: 'Passed',
     journey_unlock_at: 'Unlocks at {n} days',
-    journey_next: 'Next: {name}',
+    journey_next: 'Next: level {level}',
     journey_tier_label: '{name}, {n} days',
+    journey_locked_label: 'Level {level} locked, {n} days',
+    journey_locked_name: '???',
+    journey_locked_words: 'Keep the flame {n} more days\nto light this one.',
 
     rewards_kicker: 'Treasure',
     rewards_title: 'Chests',

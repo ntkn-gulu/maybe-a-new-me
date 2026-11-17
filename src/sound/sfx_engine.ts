@@ -21,15 +21,18 @@ let current_volume = 0.8;
 let is_enabled = true;
 let needs_rebuild = false;     // set when resume() failed: next tap builds a fresh context
 let loudness = 1;             // per-call multiplier set by playSfx (e.g. escalating alarms)
+let is_background_playback = false;   // music/podcast playing: keep audio alive in the background
 
-// Safari 17+ exposes navigator.audioSession. "playback" lets sounds play
-// even when the iPhone silent switch is on (needed for focus alarms).
-function preferPlaybackSession(): void
+// Safari 17+ exposes navigator.audioSession.
+// "playback" lets sounds play even when the iPhone silent switch is on (needed
+// for focus alarms), but it also makes iOS treat the app as a media player.
+// "auto" is the default and gives that status back.
+function setAudioSessionType(type: 'playback' | 'auto'): void
 {
     const audio_session = (navigator as Navigator & { audioSession?: AudioSessionLike }).audioSession;
-    if (audio_session)
+    if (audio_session && audio_session.type !== type)
     {
-        audio_session.type = 'playback';
+        audio_session.type = type;
     }
 }
 
@@ -37,7 +40,7 @@ function getContext(): AudioContext
 {
     if (!audio_context)
     {
-        preferPlaybackSession();
+        setAudioSessionType('playback');
         audio_context = new AudioContext();
         master_gain = audio_context.createGain();
         master_gain.gain.value = current_volume;
@@ -127,18 +130,53 @@ export function isAudioStale(): boolean
     return needs_rebuild;
 }
 
-// Known iOS bug: after the app goes to the background and comes back, the
-// context can report "running" yet play nothing. So every return from the
-// background marks it stale; the next tap builds a fresh one. Meanwhile we
-// still try a resume in case the old context is fine.
+// Music or a podcast (later phases) calls this while it plays, so leaving the
+// app keeps the audio session alive instead of releasing it.
+export function setBackgroundPlaybackActive(active: boolean): void
+{
+    is_background_playback = active;
+}
+
+// Leaving the app with nothing playing: close the context and hand the audio
+// session back to iOS. An open "playback" session keeps the app listed as
+// playing audio (the Dynamic Island / Control Center player) even when silent.
+function releaseAudio(): void
+{
+    if (is_background_playback)
+    {
+        return;
+    }
+    if (audio_context && audio_context.state !== 'closed')
+    {
+        void audio_context.close();
+    }
+    audio_context = null;
+    master_gain = null;
+    noise_buffer = null;
+    needs_rebuild = true;           // the next tap builds a fresh context
+    setAudioSessionType('auto');
+}
+
+// Coming back: the context was released (next tap rebuilds it), or it was kept
+// for background playback. A kept context can hit a known iOS bug where it
+// reports "running" yet plays nothing, so it is marked stale too; the next tap
+// builds a fresh one. Meanwhile we still try a resume in case it is fine.
 document.addEventListener('visibilitychange', () =>
 {
-    if (document.visibilityState === 'visible' && audio_context)
+    if (document.visibilityState === 'hidden')
+    {
+        releaseAudio();
+        return;
+    }
+    if (audio_context)
     {
         needs_rebuild = true;
         tryResume(audio_context);
     }
 });
+
+// iOS can skip visibilitychange when the app is swiped away
+window.addEventListener('pagehide', releaseAudio);
 
 export function setSfxVolume(volume: number): void
 {
@@ -309,6 +347,12 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
 export function playSfx(name: SfxName, loudness_scale = 1): void
 {
     if (!is_enabled || current_volume === 0)
+    {
+        return;
+    }
+    // A delayed sound firing after the user left (e.g. the 2nd time-up ring)
+    // would reopen the audio session and bring back the "playing" indicator
+    if (document.visibilityState === 'hidden' && !is_background_playback)
     {
         return;
     }
