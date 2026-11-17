@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { getFlameColors, getFlameEffects, type FlameColors } from './flame_palettes';
 import styles from './low_poly_flame.module.css';
 
-// The 3D theme's flame (paper + ink themes use PaperFlame instead).
+// The 3D theme's flame (the sketch theme uses SketchFlame instead).
 // A faceted "low-poly" flame drawn with SVG triangles.
 // Light comes from the upper left, so each facet uses one of 4 shades.
 // On mount (or when the tier / color changes) the facets fly in and assemble;

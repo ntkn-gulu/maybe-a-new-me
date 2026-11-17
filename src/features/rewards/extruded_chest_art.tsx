@@ -1,4 +1,4 @@
-// The 3D theme's chest (paper + ink themes use ChestArt).
+// The 3D theme's chest (the sketch theme uses SketchChestArt).
 // Chunky 2.5D treasure chest drawn with flat-shaded SVG faces
 // (front, side, lid). Purely visual; animation is done by the parent.
 

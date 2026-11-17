@@ -7,7 +7,7 @@ import { playSfx } from '../../sound/sfx_engine';
 import { triggerHaptic } from '../../sound/haptic_hack';
 import { useT } from '../../i18n/use_t';
 import type { StringKey } from '../../i18n/strings';
-import { ChestArt } from './chest_art';
+import { SketchChestArt } from './sketch_chest_art';
 import { ExtrudedChestArt } from './extruded_chest_art';
 import { useArtStyle } from '../../stores/settings_store';
 import { getPressableProps } from '../../ui/pressable';
@@ -81,7 +81,7 @@ export function ChestScreen()
                     aria-label={t('rewards_chest_label')}
                 >
                     <motion.div animate={chest_controls}>
-                        {art_style === 'extruded' ? <ExtrudedChestArt size={210} /> : <ChestArt size={210} />}
+                        {art_style === 'extruded' ? <ExtrudedChestArt size={210} /> : <SketchChestArt size={210} />}
                     </motion.div>
                     <HapticOverlay />
                 </motion.div>

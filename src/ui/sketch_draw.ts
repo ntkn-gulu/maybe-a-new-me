@@ -7,6 +7,9 @@
 
 export type Point = [number, number];
 
+// The sketch theme's black ink
+export const SKETCH_INK = '#1f1c18';
+
 // Random numbers in [0, 1)
 export type Random = () => number;
 
@@ -113,6 +116,24 @@ export function ellipsePoints(center_x: number, center_y: number, radius_x: numb
         const angle = (index / count) * Math.PI * 2;
         return [center_x + radius_x * Math.sin(angle), center_y - radius_y * Math.cos(angle)] as Point;
     });
+}
+
+// Adds points along every edge of a closed polygon (about one per `step`
+// units), so a wobble bends straight edges while corners stay sharp
+export function densifyPolygon(polygon: Point[], step: number): Point[]
+{
+    const result: Point[] = [];
+    polygon.forEach((start, index) =>
+    {
+        const end = polygon[(index + 1) % polygon.length];
+        const count = Math.max(1, Math.round(Math.hypot(end[0] - start[0], end[1] - start[1]) / step));
+        for (let part = 0; part < count; part++)
+        {
+            const t = part / count;
+            result.push([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t]);
+        }
+    });
+    return result;
 }
 
 // Scales points around `origin`, then moves them by `offset`

@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import styles from './extruded_shattered_dial.module.css';
 
-// The 3D theme's broken dial (paper + ink themes use ShatteredDial).
+// The 3D theme's broken dial (the sketch theme uses SketchShatteredDial).
 // The Focus dial breaking apart: the pink disc splits into thick shards
 // along jagged cracks, they burst out and drop a little, the needle snaps off.
 // Geometry is computed once; shards share their crack edges exactly, so the

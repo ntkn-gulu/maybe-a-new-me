@@ -1,7 +1,7 @@
 import { motion, useTransform, type MotionValue } from 'motion/react';
 import styles from './extruded_timer_dial.module.css';
 
-// The 3D theme's dial (paper + ink themes use TimerDial). A chunky
+// The 3D theme's dial (the sketch theme uses SketchTimerDial). A chunky
 // kitchen timer built from CSS: an extruded cream ring with ticks and a
 // pink disc with thickness; the light wedge shows the session length and
 // the blue needle sits at its end. `sweep_degrees` is owned by the Focus screen.

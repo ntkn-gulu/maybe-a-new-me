@@ -10,11 +10,11 @@ import { useTodayProgress } from '../../stores/progress_store';
 import { useArtStyle, useSettingsStore } from '../../stores/settings_store';
 import { detectDevice } from '../../stores/clock';
 import type { FocusLength } from '../../core/types';
-import { TimerDial } from './timer_dial';
+import { SketchTimerDial } from './sketch_timer_dial';
 import { ExtrudedTimerDial } from './extruded_timer_dial';
 import styles from './focus_screen.module.css';
 
-// Focus tab. A kitchen-timer dial (TimerDial, or ExtrudedTimerDial in the 3D theme): the light wedge
+// Focus tab. A kitchen-timer dial (ExtrudedTimerDial in the 3D theme, SketchTimerDial in the sketch theme): the light wedge
 // shows how long the session is, the needle sits at its end. Start opens the session layer.
 // Tapping the kicker 5 times toggles dev mode (sessions run 25x faster).
 
@@ -99,7 +99,7 @@ export function FocusScreen()
         <Screen kicker={kicker} title={t('focus_title')} onKickerTap={handleKickerTap}>
             {art_style === 'extruded'
                 ? <ExtrudedTimerDial sweep_degrees={sweep_degrees} />
-                : <TimerDial sweep_degrees={sweep_degrees} />}
+                : <SketchTimerDial sweep_degrees={sweep_degrees} />}
 
             <div className={styles.time_row}>
                 <AnimatePresence mode="popLayout" initial={false}>

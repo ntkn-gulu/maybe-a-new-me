@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     clipToHalfPlane,
     createRandom,
+    densifyPolygon,
     ellipsePoints,
     hatchLines,
     samplePath,
@@ -126,5 +127,17 @@ describe('hatchLines', () =>
     it('is repeatable for the same seed', () =>
     {
         expect(hatchLines(SQUARE, { angle: 30, gap: 6, seed: 8 })).toBe(hatchLines(SQUARE, { angle: 30, gap: 6, seed: 8 }));
+    });
+});
+
+describe('densifyPolygon', () =>
+{
+    it('keeps the corners and adds points along each edge', () =>
+    {
+        const dense = densifyPolygon(SQUARE, 10);
+        expect(dense).toHaveLength(40);
+        expect(dense[0]).toEqual([0, 0]);
+        expect(dense[10]).toEqual([100, 0]);
+        expect(dense[20]).toEqual([100, 100]);
     });
 });

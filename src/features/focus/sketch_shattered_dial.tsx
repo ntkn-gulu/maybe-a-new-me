@@ -1,35 +1,42 @@
 import { motion } from 'motion/react';
-import styles from './shattered_dial.module.css';
+import {
+    SKETCH_INK,
+    createRandom,
+    densifyPolygon,
+    ellipsePoints,
+    hatchLines,
+    sketchOutline,
+    type Point,
+} from '../../ui/sketch_draw';
+import styles from './sketch_shattered_dial.module.css';
 
-// The Focus dial (same paper + ink style as TimerDial) breaking apart: the
-// pink paper disc tears into shards along jagged cracks, each outlined in
-// ink; they burst out and drop a little, the needle snaps off. No SVG
-// filters at all: everything here moves, and moving filtered shapes stutter on iPhone.
-// Geometry is computed once; shards share their crack edges exactly, so the
-// disc looks whole at the first frame.
-
-type Point = [number, number];
+// The sketch dial (SketchTimerDial) breaking apart: the red-hatched paper
+// disc tears into shards along jagged cracks, each with a wobbly ink
+// outline; they burst out and drop a little, the ink needle snaps off and
+// paper scraps fly. Plain vector geometry computed once (no SVG filters):
+// everything here moves, and moving filtered shapes stutter on iPhone.
+// Shards share their crack edges exactly, so the disc looks whole at the first frame.
 
 const CENTER: Point = [120, 116];
 const DISC_RADIUS = 70;
 const RING_RADIUS = 100;
 const CRACK_ORIGIN: Point = [126, 108];           // cracks start slightly off-center
+const RED_PEN = '#d1342b';
+const PAPER = 'var(--tile-face, #fbf7ef)';
 
 // Crack angles in degrees, clockwise from 12 o'clock
 const CRACK_ANGLES = [0, 48, 101, 152, 205, 258, 312];
 // Each crack bends once halfway out: [radius of the bend, angle offset]
 const CRACK_BENDS: [number, number][] = [[34, 9], [30, -10], [38, 7], [32, -8], [36, 10], [30, -6], [35, 8]];
 
-const SHARD_FACES = ['#ff4d6d', '#ff6b85', '#e83e5e', '#ff7f96', '#f2456a', '#ff5d7a', '#e54a68'];
-const INK_COLOR = '#1f1c18';
-
 // How far each shard flies: [distance px, extra drop px, rotation deg]
 const SHARD_FLIGHT: [number, number, number][] = [[16, 6, -10], [20, 10, 14], [14, 18, -8], [18, 22, 12], [12, 20, -16], [22, 12, 9], [15, 4, -12]];
 
-// Little debris triangles: [angle deg, distance px, size px]
+// Little paper scraps: [angle deg, distance px, size px]
 const DEBRIS: [number, number, number][] = [[20, 92, 7], [80, 98, 5], [140, 90, 6], [200, 100, 8], [260, 94, 5], [320, 96, 6]];
 
 const ARC_STEP_DEGREES = 8;
+const EDGE_STEP = 6;                  // densify shard edges so the wobble bends them
 
 function polar(angle_degrees: number, radius: number, origin: Point = CENTER): Point
 {
@@ -46,6 +53,8 @@ interface Shard
 {
     points: Point[];
     direction: Point;      // unit vector from the crack origin toward the shard
+    hatch: string;         // red pen hatching inside the shard
+    outline: string;       // wobbly ink outline
 }
 
 function buildShards(): Shard[]
@@ -72,14 +81,38 @@ function buildShards(): Shard[]
         const dx = middle[0] - CRACK_ORIGIN[0];
         const dy = middle[1] - CRACK_ORIGIN[1];
         const length = Math.hypot(dx, dy) || 1;
-        return { points, direction: [dx / length, dy / length] };
+        return {
+            points,
+            direction: [dx / length, dy / length],
+            hatch: hatchLines(points, { angle: 50, gap: 4.6, seed: 100 + index }),
+            outline: sketchOutline(densifyPolygon(points, EDGE_STEP), 1.2, 120 + index, 2),
+        };
     });
 }
 
-const SHARDS = buildShards();
-const TICKS = Array.from({ length: 12 }, (_, index) => index * 30);
+// Hour ticks of uneven length, like the live dial
+function buildTicks(): string
+{
+    const random = createRandom(17);
+    return Array.from({ length: 12 }, (_, index) =>
+    {
+        const angle = index * 30 + (random() - 0.5) * 3;
+        const [x1, y1] = polar(angle, RING_RADIUS - 5 - random() * 2);
+        const [x2, y2] = polar(angle, RING_RADIUS - (index % 3 === 0 ? 17 : 12) - random() * 3);
+        return `M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`;
+    }).join('');
+}
 
-export function ShatteredDial()
+const SHARDS = buildShards();
+const TICKS = buildTicks();
+const RING_POINTS = ellipsePoints(CENTER[0], CENTER[1], RING_RADIUS, RING_RADIUS, 60);
+const RING = sketchOutline(RING_POINTS, 1.3, 21, 4);
+const RING_ECHO = sketchOutline(RING_POINTS, 1.9, 22, 3);
+const GROUND_HATCH = hatchLines(ellipsePoints(120, 236, 78, 9, 32), { angle: 20, gap: 3.4, seed: 23 });
+const SOCKET_HATCH = hatchLines(ellipsePoints(CENTER[0], CENTER[1], DISC_RADIUS, DISC_RADIUS, 40), { angle: -40, gap: 6, seed: 25 });
+const NEEDLE = `M${CENTER[0]} ${CENTER[1] - 2} Q${CENTER[0] - 1.6} ${CENTER[1] - 29} ${CENTER[0] + 0.6} ${CENTER[1] - 56}`;
+
+export function SketchShatteredDial()
 {
     return (
         <motion.svg
@@ -90,21 +123,17 @@ export function ShatteredDial()
             animate={{ x: [0, -5, 5, -3, 3, 0] }}
             transition={{ duration: 0.3 }}
         >
-            <ellipse cx="120" cy="236" rx="78" ry="9" className={styles.shadow} />
+            <path d={GROUND_HATCH} stroke={SKETCH_INK} strokeWidth={1.1} strokeLinecap="round" opacity={0.4} />
 
-            {/* Paper face with ink ticks (stays intact) */}
-            <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill="#fbf8f3" />
-            {/* Empty socket where the disc was */}
-            <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} fill="var(--color-bg-deep)" />
-            <g fill="none" stroke={INK_COLOR} strokeLinecap="round">
-                <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} strokeWidth={3} />
-                <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} strokeWidth={1.4} strokeDasharray="4 6" opacity={0.5} />
-                {TICKS.map((angle) =>
-                {
-                    const [x1, y1] = polar(angle, RING_RADIUS - 6);
-                    const [x2, y2] = polar(angle, RING_RADIUS - (angle % 90 === 0 ? 16 : 12));
-                    return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth={3} />;
-                })}
+            {/* Paper face with the ink ring and ticks (stays intact) */}
+            <circle cx={CENTER[0]} cy={CENTER[1]} r={RING_RADIUS} fill={PAPER} />
+            {/* Empty socket where the disc was: faint pencil hatching */}
+            <path d={SOCKET_HATCH} stroke={SKETCH_INK} strokeWidth={1} strokeLinecap="round" opacity={0.18} />
+            <g fill="none" stroke={SKETCH_INK} strokeLinecap="round" strokeLinejoin="round">
+                <path d={RING} strokeWidth={2.8} />
+                <path d={RING_ECHO} strokeWidth={1.2} opacity={0.55} />
+                <circle cx={CENTER[0]} cy={CENTER[1]} r={DISC_RADIUS} strokeWidth={1.4} strokeDasharray="4 6" opacity={0.45} />
+                <path d={TICKS} strokeWidth={2.6} />
             </g>
 
             {SHARDS.map((shard, index) =>
@@ -118,8 +147,9 @@ export function ShatteredDial()
                         animate={{ x: shard.direction[0] * distance, y: shard.direction[1] * distance + drop, rotate: rotation }}
                         transition={{ type: 'spring', stiffness: 140, damping: 11, delay: 0.28 + index * 0.025 }}
                     >
-                        <polygon points={toPoints(shard.points)} fill={SHARD_FACES[index]} />
-                        <polygon points={toPoints(shard.points)} fill="none" stroke={INK_COLOR} strokeWidth={2.2} strokeLinejoin="round" />
+                        <polygon points={toPoints(shard.points)} fill={PAPER} />
+                        <path d={shard.hatch} stroke={RED_PEN} strokeWidth={1.7} strokeLinecap="round" />
+                        <path d={shard.outline} fill="none" stroke={SKETCH_INK} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
                     </motion.g>
                 );
             })}
@@ -133,12 +163,8 @@ export function ShatteredDial()
                 {/* Invisible circle centered on the hub: makes the group's box centered
                     there, so Motion's default (box-center) rotation turns around the hub */}
                 <circle cx={CENTER[0]} cy={CENTER[1]} r="56" fill="none" />
-                <rect x={CENTER[0] - 5} y={CENTER[1] - 54} width="10" height="50" rx="5" className={styles.needle} />
-                <circle cx={CENTER[0]} cy={CENTER[1]} r="13" className={styles.needle} />
-                <g fill="none" stroke={INK_COLOR} strokeWidth={2.2}>
-                    <rect x={CENTER[0] - 5} y={CENTER[1] - 54} width="10" height="50" rx="5" />
-                    <circle cx={CENTER[0]} cy={CENTER[1]} r="13" />
-                </g>
+                <path d={NEEDLE} fill="none" stroke={SKETCH_INK} strokeWidth={5} strokeLinecap="round" />
+                <circle cx={CENTER[0]} cy={CENTER[1]} r="9" fill={SKETCH_INK} />
             </motion.g>
 
             {DEBRIS.map(([angle, distance, size], index) =>
@@ -149,8 +175,8 @@ export function ShatteredDial()
                     <motion.polygon
                         key={`debris-${index}`}
                         points={toPoints([[x, y - size], [x + size, y + size], [x - size, y + size]])}
-                        fill={SHARD_FACES[index]}
-                        stroke={INK_COLOR}
+                        fill={index % 2 === 0 ? RED_PEN : PAPER}
+                        stroke={SKETCH_INK}
                         strokeWidth={1.4}
                         strokeLinejoin="round"
                         initial={{ x: 0, y: 0, opacity: 0, rotate: 0 }}

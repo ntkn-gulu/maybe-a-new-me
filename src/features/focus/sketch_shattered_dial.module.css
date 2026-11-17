@@ -1,0 +1,6 @@
+.dial
+{
+    width: min(62vw, 230px, 30dvh);
+    height: auto;
+    overflow: visible;
+}

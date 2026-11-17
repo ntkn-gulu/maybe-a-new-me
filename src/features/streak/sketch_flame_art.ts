@@ -1,4 +1,5 @@
 import {
+    SKETCH_INK,
     clipToHalfPlane,
     hatchLines,
     samplePath,
@@ -28,7 +29,7 @@ export const FLAME_VIEW_BOX = '0 0 200 260';
 export const FLAME_VIEW_WIDTH = 200;
 export const FLAME_VIEW_HEIGHT = 260;
 export const FLAME_BASE_Y = 248;
-export const INK_COLOR = '#1f1c18';
+export const INK_COLOR = SKETCH_INK;
 
 const FLAME_BASE: Point = [100, FLAME_BASE_Y];
 const FLAME_POINTS = samplePath(FLAME_PATH, 8);

@@ -7,7 +7,7 @@ import type { BreakReason } from '../../core/session_rules';
 import { detectDevice } from '../../stores/clock';
 import { useFocusStore } from '../../stores/focus_store';
 import { useArtStyle, useSettingsStore } from '../../stores/settings_store';
-import { ShatteredDial } from './shattered_dial';
+import { SketchShatteredDial } from './sketch_shattered_dial';
 import { ExtrudedShatteredDial } from './extruded_shattered_dial';
 import styles from './focus_session.module.css';
 
@@ -53,7 +53,7 @@ export function SessionBroken(props: SessionBrokenProps)
             <span className="mono_label">{t('broken_kicker')}</span>
             <h2 className={styles.paper_title}>{t('broken_title')}</h2>
 
-            {art_style === 'extruded' ? <ExtrudedShatteredDial /> : <ShatteredDial />}
+            {art_style === 'extruded' ? <ExtrudedShatteredDial /> : <SketchShatteredDial />}
 
             {props.reason && (
                 <motion.div
