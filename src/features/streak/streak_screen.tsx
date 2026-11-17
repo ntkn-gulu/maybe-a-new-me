@@ -16,6 +16,7 @@ import { SportCheckIn } from './sport_check_in';
 import { StreakCalendar } from './streak_calendar';
 import { DevJourneyPanel } from './dev_journey_panel';
 import { LevelUpOverlay } from './level_up_overlay';
+import { useInventoryStore } from '../../stores/inventory_store';
 import styles from './streak_screen.module.css';
 
 // Journey tab. Top: the current flame, its words, progress to the next tier
@@ -43,7 +44,7 @@ export function StreakScreen()
     const [is_dev_sport_preview, setIsDevSportPreview] = useState(false);
 
     const shown_streak = is_dev_mode && dev_streak !== null ? dev_streak : streak.current_streak;
-    const color_id = is_dev_mode ? dev_color_id : null;
+    const equipped_flame_id = useInventoryStore((state) => state.equipped.flame);
     const progress = getTierProgress(shown_streak);
     const current_index = progress.current.index;
 
@@ -90,6 +91,9 @@ export function StreakScreen()
     {
         ribbon_text = t('journey_passed');
     }
+
+    // The equipped color paints the current tier's flame; other tiers show their own colors
+    const color_id = is_dev_mode && dev_color_id ? dev_color_id : (selected_index === current_index ? equipped_flame_id : null);
 
     return (
         <Screen kicker={t('journey_kicker', { level: selected_index, max: LAST_TIER_INDEX })} align="center">

@@ -11,6 +11,9 @@ export const CHEST_RATES: Record<ChestType, Record<Rarity, number>> = {
     milestone: { common: 0, rare: 0, epic: 0.80, legendary: 0.20 },
 };
 
+// Chests waiting on a fresh install, so there is something to open right away
+export const WELCOME_CHESTS: readonly ChestType[] = ['daily', 'daily', 'daily'];
+
 // Every 7th kept day in a row also gives a silver chest
 export const SILVER_CHEST_EVERY_DAYS = 7;
 

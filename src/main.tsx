@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app';
 import { unlockAudio } from './sound/sfx_engine';
 import './stores/settings_store';
+import './stores/active_theme';                  // keeps <html data-theme> in sync
 import { useFocusStore } from './stores/focus_store';
 
 // Fonts are bundled (not loaded from Google) so the PWA works offline.

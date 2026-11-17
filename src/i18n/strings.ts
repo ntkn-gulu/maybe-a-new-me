@@ -2,6 +2,8 @@
 // Placeholders like {n} are filled by t(key, { n: 3 }).
 // The Vietnamese table defines the keys; English must provide the same keys.
 
+import type { ChestType, ItemSlot } from '../core/types';
+
 export type Language = 'vi' | 'en';
 
 const VI = {
@@ -37,6 +39,24 @@ const VI = {
     rewards_nudge: 'Lắc hoài cũng không mở đâu.\nĐi học đi rồi tính 😏',
     rewards_can_drop: 'Có thể rơi ra',
     rewards_chest_label: 'Rương (đang khóa)',
+    rewards_tap_to_open: 'Chạm vào rương để mở!',
+    rewards_open_label: 'Mở rương',
+    rewards_shards: '{n} Mảnh Lửa',
+    chest_daily: 'Rương thường',
+    chest_silver: 'Rương bạc',
+    chest_milestone: 'Rương mốc',
+    reveal_new: 'Món mới!',
+    reveal_duplicate: 'Đã có rồi · +{n} Mảnh Lửa',
+    reveal_equip: 'Trang bị',
+    reveal_equipped: 'Đang dùng',
+    reveal_close: 'Tuyệt',
+    chest_tap_hint: 'Chạm vào rương · còn {n} lần',
+    chest_open_next: 'Mở tiếp · còn {n} rương',
+    slot_flame: 'Màu lửa',
+    slot_timer_skin: 'Skin đồng hồ',
+    slot_sound_pack: 'Bộ âm thanh',
+    slot_theme: 'Giao diện',
+    slot_title: 'Danh hiệu',
     rarity_common: 'Thường',
     rarity_rare: 'Hiếm',
     rarity_epic: 'Sử thi',
@@ -53,7 +73,8 @@ const VI = {
     settings_language: 'Ngôn ngữ',
     settings_date_format: 'Định dạng ngày',
     settings_theme: 'Giao diện',
-    settings_theme_caption: 'Cách vẽ app',
+    settings_theme_caption: 'Xem thử (dev)',
+    theme_equipped: 'Đang mặc',
     theme_3d: '3D',
     theme_sketch: 'Phác thảo',
     settings_date_format_caption: 'Dùng trong lịch',
@@ -196,12 +217,14 @@ const VI = {
     dev_level_up: 'Xem Level Up',
     dev_flame_color: 'Màu lửa',
     dev_sport_preview: 'Thử check-in thể thao',
+    dev_add_chests: '+{n} rương',
 
     // Reward items (ids match REWARD_CATALOG in core)
     item_flame_follow_tier: 'Lửa theo cấp',
     item_timer_classic: 'Đồng hồ cổ điển',
     item_sound_classic: 'Âm thanh gốc',
-    item_theme_paper: 'Giấy kem',
+    item_theme_classic: '3D Cổ điển',
+    item_theme_sketch: 'Phác thảo',
     item_title_beginner: 'Người mới bắt đầu',
     item_title_night_owl: 'Cú Đêm',
     item_title_early_bird: 'Chim Dậy Sớm',
@@ -220,7 +243,7 @@ const VI = {
     item_timer_retro_lcd: 'Màn LCD cổ',
     item_timer_nixie: 'Đèn Nixie',
     item_timer_neon: 'Ống neon',
-    item_timer_paper: 'Giấy gấp',
+    item_timer_hourglass: 'Đồng hồ cát',
     item_flame_ice: 'Lửa Băng',
     item_flame_toxic: 'Lửa Độc',
     item_flame_shadow: 'Lửa Bóng Tối',
@@ -267,6 +290,24 @@ const EN: Record<StringKey, string> = {
     rewards_nudge: 'Shaking it won’t open it.\nGo study first 😏',
     rewards_can_drop: 'Possible drops',
     rewards_chest_label: 'Chest (locked)',
+    rewards_tap_to_open: 'Tap the chest to open it!',
+    rewards_open_label: 'Open chest',
+    rewards_shards: '{n} Flame Shards',
+    chest_daily: 'Daily chest',
+    chest_silver: 'Silver chest',
+    chest_milestone: 'Milestone chest',
+    reveal_new: 'New item!',
+    reveal_duplicate: 'Already owned · +{n} Flame Shards',
+    reveal_equip: 'Equip',
+    reveal_equipped: 'Equipped',
+    reveal_close: 'Nice',
+    chest_tap_hint: 'Tap the chest · {n} more',
+    chest_open_next: 'Open next · {n} left',
+    slot_flame: 'Flame color',
+    slot_timer_skin: 'Timer skin',
+    slot_sound_pack: 'Sound pack',
+    slot_theme: 'Theme',
+    slot_title: 'Title',
     rarity_common: 'Common',
     rarity_rare: 'Rare',
     rarity_epic: 'Epic',
@@ -282,7 +323,8 @@ const EN: Record<StringKey, string> = {
     settings_language: 'Language',
     settings_date_format: 'Date format',
     settings_theme: 'Theme',
-    settings_theme_caption: 'App style',
+    settings_theme_caption: 'Preview (dev)',
+    theme_equipped: 'Equipped',
     theme_3d: '3D',
     theme_sketch: 'Sketch',
     settings_date_format_caption: 'Used in the calendar',
@@ -423,11 +465,13 @@ const EN: Record<StringKey, string> = {
     dev_level_up: 'Play level up',
     dev_flame_color: 'Flame color',
     dev_sport_preview: 'Try sport check-in',
+    dev_add_chests: '+{n} chests',
 
     item_flame_follow_tier: 'Tier flame',
     item_timer_classic: 'Classic dial',
     item_sound_classic: 'Classic sounds',
-    item_theme_paper: 'Paper',
+    item_theme_classic: 'Classic 3D',
+    item_theme_sketch: 'Sketch',
     item_title_beginner: 'Beginner',
     item_title_night_owl: 'Night Owl',
     item_title_early_bird: 'Early Bird',
@@ -446,7 +490,7 @@ const EN: Record<StringKey, string> = {
     item_timer_retro_lcd: 'Retro LCD',
     item_timer_nixie: 'Nixie tubes',
     item_timer_neon: 'Neon tube',
-    item_timer_paper: 'Folded paper',
+    item_timer_hourglass: 'Hourglass',
     item_flame_ice: 'Ice Flame',
     item_flame_toxic: 'Toxic Flame',
     item_flame_shadow: 'Shadow Flame',
@@ -493,6 +537,16 @@ export function tierWordsKey(tier_index: number): StringKey
 export function itemNameKey(item_id: string): StringKey
 {
     return `item_${item_id}` as StringKey;
+}
+
+export function slotNameKey(slot: ItemSlot): StringKey
+{
+    return `slot_${slot}` as StringKey;
+}
+
+export function chestNameKey(chest_type: ChestType): StringKey
+{
+    return `chest_${chest_type}` as StringKey;
 }
 
 export function monthNameKey(month: number): StringKey

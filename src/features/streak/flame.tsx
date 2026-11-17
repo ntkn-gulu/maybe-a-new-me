@@ -1,4 +1,4 @@
-import { useArtStyle } from '../../stores/settings_store';
+import { useArtStyle } from '../../stores/active_theme';
 import { LowPolyFlame } from './low_poly_flame';
 import { SketchFlame } from './sketch_flame';
 

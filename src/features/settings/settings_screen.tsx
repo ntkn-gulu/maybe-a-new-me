@@ -3,7 +3,9 @@ import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { ToggleSwitch } from '../../ui/toggle_switch';
 import { SegmentedSwitch, type SegmentOption } from '../../ui/segmented_switch';
-import { useSettingsStore, type AppTheme } from '../../stores/settings_store';
+import { useSettingsStore } from '../../stores/settings_store';
+import type { AppTheme } from '../../stores/active_theme';
+import { useInventoryStore } from '../../stores/inventory_store';
 import { MAX_DAILY_GOAL, MIN_DAILY_GOAL, useGoalSetting, useProgressStore } from '../../stores/progress_store';
 import { getTodayKey } from '../../stores/clock';
 import { playSfx, type SfxName } from '../../sound/sfx_engine';
@@ -12,8 +14,13 @@ import type { Language, StringKey } from '../../i18n/strings';
 import type { DateFormat } from '../../i18n/date_format';
 import styles from './settings_screen.module.css';
 
-// Settings tab: daily goal, theme, language, date format, sound + haptic preferences.
-// The sound tester only shows in dev mode. Sport days, backup and credits arrive in later phases.
+// Settings tab: daily goal, language, date format, sound + haptic preferences.
+// Dev mode adds a theme preview (any theme, owned or not), the sound tester and
+// a "+10 chests" button. Sport days, backup and credits arrive in later phases.
+
+// Theme preview choices; "equipped" means no preview (the equipped theme item shows)
+type ThemePreview = AppTheme | 'equipped';
+const DEV_CHEST_GIFT = 10;
 
 const PREVIEW_SOUNDS: { name: SfxName; label_key: StringKey }[] = [
     { name: 'tab', label_key: 'sfx_tab' },
@@ -74,9 +81,11 @@ export function SettingsScreen()
     const date_format = useSettingsStore((state) => state.date_format);
     const setDateFormat = useSettingsStore((state) => state.setDateFormat);
     const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
-    const theme = useSettingsStore((state) => state.theme);
-    const setTheme = useSettingsStore((state) => state.setTheme);
-    const theme_options: SegmentOption<AppTheme>[] = [
+    const dev_theme = useSettingsStore((state) => state.dev_theme);
+    const setDevTheme = useSettingsStore((state) => state.setDevTheme);
+    const addChests = useInventoryStore((state) => state.addChests);
+    const theme_options: SegmentOption<ThemePreview>[] = [
+        { value: 'equipped', label: t('theme_equipped') },
         { value: 'classic_3d', label: t('theme_3d') },
         { value: 'sketch', label: t('theme_sketch') },
     ];
@@ -110,7 +119,7 @@ export function SettingsScreen()
 
             <h2 className={`mono_label ${styles.group_title}`}>{t('settings_group_general')}</h2>
             <div className={`${styles.group} sk-frame`}>
-                {/* The sketch theme is a dev-mode preview until it can be won from a chest */}
+                {/* Dev mode: preview any theme without owning it */}
                 {is_dev_mode && (
                     <SettingRow
                         label={t('settings_theme')}
@@ -118,8 +127,8 @@ export function SettingsScreen()
                         control={
                             <SegmentedSwitch
                                 options={theme_options}
-                                value={theme}
-                                onChange={setTheme}
+                                value={dev_theme ?? 'equipped'}
+                                onChange={(value) => setDevTheme(value === 'equipped' ? null : value)}
                                 aria_label={t('settings_theme')}
                             />
                         }
@@ -192,6 +201,9 @@ export function SettingsScreen()
                         {/* Every tactile button already buzzes on click; this one only buzzes */}
                         <TactileButton size="sm" variant="ink">
                             {t('haptic_test')}
+                        </TactileButton>
+                        <TactileButton size="sm" variant="ink" onClick={() => addChests(Array(DEV_CHEST_GIFT).fill('daily'))}>
+                            {t('dev_add_chests', { n: DEV_CHEST_GIFT })}
                         </TactileButton>
                     </div>
                 </>

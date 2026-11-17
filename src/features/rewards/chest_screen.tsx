@@ -10,13 +10,19 @@ import type { StringKey } from '../../i18n/strings';
 import { SketchChestArt } from './sketch_chest_art';
 import { ExtrudedChestArt } from './extruded_chest_art';
 import { SketchRarityDoodles, SketchRarityGem, type RarityKey } from './sketch_rarity_gem';
-import { useArtStyle } from '../../stores/settings_store';
+import { useArtStyle } from '../../stores/active_theme';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
+import { useInventoryStore } from '../../stores/inventory_store';
+import type { ChestOpening } from '../../core/inventory';
+import { ChestOpeningOverlay } from './chest_opening';
 import styles from './chest_screen.module.css';
 
-// Rewards tab. Phase 0: the chest (tap it: it rattles but stays locked)
-// and a teaser of what can drop. Real chests + gacha arrive in phase 4.
+// Rewards tab: the chest and how many are waiting (plus Flame Shards).
+// With chests waiting, a tap opens the oldest one and ChestOpeningOverlay
+// stages it (tap to crack, burst, the item rises out); with none, the
+// chest rattles but stays locked.
+// Below, the drop rates per rarity.
 // Higher rarities get louder card effects: epic shimmers, legendary has a
 // rotating gold border, glow, twinkling sparkles and shiny text.
 
@@ -44,7 +50,6 @@ const SPARKLES: Record<RarityKey, [number, number, number, number][]> = {
     legendary: [[82, 52, 13, 0], [64, 18, 9, 0.7], [90, 80, 8, 1.3], [48, 70, 7, 1.9], [72, 84, 10, 2.4]],
 };
 
-const CHEST_COUNT = 0;
 const NUDGE_AFTER_TAPS = 3;
 
 export function ChestScreen()
@@ -53,11 +58,20 @@ export function ChestScreen()
     const chest_controls = useAnimationControls();
     const [tap_count, setTapCount] = useState(0);
     const art_style = useArtStyle();
+    const chest_count = useInventoryStore((state) => state.pending_chests.length);
+    const shards = useInventoryStore((state) => state.shards);
+    const openNextChest = useInventoryStore((state) => state.openNextChest);
+    const [opening, setOpening] = useState<ChestOpening | null>(null);
 
-    function rattleChest(): void
+    function tapChest(): void
     {
-        playSfx('press');
         triggerHaptic();
+        if (chest_count > 0)
+        {
+            setOpening(openNextChest());
+            return;
+        }
+        playSfx('press');
         setTapCount((count) => count + 1);
         void chest_controls.start({
             rotate: [0, -7, 6, -4, 3, 0],
@@ -66,18 +80,19 @@ export function ChestScreen()
         });
     }
 
-    const is_nudging = tap_count >= NUDGE_AFTER_TAPS;
+    const is_nudging = chest_count === 0 && tap_count >= NUDGE_AFTER_TAPS;
+    const words_key = chest_count > 0 ? 'rewards_tap_to_open' : (is_nudging ? 'rewards_nudge' : 'rewards_intro');
 
     return (
         <Screen kicker={t('rewards_kicker')} title={t('rewards_title')}>
             <div className={styles.hero}>
                 <div className={styles.glow} />
                 <motion.div
-                    {...getPressableProps(rattleChest)}
+                    {...getPressableProps(tapChest)}
                     className={styles.chest_button}
                     animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                    aria-label={t('rewards_chest_label')}
+                    aria-label={t(chest_count > 0 ? 'rewards_open_label' : 'rewards_chest_label')}
                 >
                     <motion.div animate={chest_controls}>
                         {art_style === 'extruded' ? <ExtrudedChestArt size={210} /> : <SketchChestArt size={210} />}
@@ -88,13 +103,14 @@ export function ChestScreen()
             </div>
 
             <div className={styles.ribbon_row}>
-                <Ribbon color="ink">{t('rewards_waiting', { n: CHEST_COUNT })}</Ribbon>
+                <Ribbon color={chest_count > 0 ? 'flame' : 'ink'}>{t('rewards_waiting', { n: chest_count })}</Ribbon>
             </div>
+            {shards > 0 && <p className={styles.shards}>{t('rewards_shards', { n: shards })}</p>}
 
             <div className={styles.words}>
                 <TypewriterText
-                    key={is_nudging ? 'nudge' : 'intro'}
-                    text={is_nudging ? t('rewards_nudge') : t('rewards_intro')}
+                    key={words_key}
+                    text={t(words_key)}
                     start_delay_ms={200}
                 />
             </div>
@@ -124,6 +140,7 @@ export function ChestScreen()
                     </motion.div>
                 ))}
             </div>
+            <ChestOpeningOverlay opening={opening} onOpenNext={() => setOpening(openNextChest())} onClose={() => setOpening(null)} />
         </Screen>
     );
 }

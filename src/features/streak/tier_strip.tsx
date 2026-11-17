@@ -6,7 +6,7 @@ import { useT } from '../../i18n/use_t';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
 import { tierNameKey } from '../../i18n/strings';
-import { useArtStyle } from '../../stores/settings_store';
+import { useArtStyle } from '../../stores/active_theme';
 import { INK_COLOR, MINI_FLAME_MARKER, MINI_FLAME_OUTLINE } from './sketch_flame_art';
 import styles from './tier_strip.module.css';
 

@@ -44,6 +44,23 @@
     margin-top: 14px;
 }
 
+.shards
+{
+    margin: 10px 0 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+}
+
+:global(:root[data-theme="sketch"]) .shards
+{
+    font-size: 15px;
+}
+
 .words
 {
     margin: 16px 0 26px;

@@ -18,7 +18,7 @@ export const REWARD_CATALOG: readonly RewardItem[] = [
     { id: 'flame_follow_tier', slot: 'flame', rarity: 'common', source: 'default' },
     { id: 'timer_classic', slot: 'timer_skin', rarity: 'common', source: 'default' },
     { id: 'sound_classic', slot: 'sound_pack', rarity: 'common', source: 'default' },
-    { id: 'theme_paper', slot: 'theme', rarity: 'common', source: 'default' },
+    { id: 'theme_classic', slot: 'theme', rarity: 'common', source: 'default' },
     { id: 'title_beginner', slot: 'title', rarity: 'common', source: 'default' },
 
     // Titles (common)
@@ -45,7 +45,7 @@ export const REWARD_CATALOG: readonly RewardItem[] = [
     { id: 'timer_retro_lcd', slot: 'timer_skin', rarity: 'epic', source: 'gacha' },
     { id: 'timer_nixie', slot: 'timer_skin', rarity: 'epic', source: 'gacha' },
     { id: 'timer_neon', slot: 'timer_skin', rarity: 'epic', source: 'gacha' },
-    { id: 'timer_paper', slot: 'timer_skin', rarity: 'epic', source: 'gacha' },
+    { id: 'timer_hourglass', slot: 'timer_skin', rarity: 'epic', source: 'gacha' },
 
     // Rare flame colors (epic / legendary)
     { id: 'flame_ice', slot: 'flame', rarity: 'epic', source: 'gacha' },
@@ -53,6 +53,9 @@ export const REWARD_CATALOG: readonly RewardItem[] = [
     { id: 'flame_shadow', slot: 'flame', rarity: 'legendary', source: 'gacha' },
     { id: 'flame_gold_24k', slot: 'flame', rarity: 'legendary', source: 'gacha' },
     { id: 'flame_aurora', slot: 'flame', rarity: 'legendary', source: 'gacha' },
+
+    // Legendary themes: a whole new way of drawing the app (see theme_checklist.md)
+    { id: 'theme_sketch', slot: 'theme', rarity: 'legendary', source: 'gacha' },
 
     // Tier flame colors, granted by reaching each tier (index 1..8)
     { id: 'flame_tier_1', slot: 'flame', rarity: 'rare', source: 'milestone' },

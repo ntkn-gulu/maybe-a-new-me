@@ -1,0 +1,252 @@
+/* Above the tab bar, like the level-up screen */
+.layer
+{
+    --rarity: var(--rarity-common);
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    overflow: hidden;
+    background: var(--color-bg);
+    color: var(--color-ink);
+}
+
+.common
+{
+    --rarity: var(--rarity-common);
+}
+
+.rare
+{
+    --rarity: var(--rarity-rare);
+}
+
+.epic
+{
+    --rarity: var(--rarity-epic);
+}
+
+.legendary
+{
+    --rarity: var(--rarity-legendary);
+}
+
+/* Legendary: the dark the gold bursts out of */
+.darkness
+{
+    position: absolute;
+    inset: 0;
+    background: #120f0a;
+    pointer-events: none;
+}
+
+.dark
+{
+    color: #fff3d6;
+}
+
+.dark :global(.mono_label)
+{
+    color: rgba(255, 243, 214, 0.7);
+}
+
+/* Rays centered on the chest, turning slowly (a transform: the GPU turns the finished picture) */
+.rays_box
+{
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    width: 150vmax;
+    height: 150vmax;
+    margin: -75vmax 0 0 -75vmax;
+    pointer-events: none;
+}
+
+.rays
+{
+    width: 100%;
+    height: 100%;
+    animation: spin 30s linear infinite;
+}
+
+@keyframes spin
+{
+    to
+    {
+        rotate: 360deg;
+    }
+}
+
+.content
+{
+    position: relative;
+    height: 100%;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: calc(28px + var(--safe-top)) var(--gutter) calc(24px + var(--safe-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.heading
+{
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+/* The tap target: the whole middle area */
+.stage
+{
+    position: relative;
+    flex: 1;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chest_box
+{
+    position: relative;
+}
+
+.cracks
+{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.flash
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    margin: -100px 0 0 -100px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.spark
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.gem_box
+{
+    display: grid;
+    place-items: center;
+    width: 140px;
+    height: 140px;
+}
+
+.gem_box svg
+{
+    width: 120px;
+    height: 120px;
+    margin: 0;
+}
+
+/* 3D theme gem: a big faceted rotated square */
+.gem
+{
+    width: 78px;
+    height: 78px;
+    transform: rotate(45deg);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, var(--rarity) 45%, var(--rarity) 100%);
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.18);
+}
+
+.details
+{
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tap_hint
+{
+    margin-top: 12px;
+}
+
+.item_text
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.rarity
+{
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--rarity);
+}
+
+.name
+{
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+.slot
+{
+    font-size: 14px;
+    opacity: 0.75;
+}
+
+.status
+{
+    margin: 8px 0 0;
+    font-size: 15px;
+}
+
+.actions
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+    .rays
+    {
+        animation: none;
+    }
+}
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .rarity
+{
+    font-size: 16px;
+}
+
+:global(:root[data-theme="sketch"]) .slot
+{
+    font-size: 16px;
+}

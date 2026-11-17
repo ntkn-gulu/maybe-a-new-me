@@ -4,7 +4,7 @@ import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
 import { ChestIcon, FlameIcon, GearIcon, TimerIcon } from './icons';
 import { SketchChestIcon, SketchFlameIcon, SketchGearIcon, SketchTimerIcon } from './sketch_icons';
-import { useArtStyle } from '../stores/settings_store';
+import { useArtStyle } from '../stores/active_theme';
 import { SPRING_PRESS, SPRING_SLIDE } from './motion_presets';
 import { getPressableProps } from './pressable';
 import { HapticOverlay } from './haptic_overlay';
