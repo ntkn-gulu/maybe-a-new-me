@@ -77,3 +77,19 @@
 {
     font-size: 12.5px;
 }
+
+/* Hint mark in the pill's top-right corner: this tab has a sub-page (tap it again) */
+.hint
+{
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    width: 10px;
+    height: 8px;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

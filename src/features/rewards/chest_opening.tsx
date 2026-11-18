@@ -12,9 +12,10 @@ import { useT } from '../../i18n/use_t';
 import { chestNameKey, itemNameKey, slotNameKey } from '../../i18n/strings';
 import { getItem } from '../../core/reward_catalog';
 import type { ChestOpening } from '../../core/inventory';
-import type { ItemSlot, Rarity } from '../../core/types';
+import type { Rarity } from '../../core/types';
 import { useInventoryStore } from '../../stores/inventory_store';
-import { isThemeItemReady, useArtStyle } from '../../stores/active_theme';
+import { useArtStyle } from '../../stores/active_theme';
+import { canEquipNow } from './item_usable';
 import { ExtrudedChestArt } from './extruded_chest_art';
 import { SketchChestArt } from './sketch_chest_art';
 import { SketchRarityGem } from './sketch_rarity_gem';
@@ -51,12 +52,6 @@ const CRACKS = [
     'M66 92 L54 100 L47 114 L36 120 M64 80 L58 70 L62 62 L54 57',
     'M90 90 L104 99 L113 94 L126 106 M144 86 L152 100 L147 114 L156 128',
 ];
-
-// Items that already change the app when equipped
-function canEquipNow(item_id: string, slot: ItemSlot): boolean
-{
-    return slot === 'flame' || (slot === 'theme' && isThemeItemReady(item_id));
-}
 
 interface Spark
 {
@@ -343,7 +338,7 @@ function OpeningStage(props: OpeningStageProps)
                     transition={{ y: SPRING_POP, opacity: OPACITY_FADE }}
                     style={{ pointerEvents: is_buttons_ready ? 'auto' : 'none' }}
                 >
-                    {item && canEquipNow(item.id, item.slot) && (
+                    {item && canEquipNow(item) && (
                         equipped[item.slot] === item.id
                             ? <TactileButton size="md" is_full_width is_disabled>{t('reveal_equipped')}</TactileButton>
                             : <TactileButton size="md" variant="ink" is_full_width onClick={() => equip(item.id)}>{t('reveal_equip')}</TactileButton>

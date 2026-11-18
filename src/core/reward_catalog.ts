@@ -86,8 +86,20 @@ export function getGachaPool(rarity: Rarity): RewardItem[]
     return REWARD_CATALOG.filter((item) => item.source === 'gacha' && item.rarity === rarity);
 }
 
+const MILESTONE_FLAME_PREFIX = 'flame_tier_';
+
 export function getMilestoneFlameId(tier_index: number): string | null
 {
-    const id = `flame_tier_${tier_index}`;
+    const id = `${MILESTONE_FLAME_PREFIX}${tier_index}`;
     return CATALOG_BY_ID.has(id) ? id : null;
+}
+
+// The flame tier whose milestone grants this item (null for other items)
+export function getMilestoneTierIndex(item_id: string): number | null
+{
+    if (!item_id.startsWith(MILESTONE_FLAME_PREFIX) || !CATALOG_BY_ID.has(item_id))
+    {
+        return null;
+    }
+    return Number(item_id.slice(MILESTONE_FLAME_PREFIX.length));
 }

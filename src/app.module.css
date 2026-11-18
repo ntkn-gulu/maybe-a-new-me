@@ -10,3 +10,23 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+/* A tab's sub-page: a full sheet that slides up over the screen, under the tab bar */
+.sub_page
+{
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--color-bg);
+    box-shadow: 0 -10px 30px rgba(60, 45, 25, 0.16);
+    will-change: transform;
+}
+
+:global(:root[data-theme="sketch"]) .sub_page
+{
+    background: var(--sk-grain), var(--color-bg);
+    box-shadow: none;
+    border-top: 2.5px solid var(--color-ink);
+}

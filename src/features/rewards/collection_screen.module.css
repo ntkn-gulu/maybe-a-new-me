@@ -1,0 +1,285 @@
+.summary
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -4px 4px 14px;
+}
+
+.shards
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-ink);
+}
+
+/* A small flame-colored shard: a rotated square */
+.shard_gem
+{
+    width: 9px;
+    height: 9px;
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: var(--color-flame);
+    box-shadow: 1px 1px 0 var(--color-flame-side);
+}
+
+/* Slot filter: a row of tiles like a small tab bar */
+.filters
+{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    padding: 6px;
+    border-radius: var(--radius-lg);
+    background: var(--tile-face);
+    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+}
+
+.filter
+{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 54px;
+    color: var(--color-ink-faint);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.filter_active
+{
+    color: #ffffff;
+}
+
+.filter_pill
+{
+    --sk-fill: var(--btn-ink-face);             /* sketch theme */
+    --sk-radius: 10px 13px 9px 12px / 12px 9px 13px 10px;
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+    background: var(--btn-ink-face);
+    box-shadow: 0 4px 0 var(--btn-ink-side);
+}
+
+.filter_icon,
+.filter_count
+{
+    position: relative;   /* sit above the pill */
+}
+
+.filter_icon
+{
+    display: flex;
+}
+
+.filter_count
+{
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.section_label
+{
+    margin: 22px 0 12px 4px;
+}
+
+.grid
+{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+/* One item: picture, name, rarity / price */
+.card
+{
+    --rarity: var(--rarity-common);
+    --sk-radius: 11px 15px 10px 14px / 14px 10px 15px 11px;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 14px 6px 12px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 5px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+    text-align: center;
+    cursor: pointer;
+}
+
+.common
+{
+    --rarity: var(--rarity-common);
+}
+
+.rare
+{
+    --rarity: var(--rarity-rare);
+}
+
+.epic
+{
+    --rarity: var(--rarity-epic);
+}
+
+.legendary
+{
+    --rarity: var(--rarity-legendary);
+}
+
+/* Missing items: the paper is a little sunken and the text faint */
+.missing
+{
+    background: var(--color-bg-deep);
+    box-shadow: 0 5px 0 var(--tile-side), inset 0 0 0 1.5px var(--tile-stroke);
+}
+
+.missing .name
+{
+    color: var(--color-ink-faint);
+}
+
+/* Rarity: a tiny gem in the top-left corner */
+.rarity_dot
+{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: var(--rarity);
+}
+
+/* Equipped: an ink tick badge in the top-right corner */
+.equipped
+{
+    --sk-fill: var(--btn-ink-face);
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--btn-ink-face);
+    color: #ffffff;
+}
+
+.equipped svg
+{
+    position: relative;
+    width: 12px;
+    height: 12px;
+}
+
+.name
+{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.3em;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+}
+
+.rarity,
+.price
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.rarity
+{
+    color: var(--rarity);
+}
+
+.price
+{
+    color: var(--color-ink-soft);
+}
+
+.price .shard_gem
+{
+    width: 7px;
+    height: 7px;
+}
+
+/* Enough shards to trade: the price lights up */
+.price_ready
+{
+    color: var(--color-flame);
+}
+
+/* ---------- Sketch theme ---------- */
+
+:global(:root[data-theme="sketch"]) .shard_gem
+{
+    border: 1.5px solid var(--color-ink);
+    box-shadow: none;
+}
+
+:global(:root[data-theme="sketch"]) .rarity_dot
+{
+    border: 1.5px solid var(--color-ink);
+    width: 10px;
+    height: 10px;
+}
+
+:global(:root[data-theme="sketch"]) .missing
+{
+    --sk-fill: var(--color-bg-deep);
+}
+
+/* Small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .shards
+{
+    font-size: 16px;
+}
+
+:global(:root[data-theme="sketch"]) .filter_count
+{
+    font-size: 13px;
+}
+
+:global(:root[data-theme="sketch"]) .name
+{
+    font-size: 15.5px;
+    line-height: 1.1;
+}
+
+:global(:root[data-theme="sketch"]) .rarity,
+:global(:root[data-theme="sketch"]) .price
+{
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+}

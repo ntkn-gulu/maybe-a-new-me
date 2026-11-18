@@ -1,0 +1,63 @@
+.preview
+{
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.art
+{
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.flame
+{
+    width: 72%;
+    height: 90%;
+    overflow: visible;
+}
+
+.mystery_mark
+{
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    fill: var(--color-ink-faint);
+}
+
+/* Slot icon on a disc */
+.disc_box
+{
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.disc_box > .art
+{
+    position: absolute;
+    inset: 0;
+}
+
+/* 3D theme: an extruded coin in the item's tint */
+.disc
+{
+    width: 84%;
+    height: 84%;
+    margin-bottom: 4px;
+    border-radius: 50%;
+    background: var(--tint);
+    box-shadow: 0 4px 0 color-mix(in srgb, var(--tint) 62%, #000000), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.glyph
+{
+    position: relative;
+    display: flex;
+}
