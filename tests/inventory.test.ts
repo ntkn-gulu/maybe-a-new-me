@@ -123,5 +123,7 @@ describe('equipItem', () =>
         const owner = { ...base, owned_item_ids: ['theme_sketch'] };
         expect(equipItem(owner, 'theme_sketch').equipped.theme).toBe('theme_sketch');
         expect(equipItem(owner, 'not_an_item')).toBe(owner);
+        expect(equipItem(base, 'theme_sketch', false).equipped.theme).toBe('theme_sketch');
+        expect(equipItem(base, 'not_an_item', false)).toBe(base);
     });
 });

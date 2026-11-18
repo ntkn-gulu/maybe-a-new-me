@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { TabBar, type TabId } from './ui/tab_bar';
+import { TabBar, type SubPageId, type TabId } from './ui/tab_bar';
 import { FocusScreen } from './features/focus/focus_screen';
 import { StreakScreen } from './features/streak/streak_screen';
 import { ChestScreen } from './features/rewards/chest_screen';
@@ -14,9 +14,10 @@ import styles from './app.module.css';
 
 // App shell: one active screen + the bottom tab bar.
 // No router on purpose: 4 fixed tabs only need a piece of state.
-// A tab can have a sub-page (Rewards -> Collection): tapping the active tab
-// again slides it up over the tab's screen, tapping again slides it away;
-// switching tabs closes it.
+// A tab can have sub-pages (Rewards -> Collection), picked from the page
+// stack the tab bar pops up when the active tab is tapped again. A sub-page
+// slides up as a sheet over the tab's screen; going back to the tab's own
+// page or switching tabs slides it away.
 
 const DEFAULT_TAB: TabId = 'focus';
 
@@ -35,32 +36,25 @@ function renderScreen(tab: TabId)
     }
 }
 
-// The sub-page of a tab (tabs listed with a sub_page_key in TABS)
-function renderSubPage(tab: TabId)
+// Sub-pages listed under a tab's sub_pages in TABS
+function renderSubPage(sub_page: SubPageId)
 {
-    switch (tab)
+    switch (sub_page)
     {
-        case 'rewards':
+        case 'collection':
             return <CollectionScreen />;
-        default:
-            return null;
     }
 }
 
 export function App()
 {
     const [active_tab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
-    const [sub_page_tab, setSubPageTab] = useState<TabId | null>(null);
+    const [sub_page, setSubPage] = useState<SubPageId | null>(null);
 
     function changeTab(tab: TabId): void
     {
         setActiveTab(tab);
-        setSubPageTab(null);
-    }
-
-    function toggleSubPage(): void
-    {
-        setSubPageTab((open_tab) => (open_tab === active_tab ? null : active_tab));
+        setSubPage(null);
     }
 
     return (
@@ -78,24 +72,24 @@ export function App()
                 </motion.main>
             </AnimatePresence>
             <AnimatePresence>
-                {sub_page_tab && (
+                {sub_page && (
                     <motion.section
-                        key={sub_page_tab}
+                        key={sub_page}
                         className={styles.sub_page}
                         initial={{ y: '100%' }}
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={SPRING_SLIDE}
                     >
-                        {renderSubPage(sub_page_tab)}
+                        {renderSubPage(sub_page)}
                     </motion.section>
                 )}
             </AnimatePresence>
             <TabBar
                 active_tab={active_tab}
-                is_sub_page_open={sub_page_tab === active_tab}
+                sub_page={sub_page}
                 onChange={changeTab}
-                onToggleSubPage={toggleSubPage}
+                onSelectPage={setSubPage}
             />
             <FocusSessionLayer />
             <LevelUpGate />

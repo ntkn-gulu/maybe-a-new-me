@@ -6,10 +6,12 @@ import { getMaxAwayMs, getOpenPresenceCheck, getRemainingSeconds, PRESENCE_CHECK
 import { getSessionNow, useFocusStore } from '../../stores/focus_store';
 import { formatClock } from './format_time';
 import { PresenceCheck } from './presence_check';
+import { useTimerSkin } from './timer_skins';
 import styles from './focus_session.module.css';
 
 // The screen while a session runs: pure black (cheap on OLED, the screen
-// stays on the whole time), a big countdown and a thin progress ring.
+// stays on the whole time), a big countdown and a thin progress ring, both
+// in the colors of the equipped timer skin.
 
 const RING_RADIUS = 46;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
@@ -26,6 +28,7 @@ export function SessionRunning(props: SessionRunningProps)
     const clock_origin = useFocusStore((state) => state.clock_origin);
     const time_scale = useFocusStore((state) => state.time_scale);
     const giveUp = useFocusStore((state) => state.giveUp);
+    const timer_skin = useTimerSkin();
     const clock = { clock_origin, time_scale };
 
     const now = getSessionNow(clock);
@@ -49,7 +52,7 @@ export function SessionRunning(props: SessionRunningProps)
     }
 
     return (
-        <div className={styles.running} onClick={handleTap}>
+        <div className={`${styles.running} ${timer_skin === 'classic' ? '' : styles[`skin_${timer_skin}`]}`} onClick={handleTap}>
             {is_sound_stale && (
                 <motion.div
                     className={styles.sound_banner}

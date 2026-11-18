@@ -83,6 +83,8 @@ export function SettingsScreen()
     const is_dev_mode = useSettingsStore((state) => state.is_dev_mode);
     const dev_theme = useSettingsStore((state) => state.dev_theme);
     const setDevTheme = useSettingsStore((state) => state.setDevTheme);
+    const is_dev_unlock_all = useSettingsStore((state) => state.is_dev_unlock_all);
+    const toggleDevUnlockAll = useSettingsStore((state) => state.toggleDevUnlockAll);
     const addChests = useInventoryStore((state) => state.addChests);
     const theme_options: SegmentOption<ThemePreview>[] = [
         { value: 'equipped', label: t('theme_equipped') },
@@ -132,6 +134,14 @@ export function SettingsScreen()
                                 aria_label={t('settings_theme')}
                             />
                         }
+                    />
+                )}
+                {/* Dev mode: equip any item in the Collection without owning it */}
+                {is_dev_mode && (
+                    <SettingRow
+                        label={t('settings_dev_unlock_all')}
+                        caption={t('settings_dev_unlock_all_caption')}
+                        control={<ToggleSwitch is_on={is_dev_unlock_all} onChange={toggleDevUnlockAll} aria_label={t('settings_dev_unlock_all')} />}
                     />
                 )}
                 <SettingRow

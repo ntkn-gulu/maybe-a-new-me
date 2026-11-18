@@ -1,6 +1,9 @@
+import { buildPackRecipes, DEFAULT_SOUND_PACK, type NoiseOptions, type SoundPack, type ToneOptions } from './sound_packs';
+
 // Synthesized UI sounds built with the Web Audio API.
 // No audio files: every sound is generated from oscillators and noise,
 // so there is nothing to download and no licensing to worry about.
+// The equipped sound pack (sound_packs.ts) swaps the everyday tap sounds.
 
 export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle' | 'crack' | 'rise' | 'burst';
 
@@ -22,6 +25,7 @@ let is_enabled = true;
 let needs_rebuild = false;     // set when resume() failed: next tap builds a fresh context
 let loudness = 1;             // per-call multiplier set by playSfx (e.g. escalating alarms)
 let is_background_playback = false;   // music/podcast playing: keep audio alive in the background
+let sound_pack: SoundPack = DEFAULT_SOUND_PACK;
 
 // Safari 17+ exposes navigator.audioSession.
 // "playback" lets sounds play even when the iPhone silent switch is on (needed
@@ -192,14 +196,9 @@ export function setSfxEnabled(enabled: boolean): void
     is_enabled = enabled;
 }
 
-interface ToneOptions
+export function setSoundPack(pack: SoundPack): void
 {
-    start_hz: number;
-    end_hz: number;
-    duration: number;      // seconds
-    peak: number;          // 0..1 loudness before master volume
-    wave: OscillatorType;
-    delay?: number;        // seconds from now
+    sound_pack = pack;
 }
 
 function playTone(options: ToneOptions): void
@@ -224,18 +223,10 @@ function playTone(options: ToneOptions): void
     oscillator.stop(end_time + 0.02);
 }
 
-interface NoiseOptions
-{
-    duration: number;      // seconds
-    peak: number;          // 0..1 loudness before master volume
-    filter_hz: number;     // band-pass center: low = thud, high = click
-    q: number;             // band-pass sharpness
-}
-
 function playNoise(options: NoiseOptions): void
 {
     const context = getContext();
-    const start_time = context.currentTime;
+    const start_time = context.currentTime + (options.delay ?? 0);
     const end_time = start_time + options.duration;
 
     const source = context.createBufferSource();
@@ -343,8 +334,11 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
     },
 };
 
-// `loudness_scale` > 1 makes a sound louder than normal (used by alarms that escalate)
-export function playSfx(name: SfxName, loudness_scale = 1): void
+const PACK_RECIPES = buildPackRecipes({ playTone, playNoise });
+
+// `loudness_scale` > 1 makes a sound louder than normal (used by alarms that escalate).
+// `pack` plays the sound from another pack than the equipped one (Collection preview).
+export function playSfx(name: SfxName, loudness_scale = 1, pack: SoundPack = sound_pack): void
 {
     if (!is_enabled || current_volume === 0)
     {
@@ -358,6 +352,7 @@ export function playSfx(name: SfxName, loudness_scale = 1): void
     }
     unlockAudio();
     loudness = loudness_scale;
-    SFX_RECIPES[name]();
+    const recipe = pack === 'classic' ? SFX_RECIPES[name] : PACK_RECIPES[pack][name] ?? SFX_RECIPES[name];
+    recipe();
     loudness = 1;
 }

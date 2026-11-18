@@ -1,22 +1,95 @@
-/* Floating extruded dock at the bottom */
-.bar
+/* The dock: holds the bar and the page tiles that rise out of it.
+   Centered with margin auto (no transform), so the fixed backdrop inside
+   still covers the whole screen. */
+.dock
 {
     position: fixed;
-    left: 50%;
+    left: 0;
+    right: 0;
     bottom: calc(12px + var(--safe-bottom));
     z-index: 10;
+    width: min(calc(100% - 2 * var(--gutter)), var(--content-max));
+    margin: 0 auto;
+}
+
+/* A light paper wash behind the open stack; a tap on it folds the stack back */
+.backdrop
+{
+    position: fixed;
+    inset: 0;
+    background: rgba(242, 238, 231, 0.6);
+    animation: wash_in 0.18s ease-out;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes wash_in
+{
+    from
+    {
+        opacity: 0;
+    }
+}
+
+/* Floating extruded bar */
+.bar
+{
+    position: relative;
+    z-index: 2;                                 /* above the tiles: they rise from behind it */
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    width: min(calc(100% - 2 * var(--gutter)), var(--content-max));
     padding: 8px;
-    transform: translateX(-50%);
     border-radius: var(--radius-lg);
     background: var(--tile-face);
     box-shadow:
         0 7px 0 var(--tile-side),
         0 18px 34px rgba(60, 45, 25, 0.18),
         inset 0 0 0 1.5px var(--tile-stroke);
+}
+
+/* Same columns as the bar, just above it and in front of it, so each tile
+   lines up with its tab and is exactly as wide */
+.stack_lane
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 10px);
+    z-index: 3;                                 /* in front of the bar */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 0 8px;
+    pointer-events: none;
+}
+
+/* Page tiles of the active tab (every page but the one shown), lowest first */
+.stack
+{
+    grid-row: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+}
+
+/* Same size and layout as a tab (58px tall, the column's width) */
+.tile
+{
+    --sk-radius: 11px 15px 10px 14px / 14px 10px 15px 11px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 100%;
+    height: 58px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 4px 0 var(--tile-side), 0 10px 22px rgba(60, 45, 25, 0.18), inset 0 0 0 1.5px var(--tile-stroke);
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    pointer-events: auto;
 }
 
 .tab
@@ -38,7 +111,7 @@
 
 .active
 {
-    color: #ffffff;
+    color: var(--btn-ink-text);
 }
 
 /* Ink pill behind the active tab, slides between tabs */
@@ -65,20 +138,18 @@
 
 .label
 {
+    max-width: 100%;
+    overflow: hidden;
     font-family: var(--font-mono);
     font-size: 9.5px;
     font-weight: 700;
     letter-spacing: 0.08em;
+    text-overflow: ellipsis;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
-/* Sketch theme: small handwriting is hard to read, so it is set larger */
-:global(:root[data-theme="sketch"]) .label
-{
-    font-size: 12.5px;
-}
-
-/* Hint mark in the pill's top-right corner: this tab has a sub-page (tap it again) */
+/* Hint mark in the pill's top-right corner: this tab has more pages (tap it again) */
 .hint
 {
     position: absolute;
@@ -92,4 +163,10 @@
     stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .label
+{
+    font-size: 12.5px;
 }

@@ -17,6 +17,7 @@ interface SettingsState
     is_dev_mode: boolean;        // hidden: sessions run 25x faster for testing
     date_format: DateFormat;     // dd/mm or mm/dd
     dev_theme: AppTheme | null;  // dev mode only: preview a theme without owning it (null = the equipped one)
+    is_dev_unlock_all: boolean;  // dev mode only: every item can be equipped, owned or not (nothing is added to the inventory)
 
     setLanguage: (language: Language) => void;
     setSoundEnabled: (enabled: boolean) => void;
@@ -25,6 +26,7 @@ interface SettingsState
     toggleDevMode: () => void;
     setDateFormat: (format: DateFormat) => void;
     setDevTheme: (theme: AppTheme | null) => void;
+    toggleDevUnlockAll: () => void;
 }
 
 const SETTINGS_STORAGE_KEY = 'mnm-settings';
@@ -42,6 +44,7 @@ export const useSettingsStore = create<SettingsState>()(
             is_dev_mode: false,
             date_format: DEFAULT_DATE_FORMAT,
             dev_theme: null,
+            is_dev_unlock_all: false,
 
             setLanguage: (language) => set({ language }),
             setSoundEnabled: (enabled) => set({ is_sound_enabled: enabled }),
@@ -50,6 +53,7 @@ export const useSettingsStore = create<SettingsState>()(
             toggleDevMode: () => set((state) => ({ is_dev_mode: !state.is_dev_mode })),
             setDateFormat: (format) => set({ date_format: format }),
             setDevTheme: (theme) => set({ dev_theme: theme }),
+            toggleDevUnlockAll: () => set((state) => ({ is_dev_unlock_all: !state.is_dev_unlock_all })),
         }),
         {
             name: SETTINGS_STORAGE_KEY,

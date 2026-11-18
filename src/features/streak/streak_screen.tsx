@@ -16,10 +16,11 @@ import { SportCheckIn } from './sport_check_in';
 import { StreakCalendar } from './streak_calendar';
 import { DevJourneyPanel } from './dev_journey_panel';
 import { LevelUpOverlay } from './level_up_overlay';
+import { TitleBadge } from './title_badge';
 import { useInventoryStore } from '../../stores/inventory_store';
 import styles from './streak_screen.module.css';
 
-// Journey tab. Top: the current flame, its words, progress to the next tier
+// Journey tab. Top: the equipped title as a name tag, the current flame, its words, progress to the next tier
 // and a strip of every tier that can be tapped. Tiers not reached yet stay a
 // mystery (charcoal "?" flame, hidden name) so the next color is a surprise.
 // Below: sport-day check-in (sport days only), best streak + freezes, and the
@@ -97,6 +98,9 @@ export function StreakScreen()
 
     return (
         <Screen kicker={t('journey_kicker', { level: selected_index, max: LAST_TIER_INDEX })} align="center">
+            <div className={styles.title_row}>
+                <TitleBadge />
+            </div>
             <AnimatePresence mode="wait" initial={false}>
                 <motion.h1
                     key={`${selected_index}-${selected_name}`}

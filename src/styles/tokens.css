@@ -1,4 +1,5 @@
-/* Design tokens. Themes (unlocked from chests later) override these variables.
+/* Design tokens. Color themes (palettes.css) and the sketch theme
+   (sketch_theme.css) override these variables.
    Look: warm paper background, chunky extruded objects with a visible
    "thickness" edge, flat saturated colors, condensed display type + mono labels. */
 :root
@@ -6,6 +7,7 @@
     /* Paper + ink */
     --color-bg: #f2eee7;
     --color-bg-deep: #e9e3d9;
+    --color-bg-glow: #fbf9f5;                   /* soft light at the top of the page */
     --color-ink: #141414;
     --color-ink-soft: #57534c;
     --color-ink-faint: #a49d92;
@@ -35,6 +37,7 @@
     --btn-neutral-side: #d4c9b7;
     --btn-ink-face: #1b1b1b;
     --btn-ink-side: #000000;
+    --btn-ink-text: #ffffff;
     --btn-highlight: rgba(255, 255, 255, 0.55);
 
     /* Rarity colors (chests) */

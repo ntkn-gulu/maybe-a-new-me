@@ -1,0 +1,88 @@
+/* Color themes (Rare chest items): new colors for the 3D theme, set with
+   <html data-palette="..."> by active_theme.ts. Only the tokens change;
+   every shape, shadow and animation stays the same. The flame keeps its
+   own colors in every palette. Preview swatches: item_preview.tsx. */
+
+/* Matcha: soft green tea paper, a deep leaf accent */
+:root[data-palette="matcha"]
+{
+    --color-bg-glow: #f3f6ea;
+    --color-bg: #e7ecda;
+    --color-bg-deep: #dbe2cb;
+    --color-ink: #1c2616;
+    --color-ink-soft: #4b5a40;
+    --color-ink-faint: #98a48a;
+    --tile-face: #f5f8ec;
+    --tile-side: #c6d1af;
+    --color-accent: #5b8a3c;
+    --color-accent-side: #3d6325;
+    --color-accent-glow: rgba(91, 138, 60, 0.28);
+    --btn-neutral-side: #c8d2b2;
+    --btn-ink-face: #1f2b18;
+    --btn-ink-side: #0c1408;
+}
+
+/* Sunset: warm peach paper, a coral accent */
+:root[data-palette="sunset"]
+{
+    --color-bg-glow: #fff3e8;
+    --color-bg: #fbe6d5;
+    --color-bg-deep: #f4d8c2;
+    --color-ink: #2d1612;
+    --color-ink-soft: #6c4237;
+    --color-ink-faint: #bb8f7f;
+    --tile-face: #fff5ec;
+    --tile-side: #ebc4a8;
+    --color-accent: #ff6f59;
+    --color-accent-side: #c9473a;
+    --color-accent-glow: rgba(255, 111, 89, 0.3);
+    --btn-neutral-side: #ecc8ae;
+    --btn-ink-face: #3a1d18;
+    --btn-ink-side: #1c0b08;
+}
+
+/* Ocean: misty blue paper, a deep sea accent */
+:root[data-palette="ocean"]
+{
+    --color-bg-glow: #f2f9fb;
+    --color-bg: #e0eef3;
+    --color-bg-deep: #d0e4ec;
+    --color-ink: #0e2430;
+    --color-ink-soft: #3c5b6a;
+    --color-ink-faint: #89a6b3;
+    --tile-face: #f4fafc;
+    --tile-side: #b5d1dc;
+    --color-accent: #1f8fc4;
+    --color-accent-side: #156a93;
+    --color-accent-glow: rgba(31, 143, 196, 0.28);
+    --btn-neutral-side: #b9d3de;
+    --btn-ink-face: #10283a;
+    --btn-ink-side: #04121c;
+}
+
+/* Midnight: the dark one. Navy paper, light ink, and the ink buttons turn
+   into pale "moonlight" faces with dark text */
+:root[data-palette="midnight"]
+{
+    --color-bg-glow: #232a4a;
+    color-scheme: dark;
+    --color-bg: #161a2e;
+    --color-bg-deep: #0f1223;
+    --color-ink: #eef0ff;
+    --color-ink-soft: #aab1d8;
+    --color-ink-faint: #69709a;
+    --tile-face: #232a48;
+    --tile-side: #0a0d1b;
+    --tile-stroke: rgba(255, 255, 255, 0.06);
+    --color-accent: #6f7ff5;
+    --color-accent-side: #4150c4;
+    --color-accent-glow: rgba(111, 127, 245, 0.35);
+    --btn-neutral-face: #2c3459;
+    --btn-neutral-side: #10142a;
+    --btn-highlight: rgba(255, 255, 255, 0.1);
+    --btn-ink-face: #e3e7ff;
+    --btn-ink-side: #8f98cf;
+    --btn-ink-text: #161a2e;
+    --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.35);
+    --shadow-contact: 0 3px 0 rgba(0, 0, 0, 0.3);
+}

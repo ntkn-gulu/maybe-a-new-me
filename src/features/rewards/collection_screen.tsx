@@ -26,6 +26,8 @@ import styles from './collection_screen.module.css';
 // a grid shows every item of that slot: owned ones with their picture and
 // an "equipped" tick, missing ones as "?" with their rarity, shard price
 // or the streak that grants them. A tap opens ItemSheet (equip / trade).
+// The cards carry no HapticOverlay on purpose: a swipe that starts on an
+// iOS switch moves the switch instead of scrolling the page (and fires a tap).
 
 const CARD_PREVIEW_SIZE = 52;
 const CARD_STAGGER_S = 0.025;
@@ -149,7 +151,6 @@ export function CollectionScreen()
                             <ItemPreview item={item} is_owned={is_owned} tier_index={tier_index} size={CARD_PREVIEW_SIZE} />
                             <span className={styles.name}>{name}</span>
                             {footer}
-                            <HapticOverlay />
                         </motion.div>
                     );
                 })}

@@ -56,7 +56,7 @@
 
 .filter_active
 {
-    color: #ffffff;
+    color: var(--btn-ink-text);
 }
 
 .filter_pill
@@ -179,7 +179,7 @@
     height: 20px;
     border-radius: 50%;
     background: var(--btn-ink-face);
-    color: #ffffff;
+    color: var(--btn-ink-text);
 }
 
 .equipped svg

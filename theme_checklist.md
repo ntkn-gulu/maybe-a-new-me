@@ -11,11 +11,12 @@ Theme **chỉ đổi màu** (Midnight, Matcha...) thì chỉ cần mục 1, 2 v�
 ## 1. Đăng ký theme
 - [ ] `src/core/reward_catalog.ts`: thêm `{ id: 'theme_winter', slot: 'theme', rarity: 'legendary', source: 'gacha' }`.
 - [ ] `src/i18n/strings.ts`: tên món `item_theme_winter` (vi + en), tên hiển thị trong Bộ sưu tập.
-- [ ] `src/stores/settings_store.ts`: thêm vào `AppTheme`, `ArtStyle` (nếu có bộ hình riêng), `getArtStyle`, `migrateSettings` (giá trị lạ → mặc định).
-- [ ] Ánh xạ món đồ → theme (item `theme_winter` → `AppTheme 'winter'`).
+- [ ] `src/stores/active_theme.ts`: thêm vào `AppTheme`, `ArtStyle` (nếu có bộ hình riêng), `getArtStyle`, `THEME_BY_ITEM` (item `theme_winter` → `AppTheme 'winter'`); món có trong đó tự thành "trang bị được".
+- [ ] Lựa chọn xem trước trong Cài đặt (dev): thêm vào nút gạt Giao diện.
 
 ## 2. Token và chữ (`src/styles/winter_theme.css`, import ở `main.tsx`)
-- [ ] `:root[data-theme="winter"]`: màu nền, mực, tile, nút, accent, màu độ hiếm nếu đổi.
+- [ ] `:root[data-theme="winter"]`: màu nền, mực, tile, nút (kể cả `--btn-ink-text`, chữ trên nút mực), accent, màu độ hiếm nếu đổi.
+- [ ] Theme màu (`palettes.css`) chỉ áp lên 3D; theme mới không nhận palette (`getActivePalette`).
 - [ ] Font cho cả 3 vai trò (`--font-display`, `--font-ui`, `--font-mono`); nếu font chỉ có 1 độ đậm thì chặn fake bold.
 - [ ] Đo font mới so với font gốc (x-height, bề ngang). Chữ hẹp hoặc mảnh thì chỉnh `font-size-adjust`, `letter-spacing`, và **nâng riêng chữ ≤ 12px** (lịch, caption, nhãn tab, chip...).
 - [ ] Nền (texture) nếu có: chỉ dùng **tile SVG nhỏ**, không gradient lặp.
@@ -30,18 +31,19 @@ Hệ class hiện tại tên `sk-*` (sketch); theme mới **tái dùng các hook
 - [ ] `sk-hide` / `sk-only`: phần chỉ hiện ở theme 3D hoặc ở theme mới.
 - [ ] Công tắc (`ToggleSwitch`), nút gạt (`SegmentedSwitch`), thanh trượt âm lượng.
 - [ ] Dấu nhỏ: ô mục tiêu đã xong (`ScribbleMark`), ngày giữ lửa trong lịch (`CircleMark`) và chú thích lịch.
-- [ ] Icon thanh tab (bản riêng như `sketch_icons.tsx`).
+- [ ] Icon thanh tab và icon loại đồ (âm thanh, bảng màu, danh hiệu) (bản riêng như `sketch_icons.tsx`).
+- [ ] Chồng ô trang con trồi lên từ thanh tab, ô lọc + thẻ vật phẩm trong Bộ sưu tập, thẻ danh hiệu ở Hành trình.
 
 ## 4. Hình minh họa (mỗi cái cần 1 bản cho theme)
 - [ ] **Ngọn lửa**: 9 cấp + cấp chưa mở ("?") + 5 màu lửa hiếm + màu cầu vồng (cấp 7) + sao (cấp 8), cảnh vẽ ra, tàn lửa, nổ khi Level up (`Flame` chọn theo `useArtStyle()`).
 - [ ] Lửa mini trên **hàng 9 cấp** (`tier_strip`).
 - [ ] **Đồng hồ** (`TimerDial`): mặt, vạch, phần thời gian, kim quay mượt.
 - [ ] **Đồng hồ vỡ** (`ShatteredDial`).
-- [ ] Skin đồng hồ có bản cho mọi theme (hiện tại: **Đồng hồ cát**).
+- [ ] Skin đồng hồ có bản cho mọi theme (hiện tại: **Đồng hồ cát**, dùng chung `hourglass_shape.ts`). Skin chỉ có bản 3D (LCD, Nixie, Neon) tự lui về đồng hồ cổ điển: khai báo theme mới trong `SKIN_ART_STYLES` (`timer_skins.ts`).
 - [ ] **Rương** (`ChestArt`) và **màn mở rương** (rung, nứt, bung sáng theo độ hiếm, Huyền thoại nổ vàng).
 - [ ] **Icon độ hiếm** + trang trí thẻ tỉ lệ (`SketchRarityGem` / `SketchRarityDoodles`).
 - [ ] Màn Level up: tia sáng nền, băng rôn, nút.
-- [ ] Ảnh xem trước của theme trong Bộ sưu tập.
+- [ ] Ảnh xem trước của theme trong Bộ sưu tập (`THEME_SWATCHES`), và cách vẽ hình món đồ (`ItemPreview`: lửa mini, đĩa icon, dấu "?").
 
 ## 5. Luật hiệu năng iPhone (bắt buộc)
 - [ ] **Không bộ lọc SVG** (feDisplacementMap, feDropShadow, feTurbulence...).

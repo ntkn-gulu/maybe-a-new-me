@@ -18,7 +18,7 @@ body,
 body
 {
     background:
-        radial-gradient(120% 70% at 50% 0%, #fbf9f5 0%, transparent 60%),
+        radial-gradient(120% 70% at 50% 0%, var(--color-bg-glow) 0%, transparent 60%),
         var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-ui);

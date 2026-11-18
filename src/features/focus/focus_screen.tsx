@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useSpring } from 'motion/react';
+import { AnimatePresence, motion, useSpring, type MotionValue } from 'motion/react';
 import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { playSfx } from '../../sound/sfx_engine';
@@ -13,11 +13,21 @@ import { detectDevice } from '../../stores/clock';
 import type { FocusLength } from '../../core/types';
 import { SketchTimerDial } from './sketch_timer_dial';
 import { ExtrudedTimerDial } from './extruded_timer_dial';
+import { RetroLcdDial } from './retro_lcd_dial';
+import { NixieDial } from './nixie_dial';
+import { NeonDial } from './neon_dial';
+import { ExtrudedHourglassDial } from './extruded_hourglass_dial';
+import { SketchHourglassDial } from './sketch_hourglass_dial';
+import { useTimerSkin, type TimerSkin } from './timer_skins';
+import type { ArtStyle } from '../../stores/active_theme';
 import { ScribbleMark } from '../../ui/sketch_marks';
 import styles from './focus_screen.module.css';
 
-// Focus tab. A kitchen-timer dial (ExtrudedTimerDial in the 3D theme, SketchTimerDial in the sketch theme): the light wedge
-// shows how long the session is, the needle sits at its end. Start opens the session layer.
+// Focus tab. The dial of the equipped timer skin shows how long the session
+// is: the classic kitchen timer (ExtrudedTimerDial in the 3D theme,
+// SketchTimerDial in the sketch theme: the light wedge is the length, the
+// needle sits at its end), or a Retro LCD, Nixie, Neon or Hourglass skin.
+// Start opens the session layer.
 // Tapping the kicker 5 times toggles dev mode (sessions run 25x faster).
 
 const FOCUS_LENGTHS: FocusLength[] = [25, 50];
@@ -31,6 +41,24 @@ const RATCHET_INTERVAL_MS = 45;
 
 // Spring that turns the dial like a real knob (slight overshoot)
 const DIAL_SPRING = { stiffness: 140, damping: 14 };
+
+function TimerDial(props: { skin: TimerSkin; art_style: ArtStyle; sweep_degrees: MotionValue<number> })
+{
+    const is_sketch = props.art_style === 'sketch';
+    switch (props.skin)
+    {
+        case 'retro_lcd':
+            return <RetroLcdDial sweep_degrees={props.sweep_degrees} />;
+        case 'nixie':
+            return <NixieDial sweep_degrees={props.sweep_degrees} />;
+        case 'neon':
+            return <NeonDial sweep_degrees={props.sweep_degrees} />;
+        case 'hourglass':
+            return is_sketch ? <SketchHourglassDial sweep_degrees={props.sweep_degrees} /> : <ExtrudedHourglassDial sweep_degrees={props.sweep_degrees} />;
+        default:
+            return is_sketch ? <SketchTimerDial sweep_degrees={props.sweep_degrees} /> : <ExtrudedTimerDial sweep_degrees={props.sweep_degrees} />;
+    }
+}
 
 function formatMinutes(minutes: number): string
 {
@@ -47,6 +75,7 @@ export function FocusScreen()
     const toggleDevMode = useSettingsStore((state) => state.toggleDevMode);
     const today = useTodayProgress();
     const art_style = useArtStyle();
+    const timer_skin = useTimerSkin();
     const [dev_toast, setDevToast] = useState<string | null>(null);
     const kicker_taps = useRef<number[]>([]);
 
@@ -99,9 +128,7 @@ export function FocusScreen()
 
     return (
         <Screen kicker={kicker} title={t('focus_title')} onKickerTap={handleKickerTap}>
-            {art_style === 'extruded'
-                ? <ExtrudedTimerDial sweep_degrees={sweep_degrees} />
-                : <SketchTimerDial sweep_degrees={sweep_degrees} />}
+            <TimerDial skin={timer_skin} art_style={art_style} sweep_degrees={sweep_degrees} />
 
             <div className={styles.time_row}>
                 <AnimatePresence mode="popLayout" initial={false}>

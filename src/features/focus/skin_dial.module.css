@@ -1,0 +1,16 @@
+/* Same box as the classic dial, so every skin sits in the same spot */
+.dial
+{
+    position: relative;
+    width: min(72vw, 260px, 30dvh);
+    aspect-ratio: 1;
+    margin: 4px auto 0;
+}
+
+.dial svg
+{
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}

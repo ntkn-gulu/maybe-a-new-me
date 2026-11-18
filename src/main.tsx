@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app';
 import { unlockAudio } from './sound/sfx_engine';
 import './stores/settings_store';
-import './stores/active_theme';                  // keeps <html data-theme> in sync
+import './stores/active_theme';                  // keeps <html data-theme / data-palette> in sync
 import { useFocusStore } from './stores/focus_store';
 
 // Fonts are bundled (not loaded from Google) so the PWA works offline.
@@ -14,6 +14,7 @@ import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import '@fontsource/patrick-hand/400.css';         // handwriting for the sketch theme
 import './styles/global.css';
+import './styles/palettes.css';
 import './styles/sketch_theme.css';
 
 // iOS only allows audio after a real user activation. On touch screens that is

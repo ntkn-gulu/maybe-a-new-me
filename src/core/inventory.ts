@@ -126,11 +126,12 @@ export function buyWithShards(inventory: Inventory, item_id: string): { inventor
     };
 }
 
-// Puts an owned item in its slot; unknown or missing items change nothing
-export function equipItem(inventory: Inventory, item_id: string): Inventory
+// Puts an owned item in its slot; unknown or missing items change nothing.
+// `is_ownership_required` = false lets any catalog item in (dev testing).
+export function equipItem(inventory: Inventory, item_id: string, is_ownership_required = true): Inventory
 {
     const item = getItem(item_id);
-    if (!item || !getOwnedSet(inventory).has(item_id))
+    if (!item || (is_ownership_required && !getOwnedSet(inventory).has(item_id)))
     {
         return inventory;
     }

@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ModalCard } from '../../ui/modal_card';
 import { TactileButton } from '../../ui/tactile_button';
 import { OPACITY_FADE, SPRING_POP } from '../../ui/motion_presets';
-import { playSfx } from '../../sound/sfx_engine';
+import { playSfx, type SfxName } from '../../sound/sfx_engine';
+import { getSoundPackForItem } from '../../sound/sound_packs';
 import { triggerHaptic } from '../../sound/haptic_hack';
 import { useT } from '../../i18n/use_t';
 import { itemNameKey, slotNameKey } from '../../i18n/strings';
@@ -11,6 +12,8 @@ import { getItemOffer } from '../../core/collection';
 import type { RewardItem } from '../../core/reward_catalog';
 import { useInventoryStore, useOwnedItemIds } from '../../stores/inventory_store';
 import { canEquipNow } from './item_usable';
+import { getTimerSkinForItem, isSkinDrawnIn } from '../focus/timer_skins';
+import { useArtStyle } from '../../stores/active_theme';
 import { ItemPreview } from './item_preview';
 import styles from './item_sheet.module.css';
 
@@ -21,9 +24,13 @@ import styles from './item_sheet.module.css';
 //                   tap within BUY_ARM_MS trades (no pop-up dialog); short on
 //                   shards = a disabled button and how many are missing
 // - chest / streak: a note on where it comes from
+// Sound packs also get a "listen" button that plays a few of the pack's sounds.
 
 const SHEET_PREVIEW_SIZE = 96;
 const BUY_ARM_MS = 2600;
+
+// The pack preview: a few taps, then the "something good" sound [sound, ms from start]
+const SOUND_PREVIEW: [SfxName, number][] = [['press', 0], ['release', 110], ['tab', 380], ['toggle', 700], ['sparkle', 1050]];
 
 interface ItemSheetProps
 {
@@ -67,6 +74,9 @@ function SheetBody(props: SheetBodyProps)
     const buyWithShards = useInventoryStore((state) => state.buyWithShards);
     const [is_buy_armed, setIsBuyArmed] = useState(false);
     const [is_just_bought, setIsJustBought] = useState(false);
+    const art_style = useArtStyle();
+    // A 3D-only timer skin in the sketch theme: it is kept, but the classic dial is drawn
+    const is_hidden_here = item.slot === 'timer_skin' && !isSkinDrawnIn(getTimerSkinForItem(item.id), art_style);
 
     // An armed trade button calms down again if the second tap never comes
     useEffect(() =>
@@ -83,6 +93,15 @@ function SheetBody(props: SheetBodyProps)
     const is_owned = offer.status === 'owned';
     const is_equipped = equipped_id === item.id;
     const is_hidden = offer.status === 'milestone';
+
+    function listen(): void
+    {
+        const pack = getSoundPackForItem(item.id);
+        for (const [name, delay_ms] of SOUND_PREVIEW)
+        {
+            window.setTimeout(() => playSfx(name, 1, pack), delay_ms);
+        }
+    }
 
     function tapBuy(): void
     {
@@ -112,6 +131,10 @@ function SheetBody(props: SheetBodyProps)
             else if (!canEquipNow(item))
             {
                 note = t('collection_coming_soon');
+            }
+            else if (is_hidden_here)
+            {
+                note = t('collection_3d_only');
             }
             else
             {
@@ -157,6 +180,9 @@ function SheetBody(props: SheetBodyProps)
             </AnimatePresence>
 
             <div className={styles.actions}>
+                {item.slot === 'sound_pack' && (
+                    <TactileButton size="md" is_full_width onClick={listen}>{t('collection_listen')}</TactileButton>
+                )}
                 {is_owned && canEquipNow(item) && (
                     is_equipped
                         ? <TactileButton size="md" is_full_width is_disabled>{t('reveal_equipped')}</TactileButton>

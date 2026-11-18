@@ -44,14 +44,14 @@ interface ThemeSwatch
     ink: string;
 }
 
-// Preview colors per theme item
+// Preview colors per theme item (the color themes match palettes.css)
 const THEME_SWATCHES: Record<string, ThemeSwatch> = {
     theme_classic: { paper: '#f2eee7', accent: '#ff5a1f', ink: '#141414' },
     theme_sketch: { paper: '#f6f1e6', accent: '#ff5a1f', ink: SKETCH_INK },
-    theme_midnight: { paper: '#1d2238', accent: '#8fa3ff', ink: '#e9ecff' },
-    theme_matcha: { paper: '#e3ead3', accent: '#5b8a3c', ink: '#24301b' },
-    theme_sunset: { paper: '#ffe3cc', accent: '#ff6f59', ink: '#3d1f1a' },
-    theme_ocean: { paper: '#d8eef4', accent: '#1f7fae', ink: '#0f2a38' },
+    theme_midnight: { paper: '#161a2e', accent: '#6f7ff5', ink: '#eef0ff' },
+    theme_matcha: { paper: '#e7ecda', accent: '#5b8a3c', ink: '#1c2616' },
+    theme_sunset: { paper: '#fbe6d5', accent: '#ff6f59', ink: '#2d1612' },
+    theme_ocean: { paper: '#e0eef3', accent: '#1f8fc4', ink: '#0e2430' },
 };
 
 const FALLBACK_TINT = '#9c958a';

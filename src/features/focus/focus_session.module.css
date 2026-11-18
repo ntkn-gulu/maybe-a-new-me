@@ -100,7 +100,7 @@
 .ring_progress
 {
     fill: none;
-    stroke: var(--color-accent);
+    stroke: var(--run-ring, var(--color-accent));
     stroke-width: 1.6;
     stroke-linecap: round;
     transition: stroke-dashoffset 1s linear;
@@ -114,7 +114,37 @@
     font-size: clamp(56px, 18vw, 84px);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.04em;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--run-digits, rgba(255, 255, 255, 0.9));
+    text-shadow: var(--run-glow, none);
+}
+
+/* Timer skins: the running countdown takes the skin's colors
+   (the glow is a static text-shadow: repainted once a second at most) */
+.skin_retro_lcd
+{
+    --run-ring: #9fbf6a;
+    --run-digits: #c3dc94;
+    --run-glow: 0 0 14px rgba(159, 191, 106, 0.35);
+}
+
+.skin_nixie
+{
+    --run-ring: #ff7a1a;
+    --run-digits: #ffd2a1;
+    --run-glow: 0 0 6px rgba(255, 138, 42, 0.9), 0 0 22px rgba(255, 106, 0, 0.55);
+}
+
+.skin_neon
+{
+    --run-ring: #ff3fa4;
+    --run-digits: #dcfdff;
+    --run-glow: 0 0 6px rgba(60, 240, 255, 0.9), 0 0 24px rgba(60, 240, 255, 0.45);
+}
+
+.skin_hourglass
+{
+    --run-ring: #eab54c;
+    --run-digits: #f6dca6;
 }
 
 .running_bottom

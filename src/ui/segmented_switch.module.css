@@ -30,7 +30,7 @@
 
 .active
 {
-    color: #ffffff;
+    color: var(--btn-ink-text);
 }
 
 .thumb
