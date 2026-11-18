@@ -1,0 +1,53 @@
+.row
+{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    width: 100%;
+}
+
+/* A small extruded key */
+.day
+{
+    --sk-radius: 9px 12px 8px 11px / 11px 8px 12px 9px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: var(--btn-neutral-face);
+    box-shadow: 0 4px 0 var(--btn-neutral-side), inset 0 0 0 1.5px var(--tile-stroke);
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* Chosen: accent paint, pressed in a little */
+.on
+{
+    --sk-fill: var(--color-accent);
+    transform: translateY(2px);
+    background: var(--color-accent);
+    box-shadow: 0 2px 0 var(--color-accent-side);
+    color: #ffffff;
+}
+
+.label
+{
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+/* Sketch theme: small handwriting is hard to read, so it is set larger */
+:global(:root[data-theme="sketch"]) .label
+{
+    font-size: 15px;
+}
+
+:global(:root[data-theme="sketch"]) .on
+{
+    color: var(--color-ink);
+}

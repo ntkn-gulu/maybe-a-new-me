@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { buildDayRecord, buildDayRecords, type DayRecordInput } from '../core/day_records';
-import { createSchedule, getPendingChange, getValueForDay, scheduleChange, type Schedule } from '../core/scheduled_value';
+import { createSchedule, getPendingChange, getValueForDay, scheduleChange, setupValue, type Schedule } from '../core/scheduled_value';
 import { computeStreak, getDayTarget, getSessionsToKeep, isDayKept, type StreakState } from '../core/streak_engine';
 import { canCheckInSport } from '../core/sport_rules';
 import type { DayKey, DayRecord, SessionRecord, SportCheckIn } from '../core/types';
@@ -29,6 +29,8 @@ interface ProgressState
 
     addSession: (record: SessionRecord) => void;
     setDailyGoal: (goal: number, today: DayKey) => void;
+    setSportWeekdays: (weekdays: number[], today: DayKey) => void;
+    applyStartingSetup: (goal: number, weekdays: number[], today: DayKey) => void;
     checkInSport: (check_in: SportCheckIn) => void;
     setCelebratedTier: (tier_index: number) => void;
 }
@@ -56,8 +58,23 @@ export const useProgressStore = create<ProgressState>()(
 
             setDailyGoal: (goal, today) => set((state) =>
             {
-                const clamped = Math.min(MAX_DAILY_GOAL, Math.max(MIN_DAILY_GOAL, Math.round(goal)));
-                return { goal_schedule: scheduleChange(state.goal_schedule, clamped, today) };
+                return { goal_schedule: scheduleChange(state.goal_schedule, clampGoal(goal), today) };
+            }),
+
+            // Sport weekdays (0 = Sunday ... 6 = Saturday), from tomorrow like the goal
+            setSportWeekdays: (weekdays, today) => set((state) => ({
+                sport_weekday_schedule: scheduleChange(state.sport_weekday_schedule, normalizeWeekdays(weekdays), today),
+            })),
+
+            // Onboarding: goal and sport days apply from the first day while
+            // there is no history yet, otherwise from tomorrow
+            applyStartingSetup: (goal, weekdays, today) => set((state) =>
+            {
+                const has_history = state.sessions.length > 0 || state.sport_check_ins.length > 0;
+                return {
+                    goal_schedule: setupValue(state.goal_schedule, clampGoal(goal), state.first_day_key, today, has_history),
+                    sport_weekday_schedule: setupValue(state.sport_weekday_schedule, normalizeWeekdays(weekdays), state.first_day_key, today, has_history),
+                };
             }),
 
             // Ignored unless that day is a sport day without a check-in yet
@@ -76,6 +93,17 @@ export const useProgressStore = create<ProgressState>()(
         { name: PROGRESS_STORAGE_KEY },
     ),
 );
+
+function clampGoal(goal: number): number
+{
+    return Math.min(MAX_DAILY_GOAL, Math.max(MIN_DAILY_GOAL, Math.round(goal)));
+}
+
+// Unique weekdays 0..6, sorted
+function normalizeWeekdays(weekdays: number[]): number[]
+{
+    return [...new Set(weekdays.filter((day) => Number.isInteger(day) && day >= 0 && day <= 6))].sort((a, b) => a - b);
+}
 
 type HistoryFields = Pick<ProgressState,
     'first_day_key' | 'sessions' | 'sport_check_ins' | 'goal_schedule' | 'sport_weekday_schedule'>;
@@ -167,4 +195,19 @@ export function useGoalSetting(): GoalSetting
     const today_goal = getValueForDay(goal_schedule, today);
     const pending = getPendingChange(goal_schedule, today);
     return { today_goal, tomorrow_goal: pending ? pending.value : today_goal };
+}
+
+export interface SportWeekdaySetting
+{
+    today_weekdays: number[];
+    tomorrow_weekdays: number[];      // equals today_weekdays when nothing is pending
+}
+
+export function useSportWeekdaySetting(): SportWeekdaySetting
+{
+    const schedule = useProgressStore((state) => state.sport_weekday_schedule);
+    const today = getTodayKey();
+    const today_weekdays = getValueForDay(schedule, today);
+    const pending = getPendingChange(schedule, today);
+    return { today_weekdays, tomorrow_weekdays: pending ? pending.value : today_weekdays };
 }

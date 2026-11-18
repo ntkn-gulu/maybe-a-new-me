@@ -9,6 +9,7 @@ import { SettingsScreen } from './features/settings/settings_screen';
 import { FocusSessionLayer } from './features/focus/focus_session_layer';
 import { LevelUpGate } from './features/streak/level_up_gate';
 import { RewardGate } from './features/rewards/reward_gate';
+import { OnboardingGate } from './features/onboarding/onboarding_flow';
 import { SPRING_SLIDE } from './ui/motion_presets';
 import styles from './app.module.css';
 
@@ -94,6 +95,7 @@ export function App()
             <FocusSessionLayer />
             <LevelUpGate />
             <RewardGate />
+            <OnboardingGate />
         </div>
     );
 }

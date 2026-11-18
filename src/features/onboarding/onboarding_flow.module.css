@@ -1,0 +1,359 @@
+/* Full screen above everything (tab bar, level-up and chest screens) */
+.layer
+{
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    overflow: hidden;
+    background:
+        radial-gradient(120% 70% at 50% 0%, var(--color-bg-glow) 0%, transparent 60%),
+        var(--color-bg);
+    color: var(--color-ink);
+}
+
+:global(:root[data-theme="sketch"]) .layer
+{
+    background: var(--sk-grain), var(--color-bg);
+}
+
+.content
+{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: calc(18px + var(--safe-top)) var(--gutter) calc(22px + var(--safe-bottom));
+}
+
+/* Progress dots + skip */
+.top
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 28px;
+}
+
+.dots
+{
+    display: flex;
+    gap: 6px;
+}
+
+.dot
+{
+    position: relative;
+    width: 18px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-bg-deep);
+    box-shadow: inset 0 0 0 1px var(--tile-stroke);
+}
+
+.dot_fill
+{
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    background: var(--color-accent);
+}
+
+.skip
+{
+    padding: 6px 2px;
+    cursor: pointer;
+}
+
+/* The slide area; slides cross-fade and slide inside it */
+.stage
+{
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.slide_box
+{
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.slide
+{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+}
+
+/* Setup steps: text, then the controls below it (centered a bit above the middle) */
+.form
+{
+    padding-bottom: 8dvh;
+}
+
+.art
+{
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: min(260px, 32dvh);
+    margin-bottom: 12px;
+}
+
+.title
+{
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.body
+{
+    max-width: 340px;
+    margin: 6px 0 0;
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--color-ink-soft);
+}
+
+.controls
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 26px;
+}
+
+/* Streak slide: the tier strip, a little wider than the text */
+.strip
+{
+    width: 100%;
+}
+
+/* Chests slide: floating chest above a ribbon */
+.chest
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Goal: − big number + */
+.goal
+{
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.goal_sign
+{
+    display: block;
+    min-width: 20px;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.goal_value
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+}
+
+.goal_number
+{
+    font-family: var(--font-display);
+    font-size: 84px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.sport
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+
+/* Rules: one card per rule */
+.rules
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.rule
+{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 4px 0 var(--tile-side), inset 0 0 0 1.5px var(--tile-stroke);
+    font-size: 14.5px;
+    line-height: 1.35;
+    text-align: left;
+}
+
+.rule_icon
+{
+    flex-shrink: 0;
+    font-size: 22px;
+}
+
+.actions
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding-top: 12px;
+}
+
+.back
+{
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+/* Keeps its space on the first step so the button never jumps */
+.back_hidden
+{
+    visibility: hidden;
+}
+
+/* ---------- Install step ---------- */
+
+.install_steps
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.install_row
+{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 4px 0 var(--tile-side), inset 0 0 0 1.5px var(--tile-stroke);
+    text-align: left;
+}
+
+.install_number
+{
+    --sk-fill: var(--btn-ink-face);
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--btn-ink-face);
+    color: var(--btn-ink-text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.install_text
+{
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.35;
+}
+
+/* Safari's Share icon, drawn in the accent color */
+.share_icon
+{
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.installed
+{
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 4px 0 var(--tile-side);
+    font-size: 16px;
+}
+
+.install_tip
+{
+    max-width: 320px;
+    margin: 14px 0 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-ink-soft);
+}
+
+:global(:root[data-theme="sketch"]) .install_tip
+{
+    font-size: 16px;
+}
+
+.browser_link
+{
+    margin-top: 22px;
+    padding: 8px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+/* Sketch theme: handwriting is narrower, so text is set larger */
+:global(:root[data-theme="sketch"]) .body,
+:global(:root[data-theme="sketch"]) .install_text
+{
+    font-size: 18px;
+}
+
+:global(:root[data-theme="sketch"]) .rule
+{
+    font-size: 16.5px;
+}
+
+:global(:root[data-theme="sketch"]) .install_number
+{
+    font-size: 15px;
+}

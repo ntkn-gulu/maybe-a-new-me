@@ -6,7 +6,8 @@ import { SegmentedSwitch, type SegmentOption } from '../../ui/segmented_switch';
 import { useSettingsStore } from '../../stores/settings_store';
 import type { AppTheme } from '../../stores/active_theme';
 import { useInventoryStore } from '../../stores/inventory_store';
-import { MAX_DAILY_GOAL, MIN_DAILY_GOAL, useGoalSetting, useProgressStore } from '../../stores/progress_store';
+import { MAX_DAILY_GOAL, MIN_DAILY_GOAL, useGoalSetting, useProgressStore, useSportWeekdaySetting } from '../../stores/progress_store';
+import { WeekdayPicker } from '../../ui/weekday_picker';
 import { getTodayKey } from '../../stores/clock';
 import { playSfx, type SfxName } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
@@ -14,9 +15,10 @@ import type { Language, StringKey } from '../../i18n/strings';
 import type { DateFormat } from '../../i18n/date_format';
 import styles from './settings_screen.module.css';
 
-// Settings tab: daily goal, language, date format, sound + haptic preferences.
-// Dev mode adds a theme preview (any theme, owned or not), the sound tester and
-// a "+10 chests" button. Sport days, backup and credits arrive in later phases.
+// Settings tab: daily goal and sport days (both apply from tomorrow),
+// language, date format, sound + haptic preferences, replaying the intro.
+// Dev mode adds a theme preview (any theme, owned or not), "try every item",
+// the sound tester and a "+10 chests" button. Backup arrives in a later phase.
 
 // Theme preview choices; "equipped" means no preview (the equipped theme item shows)
 type ThemePreview = AppTheme | 'equipped';
@@ -52,12 +54,13 @@ interface SettingRowProps
     label: string;
     caption?: string;
     control: ReactNode;
+    is_stacked?: boolean;         // a wide control goes under the text
 }
 
 function SettingRow(props: SettingRowProps)
 {
     return (
-        <div className={styles.row}>
+        <div className={props.is_stacked ? `${styles.row} ${styles.row_stacked}` : styles.row}>
             <div className={styles.row_text}>
                 <span className={styles.row_label}>{props.label}</span>
                 {props.caption && <span className={styles.row_caption}>{props.caption}</span>}
@@ -93,6 +96,9 @@ export function SettingsScreen()
     ];
     const goal = useGoalSetting();
     const setDailyGoal = useProgressStore((state) => state.setDailyGoal);
+    const sport_days = useSportWeekdaySetting();
+    const setSportWeekdays = useProgressStore((state) => state.setSportWeekdays);
+    const replayOnboarding = useSettingsStore((state) => state.replayOnboarding);
 
     // Edits the value for tomorrow (today's goal can never be lowered)
     function changeGoal(step: number): void
@@ -115,6 +121,18 @@ export function SettingsScreen()
                             <span className={styles.stepper_value}>{goal.tomorrow_goal}</span>
                             <TactileButton size="sm" is_disabled={goal.tomorrow_goal >= MAX_DAILY_GOAL} onClick={() => changeGoal(1)} aria_label="+1">+</TactileButton>
                         </div>
+                    }
+                />
+                <SettingRow
+                    label={t('settings_sport_days')}
+                    caption={t('settings_sport_caption')}
+                    is_stacked
+                    control={
+                        <WeekdayPicker
+                            value={sport_days.tomorrow_weekdays}
+                            onChange={(weekdays) => setSportWeekdays(weekdays, getTodayKey())}
+                            aria_label={t('settings_sport_days')}
+                        />
                     }
                 />
             </div>
@@ -155,6 +173,11 @@ export function SettingsScreen()
                             aria_label={t('settings_language')}
                         />
                     }
+                />
+                <SettingRow
+                    label={t('settings_replay_onboarding')}
+                    caption={t('settings_replay_caption')}
+                    control={<TactileButton size="sm" onClick={replayOnboarding}>{t('settings_replay_button')}</TactileButton>}
                 />
                 <SettingRow
                     label={t('settings_date_format')}

@@ -47,3 +47,23 @@ export function getPendingChange<Value>(schedule: Schedule<Value>, today: DayKey
     const last = schedule[schedule.length - 1];
     return compareDayKeys(last.effective_day_key, today) > 0 ? last : null;
 }
+
+// A value picked during first-time setup. With no history yet it is the
+// value from the very first day (nothing to cheat); once there is history it
+// waits for tomorrow like any other change.
+// Picking the value already set for tomorrow changes nothing.
+export function setupValue<Value>(schedule: Schedule<Value>, value: Value, first_day_key: DayKey, today: DayKey, has_history: boolean): Schedule<Value>
+{
+    if (!has_history)
+    {
+        return createSchedule(value, first_day_key);
+    }
+    const tomorrow_value = getValueForDay(schedule, addDays(today, 1));
+    return isSameValue(tomorrow_value, value) ? schedule : scheduleChange(schedule, value, today);
+}
+
+// Values are numbers or arrays of numbers (goal, weekdays)
+function isSameValue<Value>(a: Value, b: Value): boolean
+{
+    return JSON.stringify(a) === JSON.stringify(b);
+}

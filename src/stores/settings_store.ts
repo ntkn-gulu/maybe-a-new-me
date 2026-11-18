@@ -18,6 +18,7 @@ interface SettingsState
     date_format: DateFormat;     // dd/mm or mm/dd
     dev_theme: AppTheme | null;  // dev mode only: preview a theme without owning it (null = the equipped one)
     is_dev_unlock_all: boolean;  // dev mode only: every item can be equipped, owned or not (nothing is added to the inventory)
+    has_seen_onboarding: boolean; // the first-run walkthrough was finished (Settings can replay it)
 
     setLanguage: (language: Language) => void;
     setSoundEnabled: (enabled: boolean) => void;
@@ -27,12 +28,15 @@ interface SettingsState
     setDateFormat: (format: DateFormat) => void;
     setDevTheme: (theme: AppTheme | null) => void;
     toggleDevUnlockAll: () => void;
+    finishOnboarding: () => void;
+    replayOnboarding: () => void;
 }
 
 const SETTINGS_STORAGE_KEY = 'mnm-settings';
 // 1: the old "paper_ink" theme no longer exists
 // 2: the theme comes from the equipped item; the old setting becomes the dev preview
-const SETTINGS_STORAGE_VERSION = 2;
+// 3: onboarding exists; people who already use the app skip it
+const SETTINGS_STORAGE_VERSION = 3;
 
 export const useSettingsStore = create<SettingsState>()(
     persist(
@@ -45,6 +49,7 @@ export const useSettingsStore = create<SettingsState>()(
             date_format: DEFAULT_DATE_FORMAT,
             dev_theme: null,
             is_dev_unlock_all: false,
+            has_seen_onboarding: false,
 
             setLanguage: (language) => set({ language }),
             setSoundEnabled: (enabled) => set({ is_sound_enabled: enabled }),
@@ -54,6 +59,8 @@ export const useSettingsStore = create<SettingsState>()(
             setDateFormat: (format) => set({ date_format: format }),
             setDevTheme: (theme) => set({ dev_theme: theme }),
             toggleDevUnlockAll: () => set((state) => ({ is_dev_unlock_all: !state.is_dev_unlock_all })),
+            finishOnboarding: () => set({ has_seen_onboarding: true }),
+            replayOnboarding: () => set({ has_seen_onboarding: false }),
         }),
         {
             name: SETTINGS_STORAGE_KEY,
@@ -63,13 +70,21 @@ export const useSettingsStore = create<SettingsState>()(
     ),
 );
 
-// Saved settings from older versions: a previewed sketch theme stays as the
-// dev preview, any other old theme value is dropped
-function migrateSettings(persisted: unknown): SettingsState
+// Saved settings from older versions:
+// - before 2: a previewed sketch theme stays as the dev preview, any other old theme value is dropped
+// - before 3: saved settings mean the app is already in use, so onboarding is skipped
+function migrateSettings(persisted: unknown, version: number): SettingsState
 {
     const state = persisted as SettingsState & { theme?: string };
-    state.dev_theme = state.theme === 'sketch' ? 'sketch' : null;
-    delete state.theme;
+    if (version < 2)
+    {
+        state.dev_theme = state.theme === 'sketch' ? 'sketch' : null;
+        delete state.theme;
+    }
+    if (version < 3)
+    {
+        state.has_seen_onboarding = true;
+    }
     return state;
 }
 
