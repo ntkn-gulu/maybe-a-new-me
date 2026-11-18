@@ -344,3 +344,66 @@ function rowSpans(polygon: Point[], y: number): Span[]
     }
     return spans;
 }
+
+export interface MarkerStroke
+{
+    d: string;
+    width: number;
+}
+
+interface MarkerOptions
+{
+    gap?: number;                 // distance between strokes (default 6.5)
+    slant?: number;               // sideways travel per unit of height (default 0.45)
+    bleed?: number;               // how far strokes may run past the box (default 2.5)
+}
+
+// Marker coloring of a width x height box (px), the way a hand colors in a
+// shape quickly: slanted strokes side by side, each its own line so the
+// semi-transparent marker darkens where they overlap. Stroke widths, tilt,
+// bends and both ends vary; ends stop a little short or run past the edge,
+// and the odd gap lets the paper show through.
+export function markerStrokes(width: number, height: number, seed: number, options: MarkerOptions = {}): MarkerStroke[]
+{
+    const random = createRandom(seed);
+    const gap = options.gap ?? 6.5;
+    const slant = options.slant ?? 0.45;
+    const bleed = options.bleed ?? 2.5;
+    const lean = height * slant;
+    const strokes: MarkerStroke[] = [];
+
+    let x = -lean + random() * gap;
+    while (x < width)
+    {
+        const stroke_width = 6 + random() * 4;
+        const cap = stroke_width / 2;             // a round cap reaches this far past the end point
+
+        // Where the visible end lands: mostly a little past the edge, sometimes short of it
+        const edgeY = (edge: number, direction: number): number =>
+            edge + direction * ((random() < 0.65 ? random() * bleed : -random() * bleed) - cap);
+
+        const bottom: Point = [x + (random() - 0.5) * 2, edgeY(height, 1)];
+        const top: Point = [x + lean + (random() - 0.5) * 3, edgeY(0, -1)];
+
+        // Keep the stroke within the box sideways (plus a small, uneven spill)
+        const left_limit = cap * 0.6 - random() * 2;
+        const right_limit = width - cap * 0.6 + random() * 2;
+        const dx = top[0] - bottom[0];
+        const t_start = dx === 0 ? 0 : Math.max(0, (left_limit - bottom[0]) / dx);
+        const t_end = dx === 0 ? 1 : Math.min(1, (right_limit - bottom[0]) / dx);
+        if (t_end > t_start + 0.05)
+        {
+            const pointAt = (t: number): Point => [bottom[0] + dx * t, bottom[1] + (top[1] - bottom[1]) * t];
+            const start = pointAt(t_start);
+            const end = pointAt(t_end);
+            const bend = (random() - 0.5) * 3;
+            const control: Point = [(start[0] + end[0]) / 2 + bend, (start[1] + end[1]) / 2];
+            strokes.push({
+                d: `M${formatNumber(start[0])} ${formatNumber(start[1])}Q${formatNumber(control[0])} ${formatNumber(control[1])} ${formatNumber(end[0])} ${formatNumber(end[1])}`,
+                width: stroke_width,
+            });
+        }
+        x += gap * (0.7 + random() * 0.65);
+    }
+    return strokes;
+}

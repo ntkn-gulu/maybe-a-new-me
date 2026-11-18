@@ -5,7 +5,7 @@ import { triggerHaptic } from '../sound/haptic_hack';
 import { SPRING_PRESS } from './motion_presets';
 import { getPressableProps } from './pressable';
 import { HapticOverlay } from './haptic_overlay';
-import { MarkerFill, type MarkerRows } from './sketch_marks';
+import { MarkerFill } from './sketch_marks';
 import styles from './tactile_button.module.css';
 
 // A physical-feeling 3D button: the face sinks into its base on press,
@@ -28,8 +28,6 @@ interface TactileButtonProps
 
 // Thickness of the button "side" in pixels, per size
 const DEPTH_BY_SIZE: Record<TactileSize, number> = { sm: 5, md: 7, lg: 10 };
-// Sketch theme: marker passes needed to color in an accent face of each height
-const MARKER_ROWS_BY_SIZE: Record<TactileSize, MarkerRows> = { sm: 3, md: 4, lg: 5 };
 
 // How far a selected (latched) button stays sunk, as a share of depth
 const SELECTED_SINK_RATIO = 0.6;
@@ -106,7 +104,7 @@ export function TactileButton(props: TactileButtonProps)
                 animate={{ y: sink }}
                 transition={SPRING_PRESS}
             >
-                {variant === 'accent' && <MarkerFill rows={MARKER_ROWS_BY_SIZE[size]} />}
+                {variant === 'accent' && <MarkerFill />}
                 {props.children}
             </motion.span>
             <HapticOverlay is_disabled={props.is_disabled} />

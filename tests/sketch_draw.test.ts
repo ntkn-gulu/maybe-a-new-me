@@ -5,6 +5,7 @@ import {
     densifyPolygon,
     ellipsePoints,
     hatchLines,
+    markerStrokes,
     samplePath,
     scalePoints,
     sketchOutline,
@@ -139,5 +140,32 @@ describe('densifyPolygon', () =>
         expect(dense[0]).toEqual([0, 0]);
         expect(dense[10]).toEqual([100, 0]);
         expect(dense[20]).toEqual([100, 100]);
+    });
+});
+
+describe('markerStrokes', () =>
+{
+    it('covers the box with slanted strokes that stay near it', () =>
+    {
+        const strokes = markerStrokes(200, 60, 5);
+        expect(strokes.length).toBeGreaterThan(20);
+        for (const stroke of strokes)
+        {
+            expect(stroke.width).toBeGreaterThanOrEqual(6);
+            expect(stroke.width).toBeLessThanOrEqual(10);
+            const numbers = pathNumbers(stroke.d);
+            for (let index = 0; index < numbers.length; index += 2)
+            {
+                expect(numbers[index]).toBeGreaterThan(-6);
+                expect(numbers[index]).toBeLessThan(206);
+                expect(numbers[index + 1]).toBeGreaterThan(-6);
+                expect(numbers[index + 1]).toBeLessThan(66);
+            }
+        }
+    });
+
+    it('is repeatable for the same seed', () =>
+    {
+        expect(markerStrokes(120, 40, 9)).toEqual(markerStrokes(120, 40, 9));
     });
 });

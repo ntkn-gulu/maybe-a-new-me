@@ -148,9 +148,20 @@
     cursor: not-allowed;
 }
 
-/* Sketch theme: ink lettering on the marker-colored accent button */
+/* Sketch theme: ink lettering on the marker-colored accent button, with a
+   paper-colored outline (sharp text shadows all around, no blur) so it
+   stands out from the busy marker strokes */
 :global(:root[data-theme="sketch"]) .accent .face
 {
+    --letter-outline: var(--tile-face);
     color: var(--color-ink);
-    text-shadow: none;
+    text-shadow:
+        2px 0 0 var(--letter-outline),
+        -2px 0 0 var(--letter-outline),
+        0 2px 0 var(--letter-outline),
+        0 -2px 0 var(--letter-outline),
+        1.5px 1.5px 0 var(--letter-outline),
+        -1.5px 1.5px 0 var(--letter-outline),
+        1.5px -1.5px 0 var(--letter-outline),
+        -1.5px -1.5px 0 var(--letter-outline);
 }
