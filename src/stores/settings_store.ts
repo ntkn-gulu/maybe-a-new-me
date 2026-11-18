@@ -41,7 +41,7 @@ const SETTINGS_STORAGE_VERSION = 3;
 export const useSettingsStore = create<SettingsState>()(
     persist(
         (set) => ({
-            language: 'vi',
+            language: 'en',               // new installs start in English (Settings switches to Vietnamese)
             is_sound_enabled: true,
             sfx_volume: 0.8,
             is_haptic_enabled: true,

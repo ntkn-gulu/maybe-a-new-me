@@ -22,8 +22,8 @@ export default defineConfig(({ command }) => ({
             manifest: {
                 name: 'Maybe A New Me',
                 short_name: 'New Me',
-                description: 'Pomodoro, streak lửa và phần thưởng — giữ thói quen mỗi ngày.',
-                lang: 'vi',
+                description: 'Pomodoro, a flame streak and rewards: keep the habit every day.',
+                lang: 'en',
                 display: 'standalone',
                 orientation: 'portrait',
                 start_url: '.',
