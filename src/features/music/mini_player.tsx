@@ -7,7 +7,8 @@ import { playSfx } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
 import { useAmbientStore } from '../../stores/ambient_store';
 import { useSpin } from './use_spin';
-import { useMixName } from './use_mix_name';
+import { useNowPlayingName } from './use_mix_name';
+import { toggleSoundRoom } from '../../stores/music_store';
 import styles from './mini_player.module.css';
 
 // A small "now playing" bar riding on the tab bar while the ambient mix is
@@ -38,7 +39,6 @@ export function MiniPlayer(props: MiniPlayerProps)
     const t = useT();
     const is_open = useAmbientStore((state) => state.is_player_open);
     const is_playing = useAmbientStore((state) => state.is_playing);
-    const togglePlaying = useAmbientStore((state) => state.togglePlaying);
     const dismiss = useAmbientStore((state) => state.dismiss);
 
     // Buttons inside the bar must not also open the Sound room
@@ -52,7 +52,7 @@ export function MiniPlayer(props: MiniPlayerProps)
         };
     }
 
-    const status = useMixName();
+    const status = useNowPlayingName();
 
     return (
         <AnimatePresence>
@@ -89,7 +89,7 @@ export function MiniPlayer(props: MiniPlayerProps)
                             role="button"
                             tabIndex={0}
                             aria-label={is_playing ? t('ambient_pause') : t('ambient_play')}
-                            onClick={onButton(togglePlaying)}
+                            onClick={onButton(toggleSoundRoom)}
                         >
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 {is_playing

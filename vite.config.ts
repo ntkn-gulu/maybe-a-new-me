@@ -20,7 +20,8 @@ export default defineConfig(({ command }) => ({
                 // Precache fonts too, so the app looks right offline
                 globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
                 // Sound files are not precached (MBs nobody may need): each one is
-                // kept the first time it plays, so it works offline from then on
+                // kept the first time it plays (the app fetches it whole), so it
+                // works offline from then on
                 runtimeCaching: [
                     {
                         urlPattern: ({ url }) => url.pathname.includes('/audio/'),

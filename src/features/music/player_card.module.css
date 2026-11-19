@@ -1,0 +1,360 @@
+/* ---- Card ------------------------------------------------------------------- */
+
+.card
+{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 18px 14px;
+    border-radius: var(--radius-lg);
+    background: var(--tile-face);
+    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+}
+
+.head
+{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.art
+{
+    flex-shrink: 0;
+    width: 132px;
+}
+
+.head_text
+{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+/* ---- Title -------------------------------------------------------------------- */
+
+.title_block
+{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+}
+
+.title_slot
+{
+    width: 100%;
+    min-width: 0;
+}
+
+.title
+{
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+}
+
+.subtitle
+{
+    font-size: 14px;
+    color: var(--color-ink-soft);
+}
+
+/* The ambience under the music: a quiet pill */
+.mix_pill
+{
+    --sk-fill: var(--color-bg-deep);
+
+    display: inline-flex;
+    align-self: flex-start;             /* hug its text instead of stretching across */
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    margin-top: 6px;
+    padding: 4px 10px 4px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-deep);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-ink-soft);
+}
+
+.mix_pill svg
+{
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+}
+
+/* ---- Scrolling text --------------------------------------------------------------- */
+
+/* Cut off only at the sides (never the tops or tails of letters) */
+.marquee
+{
+    display: block;
+    min-width: 0;
+    overflow: visible;
+    white-space: nowrap;
+    clip-path: inset(-0.5em 0);
+}
+
+.marquee_on
+{
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 92%, transparent);
+}
+
+.marquee_track
+{
+    display: inline-flex;
+}
+
+.marquee_on .marquee_copy
+{
+    padding-right: 44px;
+}
+
+/* Two copies in a row: once the first has passed, the second sits where it started */
+.marquee_on .marquee_track
+{
+    animation: marquee var(--marquee-seconds) linear infinite;
+}
+
+@keyframes marquee
+{
+    0%, 18% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* ---- Waveform ------------------------------------------------------------------------ */
+
+.progress
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wave_hit
+{
+    cursor: pointer;
+    touch-action: none;                 /* a drag on the waveform seeks instead of scrolling */
+}
+
+.wave
+{
+    display: block;
+    width: 100%;
+    height: 64px;
+}
+
+.wave_bar
+{
+    fill: var(--tile-side);
+    transition: fill 0.2s;
+}
+
+.wave_mirror
+{
+    opacity: 0.45;
+}
+
+.wave_played
+{
+    fill: var(--color-ink);
+}
+
+/* The bar under the playhead glows in the accent and breathes */
+.wave_head
+{
+    fill: var(--color-accent);
+    transform-box: fill-box;
+    transform-origin: center 62%;
+    animation: breathe 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes breathe
+{
+    from { transform: scaleY(0.75); }
+    to { transform: scaleY(1.1); }
+}
+
+.times
+{
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-soft);
+}
+
+/* ---- Controls ------------------------------------------------------------------------ */
+
+.controls
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2px;
+}
+
+.icon_button
+{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--color-ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.icon_button svg
+{
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.fill
+{
+    fill: currentColor;
+    stroke: none;
+}
+
+.icon_on
+{
+    color: var(--color-accent);
+}
+
+/* A small dot under a key that is on (shuffle, the volume drawer) */
+.on_dot
+{
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.icon_disabled
+{
+    opacity: 0.25;
+    cursor: default;
+}
+
+/* The play key: an ink ring around the icon */
+.play_ring
+{
+    --sk-fill: var(--tile-face);
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--tile-face);
+    box-shadow: inset 0 0 0 3.5px var(--color-ink), 0 4px 0 var(--tile-side);
+    color: var(--color-ink);
+    cursor: pointer;
+}
+
+.play_ring svg
+{
+    width: 28px;
+    height: 28px;
+}
+
+/* ---- Volume drawer ------------------------------------------------------------------ */
+
+.drawer
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.volume_row
+{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 6px 4px;
+}
+
+.volume_row svg
+{
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--color-ink-soft);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.volume_row input
+{
+    flex: 1;
+}
+
+/* ---- Sketch theme ----------------------------------------------------------------------- */
+
+:global(:root[data-theme="sketch"]) .title
+{
+    font-size: 25px;
+    letter-spacing: 0;
+}
+
+:global(:root[data-theme="sketch"]) .subtitle
+{
+    font-size: 17px;
+}
+
+:global(:root[data-theme="sketch"]) .mix_pill
+{
+    font-size: 15px;
+}
+
+:global(:root[data-theme="sketch"]) .times
+{
+    font-size: 15px;
+}
+
+:global(:root[data-theme="sketch"]) .play_ring
+{
+    box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+    .wave_head,
+    .marquee_on .marquee_track
+    {
+        animation: none;
+    }
+}

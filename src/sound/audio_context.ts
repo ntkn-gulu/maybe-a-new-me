@@ -19,7 +19,7 @@ let master_gain: GainNode | null = null;
 let noise_buffer: AudioBuffer | null = null;
 let current_volume = 0.8;
 let needs_rebuild = false;     // set when resume() failed: next tap builds a fresh context
-let is_background_playback = false;   // music/podcast playing: keep audio alive in the background
+const background_players = new Set<string>();   // who is playing (ambient, music): keep audio alive in the background
 const context_listeners = new Set<() => void>();
 
 // Safari 17+ exposes navigator.audioSession.
@@ -144,16 +144,24 @@ export function isAudioStale(): boolean
     return needs_rebuild;
 }
 
-// Ambient sound, music or a podcast calls this while it plays, so leaving the
-// app keeps the audio session alive instead of releasing it.
-export function setBackgroundPlaybackActive(active: boolean): void
+// Ambient sound and music each call this while they play (`player` names
+// them), so leaving the app keeps the audio session alive instead of
+// releasing it. It is released only once no player is left.
+export function setBackgroundPlaybackActive(player: string, active: boolean): void
 {
-    is_background_playback = active;
+    if (active)
+    {
+        background_players.add(player);
+    }
+    else
+    {
+        background_players.delete(player);
+    }
 }
 
 export function isBackgroundPlaybackActive(): boolean
 {
-    return is_background_playback;
+    return background_players.size > 0;
 }
 
 // Leaving the app with nothing playing: close the context and hand the audio
@@ -161,7 +169,7 @@ export function isBackgroundPlaybackActive(): boolean
 // playing audio (the Dynamic Island / Control Center player) even when silent.
 function releaseAudio(): void
 {
-    if (is_background_playback)
+    if (isBackgroundPlaybackActive())
     {
         return;
     }

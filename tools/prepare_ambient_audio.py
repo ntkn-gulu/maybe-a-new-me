@@ -8,7 +8,7 @@ cuts the steadiest part of each (picked from its loudness over time),
 matches loudness across files and writes public/audio/ambient/<layer>.m4a
 (AAC, 32 kHz stereo). The cut keeps LOOP_SEAM_SECONDS extra at the end:
 the app crossfades that tail into the start, so the loop point is seamless.
-Also writes public/audio/credits.json for the Credits screen.
+Also updates the "ambient" part of public/audio/credits.json for the Credits screen.
 """
 import json
 import re
@@ -90,7 +90,9 @@ def main():
             'license': LICENSE,
             'url': f'https://bigsoundbank.com/sound-{source_id}-x.html',
         })
-    CREDITS_FILE.write_text(json.dumps({'ambient': credits}, indent=2) + '\n', encoding='utf-8')
+    existing = json.loads(CREDITS_FILE.read_text(encoding='utf-8')) if CREDITS_FILE.exists() else {}
+    existing['ambient'] = credits
+    CREDITS_FILE.write_text(json.dumps(existing, indent=2) + '\n', encoding='utf-8')
 
 
 if __name__ == '__main__':

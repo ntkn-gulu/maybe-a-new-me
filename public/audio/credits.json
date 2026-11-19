@@ -56,5 +56,87 @@
       "license": "CC0 1.0",
       "url": "https://bigsoundbank.com/sound-2561-x.html"
     }
+  ],
+  "music": [
+    {
+      "channel": "lofi",
+      "track": "winter_blues",
+      "title": "Winter Blues",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/winter-lofi/winter-blues/"
+    },
+    {
+      "channel": "lofi",
+      "track": "first_snow",
+      "title": "First Snow",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/winter-lofi/first-snowmp3/"
+    },
+    {
+      "channel": "lofi",
+      "track": "fire_place",
+      "title": "Fire Place",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/winter-lofi/fire-place/"
+    },
+    {
+      "channel": "lofi",
+      "track": "kids",
+      "title": "Kids",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/kids/"
+    },
+    {
+      "channel": "lofi",
+      "track": "spring_at_last",
+      "title": "Spring At Last",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/spring-at-last/"
+    },
+    {
+      "channel": "lofi",
+      "track": "sense_of_purpose",
+      "title": "Sense Of Purpose",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/sense-of-purpose/"
+    },
+    {
+      "channel": "lofi",
+      "track": "april_showers",
+      "title": "April Showers",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/april-showers/"
+    },
+    {
+      "channel": "lofi",
+      "track": "dreams",
+      "title": "Dreams",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/only-in-the-milky-way-part-1/dreams-3/"
+    },
+    {
+      "channel": "lofi",
+      "track": "angels_we_have_heard_on_high",
+      "title": "Angels We Have Heard On High (Lo-Fi)",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/a-lo-fi-christmas-special/angels-we-have-heard-on-high-lo-fi/"
+    },
+    {
+      "channel": "lofi",
+      "track": "kodama",
+      "title": "Kodama",
+      "author": "HoliznaCC0",
+      "license": "CC0 1.0",
+      "url": "https://freemusicarchive.org/music/holiznacc0/nature-spirit/kodama/"
+    }
   ]
 }

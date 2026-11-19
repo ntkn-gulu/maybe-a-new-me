@@ -31,6 +31,8 @@ interface AmbientState
     setLayerLevel: (layer: AmbientLayerId, level: number) => void;
     applyPreset: (preset: AmbientPreset) => void;
     togglePlaying: () => void;
+    play: () => void;               // from a tap (the caller unlocks audio)
+    pause: () => void;
     dismiss: () => void;
     setVolume: (volume: number) => void;
 }
@@ -77,6 +79,8 @@ export const useAmbientStore = create<AmbientState>()(
                 const mix = get().mix.active.length > 0 ? get().mix : applyPreset(get().mix, STARTER_PRESET);
                 set({ mix, is_playing: true, is_player_open: true });
             },
+            play: () => set({ is_playing: true, is_player_open: true }),
+            pause: () => set({ is_playing: false }),
             // Close the mini player: stops the sound too
             dismiss: () => set({ is_playing: false, is_player_open: false }),
             setVolume: (volume) => set({ volume: Math.min(1, Math.max(0, volume)) }),

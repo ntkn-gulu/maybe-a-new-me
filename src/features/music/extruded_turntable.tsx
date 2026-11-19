@@ -2,7 +2,7 @@ import { motion, type MotionValue } from 'motion/react';
 import styles from './record_deck.module.css';
 
 // The 3D theme's record player, seen from above: an extruded plinth, a
-// black record with grooves and an accent label, and a tonearm that swings
+// black record with grooves and a label in the channel's color, and a tonearm that swings
 // onto the record when playing starts. The record turns (rotation from
 // useSpin); the light on the vinyl stays put, which is what makes it look
 // like it spins. Flat shapes only, no filters or gradients.
@@ -12,6 +12,7 @@ interface ExtrudedTurntableProps
     rotate: MotionValue<number>;
     is_arm_down: boolean;
     is_powered: boolean;
+    label_color: string;
 }
 
 const RECORD_CENTER = { x: 100, y: 94 };
@@ -45,8 +46,8 @@ export function ExtrudedTurntable(props: ExtrudedTurntableProps)
                 {GROOVE_RADII.map((radius) => (
                     <circle key={radius} cx={RECORD_CENTER.x} cy={RECORD_CENTER.y} r={radius} fill="none" stroke="#2a2a2a" strokeWidth="1.3" />
                 ))}
-                <circle cx={RECORD_CENTER.x} cy={RECORD_CENTER.y} r="25" fill="var(--color-accent)" />
-                <circle cx={RECORD_CENTER.x} cy={RECORD_CENTER.y} r="25" fill="none" stroke="var(--color-accent-side)" strokeWidth="2" />
+                <circle className={styles.label} cx={RECORD_CENTER.x} cy={RECORD_CENTER.y} r="25" fill={props.label_color} />
+                <circle cx={RECORD_CENTER.x} cy={RECORD_CENTER.y} r="25" fill="none" stroke="rgba(0, 0, 0, 0.18)" strokeWidth="2" />
                 <path d={`M${RECORD_CENTER.x - 15} ${RECORD_CENTER.y - 9} h30`} stroke="#ffffff" strokeWidth="3" strokeLinecap="round" opacity="0.85" />
                 <path d={`M${RECORD_CENTER.x - 9} ${RECORD_CENTER.y + 10} h18`} stroke="#ffffff" strokeWidth="2.4" strokeLinecap="round" opacity="0.55" />
             </motion.g>

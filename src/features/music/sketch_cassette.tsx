@@ -20,6 +20,7 @@ interface SketchCassetteProps
 {
     rotate: MotionValue<number>;
     is_powered: boolean;
+    label_color: string;
 }
 
 const MARKER_SLIP: Point = [3, 3];
@@ -89,7 +90,7 @@ export function SketchCassette(props: SketchCassetteProps)
     return (
         <svg className={styles.art} viewBox="0 0 240 196" aria-hidden="true">
             <path d={BODY_FILL} fill="#3a3530" />
-            <path d={LABEL_FILL} fill="var(--color-accent)" opacity="0.85" />
+            <path className={styles.label} d={LABEL_FILL} fill={props.label_color} opacity="0.85" />
             <path d={`M${WINDOW.map((point) => point.join(' ')).join(' L')} Z`} fill="#f6f1e7" />
             {TAPE_FILLS.map((d) => <path key={d} d={d} fill="#5b4a3a" />)}
             <g fill="none" stroke={SKETCH_INK} strokeLinecap="round" strokeLinejoin="round">

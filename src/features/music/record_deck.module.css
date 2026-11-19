@@ -30,3 +30,9 @@
 {
     transform: rotate(26deg);
 }
+
+/* The label changes color with the music channel */
+.label
+{
+    transition: fill 0.4s;
+}

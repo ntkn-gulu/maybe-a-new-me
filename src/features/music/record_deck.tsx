@@ -20,6 +20,7 @@ import styles from './record_deck.module.css';
 interface RecordDeckProps
 {
     is_playing: boolean;
+    label_color: string;            // the record label / cassette label: the music channel's color
     aria_label: string;
     onToggle: () => void;
 }
@@ -78,8 +79,8 @@ export function RecordDeck(props: RecordDeckProps)
             transition={SPRING_PRESS}
         >
             {is_sketch
-                ? <SketchCassette rotate={rotate} is_powered={props.is_playing} />
-                : <ExtrudedTurntable rotate={rotate} is_arm_down={props.is_playing} is_powered={props.is_playing} />}
+                ? <SketchCassette rotate={rotate} is_powered={props.is_playing} label_color={props.label_color} />
+                : <ExtrudedTurntable rotate={rotate} is_arm_down={props.is_playing} is_powered={props.is_playing} label_color={props.label_color} />}
         </motion.div>
     );
 }

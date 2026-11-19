@@ -118,10 +118,10 @@ function reconcile(): void
     }
     if (wanted_layers.length === 0)
     {
-        setBackgroundPlaybackActive(false);
+        setBackgroundPlaybackActive('ambient', false);
         return;
     }
-    setBackgroundPlaybackActive(true);
+    setBackgroundPlaybackActive('ambient', true);
     const context = getContext();
     glide(getBus(context).gain, toGain(target.volume), LEVEL_GLIDE_SECONDS);
     for (const layer of wanted_layers)
