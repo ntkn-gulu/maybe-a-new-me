@@ -3,6 +3,7 @@
 // The Vietnamese table defines the keys; English must provide the same keys.
 
 import type { ChestType, ItemSlot } from '../core/types';
+import type { AmbientLayerId, AmbientPresetId } from '../core/ambient_mix';
 
 export type Language = 'vi' | 'en';
 
@@ -366,6 +367,39 @@ const VI = {
     item_flame_tier_6: 'Màu Bạch Hỏa',
     item_flame_tier_7: 'Màu Thất Sắc Hỏa',
     item_flame_tier_8: 'Màu Thiên Hà Hỏa',
+
+    // Sound room (Focus tab sub-page): ambient mixer
+    sound_room_tab: 'Âm thanh',
+    sound_room_kicker: 'Phòng âm thanh',
+    sound_room_title: 'Chọn không khí',
+    ambient_play: 'Phát',
+    ambient_pause: 'Tạm dừng',
+    ambient_nothing: 'Chưa chọn âm nào',
+    ambient_paused: 'Đang tạm dừng',
+    ambient_volume: 'Âm lượng',
+    ambient_presets: 'Mix có sẵn',
+    ambient_mixer: 'Trộn âm',
+    ambient_mixer_hint: 'Chạm để bật · kéo ngang để chỉnh to nhỏ',
+    ambient_full: 'Tối đa {n} âm cùng lúc, tắt bớt một âm nhé',
+    ambient_from_chests: 'Từ rương',
+    ambient_level: '{name}: {n}%',
+    ambient_rain: 'Mưa',
+    ambient_wind: 'Gió',
+    ambient_waves: 'Sóng biển',
+    ambient_campfire: 'Lửa trại',
+    ambient_brown_noise: 'Brown noise',
+    ambient_night_field: 'Đồng đêm',
+    ambient_creek: 'Suối',
+    ambient_countryside: 'Đồng quê',
+    ambient_cafe: 'Quán cafe',
+    ambient_thunderstorm: 'Giông bão',
+    ambient_night_train: 'Tàu đêm',
+    preset_rainy_window: 'Mưa bên cửa sổ',
+    preset_campfire_night: 'Đêm lửa trại',
+    preset_seaside: 'Bờ biển',
+    preset_deep_focus: 'Tập trung sâu',
+    preset_storm_shelter: 'Trú bão',
+    preset_night_express: 'Chuyến tàu đêm',
 };
 
 export type StringKey = keyof typeof VI;
@@ -722,6 +756,37 @@ const EN: Record<StringKey, string> = {
     item_flame_tier_6: 'White Flame color',
     item_flame_tier_7: 'Prism Flame color',
     item_flame_tier_8: 'Galaxy Flame color',
+    sound_room_tab: 'Sounds',
+    sound_room_kicker: 'Sound room',
+    sound_room_title: 'Set the mood',
+    ambient_play: 'Play',
+    ambient_pause: 'Pause',
+    ambient_nothing: 'Nothing picked yet',
+    ambient_paused: 'Paused',
+    ambient_volume: 'Volume',
+    ambient_presets: 'Ready-made mixes',
+    ambient_mixer: 'Mixer',
+    ambient_mixer_hint: 'Tap to turn on · drag sideways for volume',
+    ambient_full: 'Up to {n} sounds at once, turn one off first',
+    ambient_from_chests: 'From chests',
+    ambient_level: '{name}: {n}%',
+    ambient_rain: 'Rain',
+    ambient_wind: 'Wind',
+    ambient_waves: 'Waves',
+    ambient_campfire: 'Campfire',
+    ambient_brown_noise: 'Brown noise',
+    ambient_night_field: 'Night field',
+    ambient_creek: 'Creek',
+    ambient_countryside: 'Countryside',
+    ambient_cafe: 'Café',
+    ambient_thunderstorm: 'Thunderstorm',
+    ambient_night_train: 'Night train',
+    preset_rainy_window: 'Rainy window',
+    preset_campfire_night: 'Campfire night',
+    preset_seaside: 'Seaside',
+    preset_deep_focus: 'Deep focus',
+    preset_storm_shelter: 'Storm shelter',
+    preset_night_express: 'Night express',
 };
 
 export const STRINGS: Record<Language, Record<StringKey, string>> = { vi: VI, en: EN };
@@ -781,4 +846,14 @@ export function weekdayKey(weekday: number): StringKey
 export function sportActivityKey(activity: string): StringKey
 {
     return `sport_${activity}` as StringKey;
+}
+
+export function ambientLayerKey(layer: AmbientLayerId): StringKey
+{
+    return `ambient_${layer}` as StringKey;
+}
+
+export function ambientPresetKey(preset: AmbientPresetId): StringKey
+{
+    return `preset_${preset}` as StringKey;
 }

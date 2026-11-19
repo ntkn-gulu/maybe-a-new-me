@@ -1,0 +1,88 @@
+/* A mixer tile: an extruded key that turns ink-dark while its sound plays */
+.tile
+{
+    --sk-radius: 12px 15px 10px 14px / 14px 10px 15px 12px;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    height: 104px;
+    padding: 10px 6px 16px;
+    border-radius: var(--radius-md);
+    background: var(--tile-face);
+    box-shadow: 0 5px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+    color: var(--color-ink-soft);
+    text-align: center;
+    cursor: pointer;
+    touch-action: pan-y;                /* vertical swipes scroll the page, sideways ones set the volume */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.active
+{
+    --sk-fill: color-mix(in srgb, var(--color-accent) 22%, var(--tile-face));
+    background: var(--btn-ink-face);
+    box-shadow: 0 5px 0 var(--btn-ink-side), var(--shadow-soft);
+    color: var(--btn-ink-text);
+}
+
+:global(:root[data-theme="sketch"]) .active
+{
+    color: var(--color-ink);
+}
+
+.name
+{
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Soundscapes from chests carry a tiny chest in the corner */
+.chest_mark
+{
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    display: flex;
+    color: var(--color-ink-faint);
+}
+
+.active .chest_mark
+{
+    color: inherit;
+    opacity: 0.6;
+}
+
+/* Volume: a thin bar along the bottom edge, filled from the left */
+.level_track
+{
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 10px;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, currentColor 18%, transparent);
+    overflow: hidden;
+}
+
+.level_fill
+{
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--color-accent);
+    transform-origin: left center;
+}

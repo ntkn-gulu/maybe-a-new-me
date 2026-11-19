@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { STRINGS, monthNameKey, sportActivityKey, tierNameKey, tierWordsKey, translate, weekdayKey } from '../src/i18n/strings';
+import { STRINGS, ambientLayerKey, ambientPresetKey, monthNameKey, sportActivityKey, tierNameKey, tierWordsKey, translate, weekdayKey } from '../src/i18n/strings';
 import { SPORT_ACTIVITIES } from '../src/core/sport_rules';
 import { FLAME_TIERS } from '../src/core/flame_tiers';
+import { AMBIENT_LAYERS, AMBIENT_PRESETS } from '../src/core/ambient_mix';
 
 describe('i18n strings', () =>
 {
@@ -19,6 +20,15 @@ describe('i18n strings', () =>
                 expect(STRINGS[language][tierNameKey(tier.index)]).toBeTruthy();
                 expect(STRINGS[language][tierWordsKey(tier.index)]).toBeTruthy();
             }
+        }
+    });
+
+    it('every ambient layer and preset has a name', () =>
+    {
+        for (const language of ['vi', 'en'] as const)
+        {
+            AMBIENT_LAYERS.forEach((layer) => expect(STRINGS[language][ambientLayerKey(layer)]).toBeTruthy());
+            AMBIENT_PRESETS.forEach((preset) => expect(STRINGS[language][ambientPresetKey(preset.id)]).toBeTruthy());
         }
     });
 

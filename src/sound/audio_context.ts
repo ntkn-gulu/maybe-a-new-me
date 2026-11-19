@@ -20,6 +20,7 @@ let noise_buffer: AudioBuffer | null = null;
 let current_volume = 0.8;
 let needs_rebuild = false;     // set when resume() failed: next tap builds a fresh context
 let is_background_playback = false;   // music/podcast playing: keep audio alive in the background
+const context_listeners = new Set<() => void>();
 
 // Safari 17+ exposes navigator.audioSession.
 // "playback" lets sounds play even when the iPhone silent switch is on (needed
@@ -76,6 +77,20 @@ function rebuildContext(): void
     noise_buffer = null;
     needs_rebuild = false;
     getContext();
+    notifyContextChanged();
+}
+
+// Long-running sound (ambient layers) lives on one context: it is told when
+// that context is replaced or released so it can rebuild itself
+export function onContextChanged(listener: () => void): () => void
+{
+    context_listeners.add(listener);
+    return () => context_listeners.delete(listener);
+}
+
+function notifyContextChanged(): void
+{
+    context_listeners.forEach((listener) => listener());
 }
 
 // Ask a non-running context to start again. iOS Safari also has an
@@ -129,7 +144,7 @@ export function isAudioStale(): boolean
     return needs_rebuild;
 }
 
-// Music or a podcast (later phases) calls this while it plays, so leaving the
+// Ambient sound, music or a podcast calls this while it plays, so leaving the
 // app keeps the audio session alive instead of releasing it.
 export function setBackgroundPlaybackActive(active: boolean): void
 {
@@ -159,6 +174,7 @@ function releaseAudio(): void
     noise_buffer = null;
     needs_rebuild = true;           // the next tap builds a fresh context
     setAudioSessionType('auto');
+    notifyContextChanged();
 }
 
 // Coming back: the context was released (next tap rebuilds it), or it was kept

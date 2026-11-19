@@ -13,3 +13,6 @@ maybe_a_new_me_playbook.md
 
 # Local-only: design reference images
 sketch_img/
+
+# Local-only: downloaded audio before processing (tools/prepare_ambient_audio.py)
+audio_source/

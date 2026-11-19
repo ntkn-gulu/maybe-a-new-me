@@ -103,6 +103,8 @@ const PALETTE = sketchOutline(samplePath(
     + 'C13.6 17.2 12.7 16.8 12.8 15.6 C12.9 14.7 13.6 14.2 14.6 14.2 L17.2 14.2 C19.2 14.1 20.6 12.6 20.5 10.5 '
     + 'C20.3 6.6 16.6 3.4 12 3.5 Z', 5), 0.3, 17, 2);
 const BADGE_RING = sketchOutline(ellipsePoints(12, 9, 5.4, 5.4, 12), 0.3, 19, 2.5);
+const EAR_CUP_LEFT = sketchOutline(samplePath('M3.2 14.2 L7.4 14 L7.6 20.8 L3.4 21 Z', 3), 0.25, 21, 1.5);
+const EAR_CUP_RIGHT = sketchOutline(samplePath('M16.6 14.1 L20.8 14.3 L20.6 21 L16.4 20.8 Z', 3), 0.25, 23, 1.5);
 
 export function SketchSoundIcon(props: IconProps)
 {
@@ -133,6 +135,18 @@ export function SketchBadgeIcon(props: IconProps)
             <path d="M8.7 13.5 L7.1 20.9 L12.1 18.3 L16.9 21.1 L15.3 13.7" />
             <path d={BADGE_RING} />
             <path d="M10.6 8.2 L13.4 9.9 M10.8 10 L13.2 8.1" strokeWidth={1.5} />
+        </Doodle>
+    );
+}
+
+export function SketchHeadphonesIcon(props: IconProps)
+{
+    return (
+        <Doodle size={props.size}>
+            <path d="M4.2 15.4 L4.1 12.2 C4.3 7.2 7.8 4 12.1 4.1 C16.4 4.2 19.8 7.4 19.8 12.1 L19.9 15.6" />
+            <path d={EAR_CUP_LEFT} />
+            <path d={EAR_CUP_RIGHT} />
+            <path d="M4.4 16.4 L6.5 15.8 M4.5 18.6 L6.6 17.6 M17.4 16 L19.6 16.6 M17.5 18 L19.7 18.9" strokeWidth={1.2} />
         </Doodle>
     );
 }

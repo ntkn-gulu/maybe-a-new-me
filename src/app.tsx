@@ -5,6 +5,7 @@ import { FocusScreen } from './features/focus/focus_screen';
 import { StreakScreen } from './features/streak/streak_screen';
 import { ChestScreen } from './features/rewards/chest_screen';
 import { CollectionScreen } from './features/rewards/collection_screen';
+import { SoundRoomScreen } from './features/music/sound_room_screen';
 import { SettingsScreen } from './features/settings/settings_screen';
 import { FocusSessionLayer } from './features/focus/focus_session_layer';
 import { LevelUpGate } from './features/streak/level_up_gate';
@@ -17,7 +18,7 @@ import styles from './app.module.css';
 
 // App shell: one active screen + the bottom tab bar.
 // No router on purpose: 4 fixed tabs only need a piece of state.
-// A tab can have sub-pages (Rewards -> Collection), picked from the page
+// A tab can have sub-pages (Rewards -> Collection, Focus -> Sound room), picked from the page
 // stack the tab bar pops up when the active tab is tapped again. A sub-page
 // slides up as a sheet over the tab's screen; going back to the tab's own
 // page or switching tabs slides it away.
@@ -49,6 +50,8 @@ function renderSubPage(sub_page: SubPageId)
     {
         case 'collection':
             return <CollectionScreen />;
+        case 'sound_room':
+            return <SoundRoomScreen />;
     }
 }
 

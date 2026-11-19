@@ -2,6 +2,7 @@ import { createBackup, getBackupFileName, readBackup, type BackupReadResult } fr
 import { PROGRESS_STORAGE_KEY } from './progress_store';
 import { INVENTORY_STORAGE_KEY } from './inventory_store';
 import { SETTINGS_STORAGE_KEY } from './settings_store';
+import { AMBIENT_STORAGE_KEY } from './ambient_store';
 import { detectDevice, getTodayKey } from './clock';
 
 // Browser side of the backup file (core/backup.ts builds and checks it).
@@ -12,7 +13,7 @@ import { detectDevice, getTodayKey } from './clock';
 // The running focus session (mnm-focus) is never part of a backup: it only
 // matters for the next minutes and must not come back on another day.
 
-const BACKUP_KEYS = [PROGRESS_STORAGE_KEY, INVENTORY_STORAGE_KEY, SETTINGS_STORAGE_KEY];
+const BACKUP_KEYS = [PROGRESS_STORAGE_KEY, INVENTORY_STORAGE_KEY, SETTINGS_STORAGE_KEY, AMBIENT_STORAGE_KEY];
 const REQUIRED_KEYS = [PROGRESS_STORAGE_KEY, INVENTORY_STORAGE_KEY];
 const COUNTS_FROM = { session_key: PROGRESS_STORAGE_KEY, item_key: INVENTORY_STORAGE_KEY };
 const URL_REVOKE_DELAY_MS = 1000;

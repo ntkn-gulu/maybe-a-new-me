@@ -2,8 +2,8 @@ import { useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { playSfx } from '../sound/sfx_engine';
 import { triggerHaptic } from '../sound/haptic_hack';
-import { BadgeIcon, ChestIcon, FlameIcon, GearIcon, TimerIcon } from './icons';
-import { SketchBadgeIcon, SketchChestIcon, SketchFlameIcon, SketchGearIcon, SketchTimerIcon } from './sketch_icons';
+import { BadgeIcon, ChestIcon, FlameIcon, GearIcon, HeadphonesIcon, TimerIcon } from './icons';
+import { SketchBadgeIcon, SketchChestIcon, SketchFlameIcon, SketchGearIcon, SketchHeadphonesIcon, SketchTimerIcon } from './sketch_icons';
 import { useArtStyle } from '../stores/active_theme';
 import { SPRING_PRESS, SPRING_SLIDE } from './motion_presets';
 import { getPressableProps } from './pressable';
@@ -21,7 +21,7 @@ import styles from './tab_bar.module.css';
 // chevron in the tab's corner hints at the stack.
 
 export type TabId = 'streak' | 'focus' | 'rewards' | 'settings';
-export type SubPageId = 'collection';
+export type SubPageId = 'collection' | 'sound_room';
 
 interface PageButton
 {
@@ -43,7 +43,13 @@ interface TabDefinition extends PageButton
 
 export const TABS: TabDefinition[] = [
     { id: 'streak', label_key: 'tab_journey', icon: <FlameIcon />, sketch_icon: <SketchFlameIcon /> },
-    { id: 'focus', label_key: 'tab_focus', icon: <TimerIcon />, sketch_icon: <SketchTimerIcon /> },
+    {
+        id: 'focus',
+        label_key: 'tab_focus',
+        icon: <TimerIcon />,
+        sketch_icon: <SketchTimerIcon />,
+        sub_pages: [{ id: 'sound_room', label_key: 'sound_room_tab', icon: <HeadphonesIcon />, sketch_icon: <SketchHeadphonesIcon /> }],
+    },
     {
         id: 'rewards',
         label_key: 'tab_rewards',

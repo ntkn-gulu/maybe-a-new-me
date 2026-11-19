@@ -16,8 +16,23 @@ export default defineConfig(({ command }) => ({
         react(),
         VitePWA({
             registerType: 'autoUpdate',
-            // Precache fonts too, so the app looks right offline
-            workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
+            workbox: {
+                // Precache fonts too, so the app looks right offline
+                globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+                // Sound files are not precached (MBs nobody may need): each one is
+                // kept the first time it plays, so it works offline from then on
+                runtimeCaching: [
+                    {
+                        urlPattern: ({ url }) => url.pathname.includes('/audio/'),
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'audio',
+                            expiration: { maxEntries: 60 },
+                            cacheableResponse: { statuses: [0, 200] },
+                        },
+                    },
+                ],
+            },
             includeAssets: ['icons/icon.svg', 'icons/apple-touch-icon.png'],
             manifest: {
                 name: 'Maybe A New Me',

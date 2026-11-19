@@ -91,3 +91,15 @@ export function BadgeIcon(props: IconProps)
         </svg>
     );
 }
+
+export function HeadphonesIcon(props: IconProps)
+{
+    const size = props.size ?? DEFAULT_ICON_SIZE;
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 15.5V12a8 8 0 0 1 16 0v3.5" />
+            <rect x="3" y="14" width="4.5" height="7" rx="1.6" fill="currentColor" />
+            <rect x="16.5" y="14" width="4.5" height="7" rx="1.6" fill="currentColor" />
+        </svg>
+    );
+}
