@@ -14,13 +14,16 @@ import { TactileButton } from '../../ui/tactile_button';
 import { playSfx } from '../../sound/sfx_engine';
 import { prewarmLayer } from '../../sound/ambient_layers';
 import { useT } from '../../i18n/use_t';
-import { ambientLayerKey, ambientPresetKey } from '../../i18n/strings';
+import { ambientPresetKey } from '../../i18n/strings';
 import { useAmbientStore } from '../../stores/ambient_store';
 import { AmbientTile } from './ambient_tile';
+import { RecordDeck } from './record_deck';
+import { useMixName } from './use_mix_name';
 import styles from './sound_room_screen.module.css';
 
-// Sound room, the Focus tab's sub-page: the ambient mix player (play /
-// pause, what plays, volume), ready-made mixes and the mixer grid.
+// Sound room, the Focus tab's sub-page: the player card (the record deck,
+// which is also the big play key, then a small play key, what plays and
+// the volume), ready-made mixes and the mixer grid.
 
 // Get sounds ready ahead, after the page has slid in, one at a time with
 // gaps, so a later tap on a tile does not wait
@@ -53,6 +56,7 @@ export function SoundRoomScreen()
     const togglePlaying = useAmbientStore((state) => state.togglePlaying);
     const setVolume = useAmbientStore((state) => state.setVolume);
     const [is_full_warning, setIsFullWarning] = useState(false);
+    const status = useMixName();
 
     useEffect(() =>
     {
@@ -83,32 +87,34 @@ export function SoundRoomScreen()
         return changed;
     }
 
-    let status = t('ambient_nothing');
-    if (mix.active.length > 0)
-    {
-        status = is_playing ? mix.active.map((layer) => t(ambientLayerKey(layer))).join(' · ') : t('ambient_paused');
-    }
 
     return (
         <Screen kicker={t('sound_room_kicker')} title={t('sound_room_title')}>
-            <div className={`${styles.player} sk-frame`}>
-                <TactileButton size="md" variant="accent" onClick={togglePlaying} aria_label={is_playing ? t('ambient_pause') : t('ambient_play')}>
-                    <PlayGlyph is_playing={is_playing} />
-                </TactileButton>
-                <div className={styles.player_text}>
-                    <span className="mono_label">{is_playing ? t('ambient_pause') : t('ambient_play')}</span>
-                    <span className={styles.status}>{status}</span>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={volume}
-                        className={styles.volume}
-                        aria-label={t('ambient_volume')}
-                        onChange={(event) => setVolume(Number(event.target.value))}
-                        onPointerUp={() => playSfx('tab')}
-                    />
+            <div className={`${styles.player_card} sk-frame`}>
+                <RecordDeck
+                    is_playing={is_playing}
+                    aria_label={is_playing ? t('ambient_pause') : t('ambient_play')}
+                    onToggle={togglePlaying}
+                />
+                <div className={styles.player}>
+                    <TactileButton size="md" variant="accent" onClick={togglePlaying} aria_label={is_playing ? t('ambient_pause') : t('ambient_play')}>
+                        <PlayGlyph is_playing={is_playing} />
+                    </TactileButton>
+                    <div className={styles.player_text}>
+                        <span className="mono_label">{is_playing ? t('ambient_pause') : t('ambient_play')}</span>
+                        <span className={styles.status}>{status}</span>
+                        <input
+                            type="range"
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            value={volume}
+                            className={styles.volume}
+                            aria-label={t('ambient_volume')}
+                            onChange={(event) => setVolume(Number(event.target.value))}
+                            onPointerUp={() => playSfx('tab')}
+                        />
+                    </div>
                 </div>
             </div>
 

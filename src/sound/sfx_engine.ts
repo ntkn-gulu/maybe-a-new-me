@@ -10,7 +10,7 @@ export { isAudioStale, setBackgroundPlaybackActive, unlockAudio } from './audio_
 // The context itself (iOS unlock, background, volume) is audio_context.ts;
 // its tap/volume helpers are re-exported here for the rest of the app.
 
-export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle' | 'crack' | 'rise' | 'burst';
+export type SfxName = 'press' | 'release' | 'tab' | 'toggle' | 'chime' | 'tick' | 'whoosh' | 'sparkle' | 'crack' | 'rise' | 'burst' | 'needle' | 'lift';
 
 let is_enabled = true;
 let current_volume = 0.8;
@@ -155,6 +155,20 @@ const SFX_RECIPES: Record<SfxName, () => void> = {
         {
             playTone({ start_hz: hz, end_hz: hz, duration: 1.4, peak: 0.1, wave: 'triangle', delay: 0.05 + index * 0.025 });
         });
+    },
+    // The stylus lands on a record: a soft low bump and a little dusty crackle
+    needle: () =>
+    {
+        playTone({ start_hz: 90, end_hz: 60, duration: 0.12, peak: 0.3, wave: 'sine' });
+        playNoise({ duration: 0.05, peak: 0.12, filter_hz: 3200, q: 1.5 });
+        playNoise({ duration: 0.03, peak: 0.08, filter_hz: 4500, q: 2, delay: 0.09 });
+        playNoise({ duration: 0.02, peak: 0.06, filter_hz: 3800, q: 2, delay: 0.17 });
+    },
+    // The tonearm lifts off: a short soft click going up
+    lift: () =>
+    {
+        playNoise({ duration: 0.03, peak: 0.1, filter_hz: 2600, q: 2 });
+        playTone({ start_hz: 300, end_hz: 520, duration: 0.08, peak: 0.08, wave: 'triangle' });
     },
     // Soft bell: fundamental + inharmonic partials, long decay
     chime: () =>

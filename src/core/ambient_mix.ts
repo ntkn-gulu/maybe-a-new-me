@@ -167,3 +167,9 @@ export function isPresetApplied(mix: AmbientMix, preset: AmbientPreset): boolean
     }
     return preset_layers.every((layer) => isLayerActive(mix, layer) && getLayerLevel(mix, layer) === preset.layers[layer]);
 }
+
+// The ready-made mix playing exactly as it was picked (none once it was changed)
+export function findAppliedPreset(mix: AmbientMix): AmbientPreset | null
+{
+    return AMBIENT_PRESETS.find((preset) => isPresetApplied(mix, preset)) ?? null;
+}

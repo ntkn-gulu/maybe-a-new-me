@@ -4,6 +4,12 @@
     overflow: hidden;
 }
 
+/* The mini player rides on the tab bar: pages leave room for both */
+.app_with_player
+{
+    --tab-bar-height: 160px;
+}
+
 .main
 {
     height: 100%;

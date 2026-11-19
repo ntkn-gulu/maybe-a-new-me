@@ -18,19 +18,20 @@ import { unlockAudio } from '../sound/audio_context';
 
 // The ambient mixer: the saved mix and volume, and whether it plays now.
 // Playing is never saved: after a restart the mix waits for a tap (iOS
-// only lets audio start from one anyway).
+// only lets audio start from one anyway). Neither is the mini player.
 
 interface AmbientState
 {
     mix: AmbientMix;
     volume: number;                 // 0..1, the whole mix
     is_playing: boolean;
+    is_player_open: boolean;        // played since the app opened and not dismissed: the mini player shows
 
     toggleLayer: (layer: AmbientLayerId) => void;
     setLayerLevel: (layer: AmbientLayerId, level: number) => void;
     applyPreset: (preset: AmbientPreset) => void;
     togglePlaying: () => void;
-    stop: () => void;
+    dismiss: () => void;
     setVolume: (volume: number) => void;
 }
 
@@ -45,6 +46,7 @@ export const useAmbientStore = create<AmbientState>()(
             mix: EMPTY_MIX,
             volume: 0.8,
             is_playing: false,
+            is_player_open: false,
 
             // Turning a layer on also starts playback (a tap on a sound means "let me hear it")
             toggleLayer: (layer) =>
@@ -55,13 +57,14 @@ export const useAmbientStore = create<AmbientState>()(
                 {
                     unlockAudio();
                 }
-                set({ mix, is_playing: get().is_playing || is_turning_on });
+                const is_playing = get().is_playing || is_turning_on;
+                set({ mix, is_playing, is_player_open: get().is_player_open || is_playing });
             },
             setLayerLevel: (layer, level) => set({ mix: setLayerLevel(get().mix, layer, level) }),
             applyPreset: (preset) =>
             {
                 unlockAudio();
-                set({ mix: applyPreset(get().mix, preset), is_playing: true });
+                set({ mix: applyPreset(get().mix, preset), is_playing: true, is_player_open: true });
             },
             togglePlaying: () =>
             {
@@ -72,9 +75,10 @@ export const useAmbientStore = create<AmbientState>()(
                 }
                 unlockAudio();
                 const mix = get().mix.active.length > 0 ? get().mix : applyPreset(get().mix, STARTER_PRESET);
-                set({ mix, is_playing: true });
+                set({ mix, is_playing: true, is_player_open: true });
             },
-            stop: () => set({ is_playing: false }),
+            // Close the mini player: stops the sound too
+            dismiss: () => set({ is_playing: false, is_player_open: false }),
             setVolume: (volume) => set({ volume: Math.min(1, Math.max(0, volume)) }),
         }),
         {

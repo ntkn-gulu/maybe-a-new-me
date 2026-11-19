@@ -7,6 +7,7 @@ import {
     MIN_LAYER_LEVEL,
     AMBIENT_LAYERS,
     applyPreset,
+    findAppliedPreset,
     getActiveLevels,
     getLayerLevel,
     getLevelDetent,
@@ -66,6 +67,14 @@ describe('ambient mix', () =>
         expect(mix.active).not.toContain('creek');
         expect(isPresetApplied(mix, preset)).toBe(true);
         expect(isPresetApplied(setLayerLevel(mix, mix.active[0], 0.11), preset)).toBe(false);
+    });
+
+    it('names the ready-made mix only while it plays exactly as picked', () =>
+    {
+        const preset = AMBIENT_PRESETS[3];
+        const mix = applyPreset(EMPTY_MIX, preset);
+        expect(findAppliedPreset(mix)).toBe(preset);
+        expect(findAppliedPreset(toggleLayer(mix, 'creek'))).toBeNull();
     });
 
     it('every preset fits in the mixer', () =>

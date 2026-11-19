@@ -1,0 +1,32 @@
+.deck
+{
+    width: 100%;
+    max-width: 290px;
+    margin: 0 auto;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.art
+{
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+/* The tonearm turns around its pivot (196, 40 in the drawing). It swings in
+   with a little overshoot, like an arm that is lowered by hand. */
+.arm
+{
+    transform-box: view-box;
+    transform-origin: 196px 40px;
+    transform: rotate(0deg);
+    transition: transform 0.56s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+.arm_down
+{
+    transform: rotate(26deg);
+}

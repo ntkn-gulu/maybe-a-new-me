@@ -6,6 +6,8 @@ import { StreakScreen } from './features/streak/streak_screen';
 import { ChestScreen } from './features/rewards/chest_screen';
 import { CollectionScreen } from './features/rewards/collection_screen';
 import { SoundRoomScreen } from './features/music/sound_room_screen';
+import { MiniPlayer } from './features/music/mini_player';
+import { useAmbientStore } from './stores/ambient_store';
 import { SettingsScreen } from './features/settings/settings_screen';
 import { FocusSessionLayer } from './features/focus/focus_session_layer';
 import { LevelUpGate } from './features/streak/level_up_gate';
@@ -59,6 +61,8 @@ export function App()
 {
     const [active_tab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
     const [sub_page, setSubPage] = useState<SubPageId | null>(null);
+    const is_player_open = useAmbientStore((state) => state.is_player_open);
+    const has_mini_player = is_player_open && sub_page !== 'sound_room';
 
     function changeTab(tab: TabId): void
     {
@@ -66,8 +70,14 @@ export function App()
         setSubPage(null);
     }
 
+    function openSoundRoom(): void
+    {
+        setActiveTab('focus');
+        setSubPage('sound_room');
+    }
+
     return (
-        <div className={styles.app}>
+        <div className={has_mini_player ? `${styles.app} ${styles.app_with_player}` : styles.app}>
             <AnimatePresence mode="wait" initial={false}>
                 <motion.main
                     key={active_tab}
@@ -102,6 +112,7 @@ export function App()
                 sub_page={sub_page}
                 onChange={changeTab}
                 onSelectPage={setSubPage}
+                accessory={has_mini_player ? <MiniPlayer onOpen={openSoundRoom} /> : undefined}
             />
             <FocusSessionLayer />
             <LevelUpGate />

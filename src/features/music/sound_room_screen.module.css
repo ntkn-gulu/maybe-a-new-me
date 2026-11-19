@@ -1,13 +1,20 @@
-/* The mix player: a play key, what plays, and the mix volume */
+/* The player card: the record deck on top, then a play key, what plays and the mix volume */
+.player_card
+{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 18px 16px;
+    border-radius: var(--radius-lg);
+    background: var(--tile-face);
+    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
+}
+
 .player
 {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px 18px;
-    border-radius: var(--radius-lg);
-    background: var(--tile-face);
-    box-shadow: 0 6px 0 var(--tile-side), var(--shadow-soft), inset 0 0 0 1.5px var(--tile-stroke);
 }
 
 .player_text

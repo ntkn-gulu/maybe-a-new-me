@@ -79,6 +79,7 @@ interface TabBarProps
     sub_page: SubPageId | null;               // sub-page shown over the active tab's page
     onChange: (tab: TabId) => void;
     onSelectPage: (sub_page: SubPageId | null) => void;   // null = the tab's own page
+    accessory?: ReactNode;                    // shown just above the bar (the mini player); hidden while the stack is open
 }
 
 export function TabBar(props: TabBarProps)
@@ -159,6 +160,12 @@ export function TabBar(props: TabBarProps)
                     </AnimatePresence>
                 </div>
             </div>
+
+            {props.accessory && (
+                <div className={is_stack_open ? `${styles.accessory} ${styles.accessory_hidden}` : styles.accessory}>
+                    {props.accessory}
+                </div>
+            )}
 
             <nav className={`${styles.bar} sk-frame`}>
                 {TABS.map((tab) =>
