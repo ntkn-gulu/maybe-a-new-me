@@ -8,7 +8,14 @@
 {
     height: 100%;
     overflow-y: auto;
+    overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+}
+
+/* Under an open sub-page: keep the scroll position, take no swipes */
+.main_covered
+{
+    overflow-y: hidden;
 }
 
 /* A tab's sub-page: a full sheet that slides up over the screen, under the tab bar */
@@ -17,11 +24,18 @@
     position: fixed;
     inset: 0;
     z-index: 5;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     background: var(--color-bg);
     box-shadow: 0 -10px 30px rgba(60, 45, 25, 0.16);
-    will-change: transform;
+}
+
+/* The sub-page's own scroll area, never transformed itself */
+.sub_page_scroll
+{
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 :global(:root[data-theme="sketch"]) .sub_page

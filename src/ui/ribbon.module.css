@@ -49,10 +49,16 @@
     --ribbon-side: var(--color-blue-side);
 }
 
+/* Follows the ink button colors, so a dark palette gets a light band with dark text */
 .ink
 {
     --ribbon-face: var(--btn-ink-face);
-    --ribbon-side: #3a3a3a;
+    --ribbon-side: var(--btn-ink-side);
+}
+
+.ink .band
+{
+    color: var(--btn-ink-text);
 }
 
 .flame

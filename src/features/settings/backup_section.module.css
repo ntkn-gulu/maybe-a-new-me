@@ -1,0 +1,41 @@
+/* The real file picker stays hidden; the Restore button opens it */
+.file_input
+{
+    display: none;
+}
+
+.confirm
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+}
+
+.confirm_title
+{
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.confirm_summary
+{
+    margin: 0;
+}
+
+.confirm_warning
+{
+    margin: 4px 0 6px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--color-ink-soft);
+}
+
+.confirm_actions
+{
+    display: flex;
+    gap: 10px;
+}

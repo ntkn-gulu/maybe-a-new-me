@@ -6,9 +6,10 @@ import {
     createInventory,
     equipItem,
     getOwnedSet,
-    openNextChest,
+    getBatchSize,
+    openChestBatch,
     rewardKeptDay,
-    type ChestOpening,
+    type ChestBatch,
     type Inventory,
 } from '../core/inventory';
 import type { ExchangeResult } from '../core/gacha_engine';
@@ -28,12 +29,12 @@ interface InventoryState extends Inventory
 {
     rewardKeptDay: (day_key: DayKey, prev_streak: number, new_streak: number) => void;
     addChests: (chests: ChestType[]) => void;
-    openNextChest: () => ChestOpening | null;
+    openChests: (count: number) => ChestBatch | null;
     buyWithShards: (item_id: string) => ExchangeResult;
     equip: (item_id: string) => void;
 }
 
-const INVENTORY_STORAGE_KEY = 'mnm-inventory';
+export const INVENTORY_STORAGE_KEY = 'mnm-inventory';
 
 // Only the data part of the state (no actions)
 function pickInventory(state: InventoryState): Inventory
@@ -56,14 +57,14 @@ export const useInventoryStore = create<InventoryState>()(
             rewardKeptDay: (day_key, prev_streak, new_streak) =>
                 set(rewardKeptDay(pickInventory(get()), day_key, prev_streak, new_streak)),
             addChests: (chests) => set(addChests(pickInventory(get()), chests)),
-            openNextChest: () =>
+            openChests: (count) =>
             {
-                const opening = openNextChest(pickInventory(get()), Math.random);
-                if (opening)
+                const batch = openChestBatch(pickInventory(get()), count, Math.random);
+                if (batch)
                 {
-                    set(opening.inventory);
+                    set(batch.inventory);
                 }
-                return opening;
+                return batch;
             },
             buyWithShards: (item_id) =>
             {
@@ -91,6 +92,12 @@ export function useOwnedItemIds(): Set<string>
     const owned_item_ids = useInventoryStore((state) => state.owned_item_ids);
     const is_unlock_all = useSettingsStore((state) => state.is_dev_mode && state.is_dev_unlock_all);
     return is_unlock_all ? new Set(ALL_ITEM_IDS) : getOwnedSet({ ...createInventory(), owned_item_ids });
+}
+
+// How many chests "open all" would open now (0 when none wait)
+export function useBatchSize(): number
+{
+    return useInventoryStore((state) => getBatchSize(state));
 }
 
 // The sound engine plays the equipped sound pack (at startup and on every change)

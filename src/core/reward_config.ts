@@ -14,6 +14,9 @@ export const CHEST_RATES: Record<ChestType, Record<Rarity, number>> = {
 // Chests waiting on a fresh install, so there is something to open right away
 export const WELCOME_CHESTS: readonly ChestType[] = ['daily', 'daily', 'daily'];
 
+// Most chests opened in one go by "open all" (a gacha "10-pull")
+export const MAX_CHESTS_PER_BATCH = 10;
+
 // Every 7th kept day in a row also gives a silver chest
 export const SILVER_CHEST_EVERY_DAYS = 7;
 

@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Screen } from '../../ui/screen';
 import { TactileButton } from '../../ui/tactile_button';
 import { ToggleSwitch } from '../../ui/toggle_switch';
@@ -8,17 +7,21 @@ import type { AppTheme } from '../../stores/active_theme';
 import { useInventoryStore } from '../../stores/inventory_store';
 import { MAX_DAILY_GOAL, MIN_DAILY_GOAL, useGoalSetting, useProgressStore, useSportWeekdaySetting } from '../../stores/progress_store';
 import { WeekdayPicker } from '../../ui/weekday_picker';
+import { LanguageSwitch } from '../../ui/language_switch';
 import { getTodayKey } from '../../stores/clock';
 import { playSfx, type SfxName } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
-import type { Language, StringKey } from '../../i18n/strings';
+import type { StringKey } from '../../i18n/strings';
 import type { DateFormat } from '../../i18n/date_format';
+import { SettingRow } from './setting_row';
+import { BackupSection } from './backup_section';
 import styles from './settings_screen.module.css';
 
 // Settings tab: daily goal and sport days (both apply from tomorrow),
 // language, date format, sound + haptic preferences, replaying the intro.
 // Dev mode adds a theme preview (any theme, owned or not), "try every item",
-// the sound tester and a "+10 chests" button. Backup arrives in a later phase.
+// the sound tester and a "+10 chests" button. The data group saves and
+// restores a backup file (BackupSection).
 
 // Theme preview choices; "equipped" means no preview (the equipped theme item shows)
 type ThemePreview = AppTheme | 'equipped';
@@ -34,12 +37,6 @@ const PREVIEW_SOUNDS: { name: SfxName; label_key: StringKey }[] = [
     { name: 'burst', label_key: 'sfx_burst' },
 ];
 
-// Language names are written in their own language, never translated
-const LANGUAGE_OPTIONS: SegmentOption<Language>[] = [
-    { value: 'vi', label: 'VI' },
-    { value: 'en', label: 'EN' },
-];
-
 // Written the same in every language, like the VI / EN labels
 const DATE_FORMAT_OPTIONS: SegmentOption<DateFormat>[] = [
     { value: 'day_first', label: 'DD/MM' },
@@ -48,36 +45,12 @@ const DATE_FORMAT_OPTIONS: SegmentOption<DateFormat>[] = [
 
 const APP_VERSION = '0.1.0';
 
-
-interface SettingRowProps
-{
-    label: string;
-    caption?: string;
-    control: ReactNode;
-    is_stacked?: boolean;         // a wide control goes under the text
-}
-
-function SettingRow(props: SettingRowProps)
-{
-    return (
-        <div className={props.is_stacked ? `${styles.row} ${styles.row_stacked}` : styles.row}>
-            <div className={styles.row_text}>
-                <span className={styles.row_label}>{props.label}</span>
-                {props.caption && <span className={styles.row_caption}>{props.caption}</span>}
-            </div>
-            {props.control}
-        </div>
-    );
-}
-
 export function SettingsScreen()
 {
     const t = useT();
-    const language = useSettingsStore((state) => state.language);
     const is_sound_enabled = useSettingsStore((state) => state.is_sound_enabled);
     const sfx_volume = useSettingsStore((state) => state.sfx_volume);
     const is_haptic_enabled = useSettingsStore((state) => state.is_haptic_enabled);
-    const setLanguage = useSettingsStore((state) => state.setLanguage);
     const setSoundEnabled = useSettingsStore((state) => state.setSoundEnabled);
     const setSfxVolume = useSettingsStore((state) => state.setSfxVolume);
     const setHapticEnabled = useSettingsStore((state) => state.setHapticEnabled);
@@ -165,14 +138,7 @@ export function SettingsScreen()
                 <SettingRow
                     label={t('settings_language')}
                     caption="Tiếng Việt · English"
-                    control={
-                        <SegmentedSwitch
-                            options={LANGUAGE_OPTIONS}
-                            value={language}
-                            onChange={setLanguage}
-                            aria_label={t('settings_language')}
-                        />
-                    }
+                    control={<LanguageSwitch />}
                 />
                 <SettingRow
                     label={t('settings_replay_onboarding')}
@@ -221,6 +187,8 @@ export function SettingsScreen()
                     control={<ToggleSwitch is_on={is_haptic_enabled} onChange={setHapticEnabled} aria_label={t('settings_haptic')} />}
                 />
             </div>
+
+            <BackupSection />
 
             {is_dev_mode && (
                 <>

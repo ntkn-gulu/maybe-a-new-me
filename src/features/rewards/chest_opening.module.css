@@ -91,10 +91,34 @@
 
 .heading
 {
-    height: 40px;
+    position: relative;
+    width: 100%;
+    min-height: 40px;
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* "Skip" while a batch is revealed one by one */
+.skip
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px 0 8px 16px;
+    cursor: pointer;
+}
+
+/* "Open all": the summary takes the stage's place and scrolls if it is long */
+.summary_box
+{
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    margin-top: 12px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 /* The tap target: the whole middle area */
@@ -109,9 +133,41 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.chest_drop
+{
+    position: relative;
+}
+
 .chest_box
 {
     position: relative;
+}
+
+/* Soft light of the best drop's color behind the chest (a static gradient; only opacity and scale move) */
+.aura
+{
+    position: absolute;
+    inset: -70px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--aura) 0%, transparent 62%);
+    pointer-events: none;
+}
+
+/* "Open all": how many chests are inside, pinned to the chest's top corner */
+.count_badge
+{
+    --sk-fill: var(--btn-ink-face);
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--btn-ink-face);
+    color: var(--btn-ink-text);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
 }
 
 .cracks

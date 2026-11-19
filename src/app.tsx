@@ -8,9 +8,11 @@ import { CollectionScreen } from './features/rewards/collection_screen';
 import { SettingsScreen } from './features/settings/settings_screen';
 import { FocusSessionLayer } from './features/focus/focus_session_layer';
 import { LevelUpGate } from './features/streak/level_up_gate';
+import { StreakLostGate } from './features/streak/streak_lost_gate';
 import { RewardGate } from './features/rewards/reward_gate';
 import { OnboardingGate } from './features/onboarding/onboarding_flow';
 import { SPRING_SLIDE } from './ui/motion_presets';
+import { SCROLL_AREA_ATTRIBUTE } from './ui/use_scroll_refresh';
 import styles from './app.module.css';
 
 // App shell: one active screen + the bottom tab bar.
@@ -19,6 +21,9 @@ import styles from './app.module.css';
 // stack the tab bar pops up when the active tab is tapped again. A sub-page
 // slides up as a sheet over the tab's screen; going back to the tab's own
 // page or switching tabs slides it away.
+// iOS scrolling: the sheet that moves is not the one that scrolls (Safari can
+// stop scrolling a box that was animated with a transform), and the screen
+// under a sub-page stops scrolling so only one scroll area takes the finger.
 
 const DEFAULT_TAB: TabId = 'focus';
 
@@ -63,7 +68,8 @@ export function App()
             <AnimatePresence mode="wait" initial={false}>
                 <motion.main
                     key={active_tab}
-                    className={styles.main}
+                    className={sub_page ? `${styles.main} ${styles.main_covered}` : styles.main}
+                    {...{ [SCROLL_AREA_ATTRIBUTE]: '' }}
                     initial={{ opacity: 0, y: 10, scale: 0.99 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -6, scale: 0.99 }}
@@ -82,7 +88,9 @@ export function App()
                         exit={{ y: '100%' }}
                         transition={SPRING_SLIDE}
                     >
-                        {renderSubPage(sub_page)}
+                        <div className={styles.sub_page_scroll} {...{ [SCROLL_AREA_ATTRIBUTE]: '' }}>
+                            {renderSubPage(sub_page)}
+                        </div>
                     </motion.section>
                 )}
             </AnimatePresence>
@@ -94,6 +102,7 @@ export function App()
             />
             <FocusSessionLayer />
             <LevelUpGate />
+            <StreakLostGate />
             <RewardGate />
             <OnboardingGate />
         </div>

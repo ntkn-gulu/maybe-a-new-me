@@ -35,6 +35,14 @@
     min-height: 28px;
 }
 
+/* Language switch (first screen only) and Skip */
+.top_right
+{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
 .dots
 {
     display: flex;

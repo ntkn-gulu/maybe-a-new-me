@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { buildDayRecord, buildDayRecords, type DayRecordInput } from '../core/day_records';
 import { createSchedule, getPendingChange, getValueForDay, scheduleChange, setupValue, type Schedule } from '../core/scheduled_value';
-import { computeStreak, getDayTarget, getSessionsToKeep, isDayKept, type StreakState } from '../core/streak_engine';
+import { computeStreak, getDayTarget, getSessionsToKeep, getStreakBreak, isDayKept, type StreakBreak, type StreakState } from '../core/streak_engine';
 import { canCheckInSport } from '../core/sport_rules';
 import type { DayKey, DayRecord, SessionRecord, SportCheckIn } from '../core/types';
 import { getTodayKey } from './clock';
@@ -11,7 +11,8 @@ import { getTodayKey } from './clock';
 // Long-term history: finished sessions, sport check-ins and the settings
 // schedules (goal, sport weekdays). Streak and daily progress are derived
 // from this with the pure core, never stored. The only extra state is the
-// highest flame tier already celebrated, so each level-up is shown once.
+// highest flame tier already celebrated, so each level-up is shown once, and
+// the last streak break already consoled, so that card is shown once too.
 
 export const DEFAULT_DAILY_GOAL = 2;
 export const MIN_DAILY_GOAL = 1;
@@ -26,6 +27,7 @@ interface ProgressState
     goal_schedule: Schedule<number>;
     sport_weekday_schedule: Schedule<number[]>;
     celebrated_tier_index: number;
+    consoled_break_day: DayKey | null;    // the last streak break the "flame went out" card was shown for
 
     addSession: (record: SessionRecord) => void;
     setDailyGoal: (goal: number, today: DayKey) => void;
@@ -33,9 +35,10 @@ interface ProgressState
     applyStartingSetup: (goal: number, weekdays: number[], today: DayKey) => void;
     checkInSport: (check_in: SportCheckIn) => void;
     setCelebratedTier: (tier_index: number) => void;
+    setConsoledBreak: (break_day: DayKey) => void;
 }
 
-const PROGRESS_STORAGE_KEY = 'mnm-progress';
+export const PROGRESS_STORAGE_KEY = 'mnm-progress';
 
 function createInitialHistory(today: DayKey)
 {
@@ -46,6 +49,7 @@ function createInitialHistory(today: DayKey)
         goal_schedule: createSchedule(DEFAULT_DAILY_GOAL, today),
         sport_weekday_schedule: createSchedule(DEFAULT_SPORT_WEEKDAYS, today),
         celebrated_tier_index: 0,
+        consoled_break_day: null as DayKey | null,
     };
 }
 
@@ -89,10 +93,20 @@ export const useProgressStore = create<ProgressState>()(
             }),
 
             setCelebratedTier: (tier_index) => set({ celebrated_tier_index: tier_index }),
+            setConsoledBreak: (break_day) => set({ consoled_break_day: break_day }),
         }),
         { name: PROGRESS_STORAGE_KEY },
     ),
 );
+
+// The streak counts from the day the app is first opened (a day with nothing
+// done is a miss once it is over). persist only saves on the first change,
+// so save the fresh history now: the first day must not move to a later day
+// if the app is closed before anything happens.
+if (localStorage.getItem(PROGRESS_STORAGE_KEY) === null)
+{
+    useProgressStore.setState({});
+}
 
 function clampGoal(goal: number): number
 {
@@ -180,6 +194,14 @@ export function useStreak(): StreakState
     const records = useDayRecords();
     const today = getTodayKey();
     return useMemo(() => computeStreak(records, today), [records, today]);
+}
+
+// The streak broken right now (yesterday was a miss), or null
+export function useStreakBreak(): StreakBreak | null
+{
+    const records = useDayRecords();
+    const today = getTodayKey();
+    return useMemo(() => getStreakBreak(records, today), [records, today]);
 }
 
 export interface GoalSetting

@@ -13,15 +13,18 @@ import { SketchRarityDoodles, SketchRarityGem, type RarityKey } from './sketch_r
 import { useArtStyle } from '../../stores/active_theme';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
-import { useInventoryStore } from '../../stores/inventory_store';
-import type { ChestOpening } from '../../core/inventory';
+import { useBatchSize, useInventoryStore } from '../../stores/inventory_store';
+import type { ChestBatch } from '../../core/inventory';
+import { TactileButton } from '../../ui/tactile_button';
 import { ChestOpeningOverlay } from './chest_opening';
 import styles from './chest_screen.module.css';
 
 // Rewards tab: the chest and how many are waiting (plus Flame Shards).
 // With chests waiting, a tap opens the oldest one and ChestOpeningOverlay
-// stages it (tap to crack, burst, the item rises out); with none, the
-// chest rattles but stays locked.
+// stages it (tap to crack, burst, the item rises out); with two or more,
+// "Open N at once" opens a batch (up to MAX_CHESTS_PER_BATCH) the same way,
+// then reveals the items one by one. With none, the chest rattles but stays
+// locked.
 // Below, the drop rates per rarity.
 // Higher rarities get louder card effects: epic shimmers, legendary has a
 // rotating gold border, glow, twinkling sparkles and shiny text.
@@ -60,15 +63,16 @@ export function ChestScreen()
     const art_style = useArtStyle();
     const chest_count = useInventoryStore((state) => state.pending_chests.length);
     const shards = useInventoryStore((state) => state.shards);
-    const openNextChest = useInventoryStore((state) => state.openNextChest);
-    const [opening, setOpening] = useState<ChestOpening | null>(null);
+    const openChests = useInventoryStore((state) => state.openChests);
+    const batch_size = useBatchSize();
+    const [batch, setBatch] = useState<ChestBatch | null>(null);
 
     function tapChest(): void
     {
         triggerHaptic();
         if (chest_count > 0)
         {
-            setOpening(openNextChest());
+            setBatch(openChests(1));
             return;
         }
         playSfx('press');
@@ -78,6 +82,12 @@ export function ChestScreen()
             y: [0, -10, 0, -4, 0],
             transition: { duration: 0.45 },
         });
+    }
+
+    // From a TactileButton, which already clicks and buzzes
+    function openBatch(count: number): void
+    {
+        setBatch(openChests(count));
     }
 
     const is_nudging = chest_count === 0 && tap_count >= NUDGE_AFTER_TAPS;
@@ -105,6 +115,11 @@ export function ChestScreen()
             <div className={styles.ribbon_row}>
                 <Ribbon color={chest_count > 0 ? 'flame' : 'ink'}>{t('rewards_waiting', { n: chest_count })}</Ribbon>
             </div>
+            {batch_size > 1 && (
+                <div className={styles.batch_row}>
+                    <TactileButton size="md" variant="ink" onClick={() => openBatch(batch_size)}>{t('chest_open_batch', { n: batch_size })}</TactileButton>
+                </div>
+            )}
             {shards > 0 && <p className={styles.shards}>{t('rewards_shards', { n: shards })}</p>}
 
             <div className={styles.words}>
@@ -140,7 +155,7 @@ export function ChestScreen()
                     </motion.div>
                 ))}
             </div>
-            <ChestOpeningOverlay opening={opening} onOpenNext={() => setOpening(openNextChest())} onClose={() => setOpening(null)} />
+            <ChestOpeningOverlay batch={batch} onOpenMore={openBatch} onClose={() => setBatch(null)} />
         </Screen>
     );
 }

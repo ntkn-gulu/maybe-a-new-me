@@ -138,3 +138,32 @@ export function computeStreak(records: DayRecord[], today: DayKey): StreakState
         day_results,
     };
 }
+
+export interface StreakBreak
+{
+    break_day: DayKey;                // the first missed day (the day the flame went out)
+    lost_streak: number;              // how long the streak was before it
+}
+
+// The streak that is broken right now: yesterday was a miss, and before that
+// run of missed days there was a streak. Null when yesterday was not a miss
+// or there was nothing to lose (e.g. an empty first day).
+export function getStreakBreak(records: DayRecord[], today: DayKey): StreakBreak | null
+{
+    const day_results = computeStreak(records, today).day_results;
+    let break_day = addDays(today, -1);
+    if (day_results[break_day] !== 'missed')
+    {
+        return null;
+    }
+    while (day_results[addDays(break_day, -1)] === 'missed')
+    {
+        break_day = addDays(break_day, -1);
+    }
+    // The streak at the end of the day before the break: with history up to
+    // that day, the break day itself is just a pending "today"
+    const before_break = addDays(break_day, -1);
+    const earlier = records.filter((record) => compareDayKeys(record.day_key, before_break) <= 0);
+    const lost_streak = computeStreak(earlier, break_day).current_streak;
+    return lost_streak > 0 ? { break_day, lost_streak } : null;
+}

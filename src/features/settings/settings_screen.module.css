@@ -57,6 +57,11 @@
     color: var(--color-ink-soft);
 }
 
+.row_caption_alert
+{
+    color: var(--color-pink);
+}
+
 .stepper
 {
     flex-shrink: 0;

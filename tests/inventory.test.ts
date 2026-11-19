@@ -4,12 +4,16 @@ import {
     buyWithShards,
     createInventory,
     equipItem,
+    getBatchSize,
+    getBestRarity,
     getOwnedSet,
+    openChestBatch,
     openNextChest,
+    sortPullsForReveal,
     rewardKeptDay,
     type Inventory,
 } from '../src/core/inventory';
-import { WELCOME_CHESTS, SHARD_COST } from '../src/core/reward_config';
+import { MAX_CHESTS_PER_BATCH, RARITIES, WELCOME_CHESTS, SHARD_COST } from '../src/core/reward_config';
 import { getDefaultItemIds } from '../src/core/reward_catalog';
 import { createSeededRandom } from '../src/core/rng';
 
@@ -94,6 +98,49 @@ describe('openNextChest', () =>
         expect(inventory.pending_chests).toHaveLength(0);
         expect(duplicates).toBeGreaterThan(0);
         expect(legendary).toBeGreaterThan(0);       // pity guarantees one within 50 chests
+    });
+});
+
+describe('openChestBatch', () =>
+{
+    it('matches opening the same chests one by one', () =>
+    {
+        const start = addChests({ ...createInventory(), pending_chests: [] }, Array(8).fill('daily'));
+        const batch = openChestBatch(start, 5, createSeededRandom(7))!;
+
+        const random = createSeededRandom(7);
+        let inventory = start;
+        for (const pull of batch.pulls)
+        {
+            const opening = openNextChest(inventory, random)!;
+            expect(opening.result).toEqual(pull.result);
+            inventory = opening.inventory;
+        }
+        expect(batch.pulls).toHaveLength(5);
+        expect(batch.inventory).toEqual(inventory);
+        expect(batch.inventory.pending_chests).toHaveLength(3);
+    });
+
+    it('stops when the chests run out, and is null with none waiting', () =>
+    {
+        const start = addChests({ ...createInventory(), pending_chests: [] }, ['daily', 'silver']);
+        expect(openChestBatch(start, 10, createSeededRandom(3))!.pulls).toHaveLength(2);
+        expect(openChestBatch({ ...start, pending_chests: [] }, 10, createSeededRandom(3))).toBeNull();
+    });
+
+    it('caps "open all" at the batch size', () =>
+    {
+        const many = addChests({ ...createInventory(), pending_chests: [] }, Array(MAX_CHESTS_PER_BATCH + 4).fill('daily'));
+        expect(getBatchSize(many)).toBe(MAX_CHESTS_PER_BATCH);
+        expect(getBatchSize({ ...many, pending_chests: ['daily', 'daily'] })).toBe(2);
+    });
+
+    it('finds the best rarity and reveals it last', () =>
+    {
+        const batch = openChestBatch(addChests({ ...createInventory(), pending_chests: [] }, Array(10).fill('daily')), 10, createSeededRandom(11))!;
+        const order = sortPullsForReveal(batch.pulls).map((pull) => RARITIES.indexOf(pull.result.rarity));
+        expect(order).toEqual([...order].sort((first, second) => first - second));
+        expect(RARITIES.indexOf(getBestRarity(batch.pulls))).toBe(order[order.length - 1]);
     });
 });
 

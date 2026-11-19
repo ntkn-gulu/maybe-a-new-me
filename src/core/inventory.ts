@@ -1,9 +1,9 @@
 import { EMPTY_PITY, exchangeShards, getChestsForKeptDay, openChest, type ChestOpenResult, type ExchangeResult } from './gacha_engine';
 import { REWARD_CATALOG, getDefaultItemIds, getItem, getMilestoneFlameId } from './reward_catalog';
-import { WELCOME_CHESTS } from './reward_config';
+import { MAX_CHESTS_PER_BATCH, RARITIES, WELCOME_CHESTS } from './reward_config';
 import { getTierForStreak } from './flame_tiers';
 import { compareDayKeys } from './day_key';
-import type { ChestType, DayKey, ItemSlot, PityState, RandomFn } from './types';
+import type { ChestType, DayKey, ItemSlot, PityState, RandomFn, Rarity } from './types';
 
 // The player's things: items won, Flame Shards, pity counters, chests
 // waiting to be opened and what is equipped in each slot. Pure functions
@@ -110,6 +110,58 @@ export function openNextChest(inventory: Inventory, random: RandomFn): ChestOpen
             owned_item_ids: result.is_duplicate ? inventory.owned_item_ids : addOwned(inventory, result.item_id),
         },
     };
+}
+
+// One chest out of a batch: what it was and what came out
+export interface ChestPull
+{
+    chest_type: ChestType;
+    result: ChestOpenResult;
+}
+
+export interface ChestBatch
+{
+    inventory: Inventory;
+    pulls: ChestPull[];               // in the order they were opened
+}
+
+// How many chests "open all" opens right now
+export function getBatchSize(inventory: Inventory): number
+{
+    return Math.min(inventory.pending_chests.length, MAX_CHESTS_PER_BATCH);
+}
+
+// Opens up to `count` waiting chests one after another, exactly as if they
+// were opened one by one: pity carries over, and the second copy of an item
+// won earlier in the same batch is already a duplicate. Null when none wait.
+export function openChestBatch(inventory: Inventory, count: number, random: RandomFn): ChestBatch | null
+{
+    let current = inventory;
+    const pulls: ChestPull[] = [];
+    while (pulls.length < count)
+    {
+        const opening = openNextChest(current, random);
+        if (!opening)
+        {
+            break;
+        }
+        current = opening.inventory;
+        pulls.push({ chest_type: opening.chest_type, result: opening.result });
+    }
+    return pulls.length > 0 ? { inventory: current, pulls } : null;
+}
+
+// The highest rarity in a batch: the chest glows in this color before it opens
+export function getBestRarity(pulls: ChestPull[]): Rarity
+{
+    const best_index = Math.max(...pulls.map((pull) => RARITIES.indexOf(pull.result.rarity)));
+    return RARITIES[Math.max(0, best_index)];
+}
+
+// Reveal order: rarer items last, so the batch builds up to its best drop
+export function sortPullsForReveal(pulls: ChestPull[]): ChestPull[]
+{
+    return [...pulls].sort((first, second) => RARITIES.indexOf(first.result.rarity) - RARITIES.indexOf(second.result.rarity));
 }
 
 // Spends shards on a missing item of the player's choice

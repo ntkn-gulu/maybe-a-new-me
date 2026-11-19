@@ -5,6 +5,7 @@ import { setHapticEnabled } from '../sound/haptic_hack';
 import type { Language } from '../i18n/strings';
 import { DEFAULT_DATE_FORMAT, type DateFormat } from '../i18n/date_format';
 import type { AppTheme } from './active_theme';
+import type { DayKey } from '../core/types';
 
 // User preferences that survive app restarts (saved to localStorage).
 
@@ -19,6 +20,7 @@ interface SettingsState
     dev_theme: AppTheme | null;  // dev mode only: preview a theme without owning it (null = the equipped one)
     is_dev_unlock_all: boolean;  // dev mode only: every item can be equipped, owned or not (nothing is added to the inventory)
     has_seen_onboarding: boolean; // the first-run walkthrough was finished (Settings can replay it)
+    last_backup_day: DayKey | null; // day the last backup file was saved (null = never)
 
     setLanguage: (language: Language) => void;
     setSoundEnabled: (enabled: boolean) => void;
@@ -30,9 +32,10 @@ interface SettingsState
     toggleDevUnlockAll: () => void;
     finishOnboarding: () => void;
     replayOnboarding: () => void;
+    markBackupSaved: (day_key: DayKey) => void;
 }
 
-const SETTINGS_STORAGE_KEY = 'mnm-settings';
+export const SETTINGS_STORAGE_KEY = 'mnm-settings';
 // 1: the old "paper_ink" theme no longer exists
 // 2: the theme comes from the equipped item; the old setting becomes the dev preview
 // 3: onboarding exists; people who already use the app skip it
@@ -50,6 +53,7 @@ export const useSettingsStore = create<SettingsState>()(
             dev_theme: null,
             is_dev_unlock_all: false,
             has_seen_onboarding: false,
+            last_backup_day: null,
 
             setLanguage: (language) => set({ language }),
             setSoundEnabled: (enabled) => set({ is_sound_enabled: enabled }),
@@ -61,6 +65,7 @@ export const useSettingsStore = create<SettingsState>()(
             toggleDevUnlockAll: () => set((state) => ({ is_dev_unlock_all: !state.is_dev_unlock_all })),
             finishOnboarding: () => set({ has_seen_onboarding: true }),
             replayOnboarding: () => set({ has_seen_onboarding: false }),
+            markBackupSaved: (day_key) => set({ last_backup_day: day_key }),
         }),
         {
             name: SETTINGS_STORAGE_KEY,

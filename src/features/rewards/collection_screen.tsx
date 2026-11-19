@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { Screen } from '../../ui/screen';
 import { getPressableProps } from '../../ui/pressable';
 import { HapticOverlay } from '../../ui/haptic_overlay';
+import { useScrollRefresh } from '../../ui/use_scroll_refresh';
 import { SPRING_PRESS, SPRING_SLIDE } from '../../ui/motion_presets';
 import { BadgeIcon, FlameIcon, PaletteIcon, SoundIcon, TimerIcon } from '../../ui/icons';
 import { SketchBadgeIcon, SketchFlameIcon, SketchPaletteIcon, SketchSoundIcon, SketchTimerIcon } from '../../ui/sketch_icons';
@@ -28,6 +29,7 @@ import styles from './collection_screen.module.css';
 // or the streak that grants them. A tap opens ItemSheet (equip / trade).
 // The cards carry no HapticOverlay on purpose: a swipe that starts on an
 // iOS switch moves the switch instead of scrolling the page (and fires a tap).
+// useScrollRefresh re-arms scrolling after the cards of a slot have flown in.
 
 const CARD_PREVIEW_SIZE = 52;
 const CARD_STAGGER_S = 0.025;
@@ -50,6 +52,9 @@ export function CollectionScreen()
     const tier_index = getTierForStreak(useStreak().current_streak).index;
     const [slot, setSlot] = useState<ItemSlot>('flame');
     const [open_item, setOpenItem] = useState<RewardItem | null>(null);
+    const grid_ref = useRef<HTMLDivElement>(null);
+    // New cards fly in on every slot change: make sure iPhone Safari still scrolls afterwards
+    useScrollRefresh(grid_ref, slot);
 
     const items = getSlotItems(slot);
 
@@ -108,7 +113,7 @@ export function CollectionScreen()
             </div>
 
             <span className={`mono_label ${styles.section_label}`}>{t(slotNameKey(slot))}</span>
-            <div className={styles.grid} key={slot}>
+            <div className={styles.grid} key={slot} ref={grid_ref}>
                 {items.map((item, index) =>
                 {
                     const offer = getItemOffer(item, owned, shards);

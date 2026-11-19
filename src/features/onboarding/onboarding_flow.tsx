@@ -5,6 +5,7 @@ import { TactileButton } from '../../ui/tactile_button';
 import { Ribbon } from '../../ui/ribbon';
 import { WeekdayPicker } from '../../ui/weekday_picker';
 import { getPressableProps } from '../../ui/pressable';
+import { LanguageSwitch } from '../../ui/language_switch';
 import { OPACITY_FADE, SPRING_POP, SPRING_SLIDE } from '../../ui/motion_presets';
 import { playSfx } from '../../sound/sfx_engine';
 import { useT } from '../../i18n/use_t';
@@ -23,6 +24,7 @@ import { ExtrudedChestArt } from '../rewards/extruded_chest_art';
 import { SketchChestArt } from '../rewards/sketch_chest_art';
 import { InstallStep } from './install_step';
 import { getInstallPlatform } from './install_platform';
+import { Slide } from './onboarding_slide';
 import styles from './onboarding_flow.module.css';
 
 // First-run walkthrough, full screen above everything:
@@ -229,14 +231,18 @@ function OnboardingFlow()
                             </span>
                         ))}
                     </div>
-                    {is_intro && (
-                        <span
-                            {...getPressableProps(() => goTo(steps.indexOf('goal')))}
-                            className={`mono_label ${styles.skip}`}
-                        >
-                            {t('onboarding_skip')}
-                        </span>
-                    )}
+                    <div className={styles.top_right}>
+                        {/* First screen: switch to Vietnamese before reading on */}
+                        {step_index === 0 && <LanguageSwitch />}
+                        {is_intro && (
+                            <span
+                                {...getPressableProps(() => goTo(steps.indexOf('goal')))}
+                                className={`mono_label ${styles.skip}`}
+                            >
+                                {t('onboarding_skip')}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 <div className={styles.stage}>
@@ -270,29 +276,5 @@ function OnboardingFlow()
                 )}
             </div>
         </motion.div>
-    );
-}
-
-interface SlideProps
-{
-    kicker: string;
-    title: string;
-    body?: string;
-    is_form?: boolean;            // controls go under the text instead of art above it
-    children: ReactNode;
-}
-
-// One step: art on top then kicker, title and text; or for a setup step
-// the text first and its controls below
-function Slide(props: SlideProps)
-{
-    return (
-        <div className={props.is_form ? `${styles.slide} ${styles.form}` : styles.slide}>
-            {!props.is_form && <div className={styles.art}>{props.children}</div>}
-            <span className="mono_label">{props.kicker}</span>
-            <h1 className={styles.title}>{props.title}</h1>
-            {props.body && <p className={styles.body}>{props.body}</p>}
-            {props.is_form && <div className={styles.controls}>{props.children}</div>}
-        </div>
     );
 }

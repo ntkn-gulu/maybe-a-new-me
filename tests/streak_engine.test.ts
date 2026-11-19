@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { addDays } from '../src/core/day_key';
-import { FREEZE_EARN_EVERY_DAYS, SPORT_DAY_MIN_SESSIONS, computeStreak, getFreezeCap, isDayKept } from '../src/core/streak_engine';
+import { FREEZE_EARN_EVERY_DAYS, SPORT_DAY_MIN_SESSIONS, computeStreak, getFreezeCap, getStreakBreak, isDayKept } from '../src/core/streak_engine';
 import type { DayRecord } from '../src/core/types';
 
 const START = '2026-01-01';
@@ -170,5 +170,33 @@ describe('computeStreak', () =>
     {
         const pattern = 'K'.repeat(365);
         expect(computeStreak(history(pattern), todayAfter(pattern)).current_tier_index).toBe(8);
+    });
+});
+
+// Every day of a pattern gets a record (like buildDayRecords): "K" kept, "M" nothing done
+function fullHistory(pattern: string): DayRecord[]
+{
+    return [...pattern].map((symbol, index) => record(addDays(START, index), symbol === 'K' ? 4 : 0));
+}
+
+describe('getStreakBreak', () =>
+{
+    it('finds the streak lost to the miss yesterday', () =>
+    {
+        const pattern = 'KKKM';
+        expect(getStreakBreak(fullHistory(pattern), todayAfter(pattern))).toEqual({ break_day: addDays(START, 3), lost_streak: 3 });
+    });
+
+    it('goes back over several missed days to the day the flame went out', () =>
+    {
+        const pattern = 'KKMMM';
+        expect(getStreakBreak(fullHistory(pattern), todayAfter(pattern))).toEqual({ break_day: addDays(START, 2), lost_streak: 2 });
+    });
+
+    it('is null when yesterday was kept or frozen, or nothing was lost', () =>
+    {
+        expect(getStreakBreak(fullHistory('KKK'), todayAfter('KKK'))).toBeNull();
+        expect(getStreakBreak(fullHistory('KKKKKKKM'), todayAfter('KKKKKKKM'))).toBeNull();   // the freeze saved it
+        expect(getStreakBreak(fullHistory('M'), todayAfter('M'))).toBeNull();                 // empty first day
     });
 });

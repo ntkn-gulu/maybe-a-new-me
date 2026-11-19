@@ -4,6 +4,7 @@ import { Screen } from '../../ui/screen';
 import { Ribbon } from '../../ui/ribbon';
 import { TypewriterText } from '../../ui/typewriter_text';
 import { FLAME_TIERS, getTierProgress, type LevelUp } from '../../core/flame_tiers';
+import { addDays } from '../../core/day_key';
 import { playSfx } from '../../sound/sfx_engine';
 import { useDayRecords, useProgressStore, useStreak, useTodayProgress } from '../../stores/progress_store';
 import { useSettingsStore } from '../../stores/settings_store';
@@ -23,7 +24,8 @@ import styles from './streak_screen.module.css';
 // Journey tab. Top: the equipped title as a name tag, the current flame, its words, progress to the next tier
 // and a strip of every tier that can be tapped. Tiers not reached yet stay a
 // mystery (charcoal "?" flame, hidden name) so the next color is a surprise.
-// Below: sport-day check-in (sport days only), best streak + freezes, and the
+// Below: sport-day check-in (sport days only), a note when a freeze saved
+// yesterday, best streak + freezes, and the
 // month calendar. In dev mode a panel can fake the streak and replay level-ups.
 // The streak comes from real session history (progress_store + core/streak_engine).
 
@@ -155,6 +157,11 @@ export function StreakScreen()
 
             <div className={styles.sections}>
                 {today.is_sport_day && <SportCheckIn today={today} />}
+
+                {/* Yesterday was saved by a freeze: say so once, so the freeze feels earned */}
+                {streak.day_results[addDays(today.today, -1)] === 'frozen' && (
+                    <p className={`${styles.freeze_note} sk-frame sk-flat`}>{t('journey_freeze_saved')}</p>
+                )}
 
                 <StreakStats
                     current_streak={shown_streak}
